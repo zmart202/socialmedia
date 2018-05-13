@@ -5,9 +5,9 @@ import ApplicantList from './ApplicantList';
 class Company extends Component{
     constructor(props){
         super(props);
-        this.state= {
+        this.state = {
             applicants: [
-                {
+            {
                 key: 1,
                 lname: "Martin",
                 fname: "Zachary",
@@ -24,8 +24,9 @@ class Company extends Component{
                 status: true
             }
         ]
+      }
     }
-    }
+
     render() {
         return(
             <div>
