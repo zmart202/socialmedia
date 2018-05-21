@@ -30,19 +30,24 @@ class Company extends Component{
     }
 
     componentDidMount() {
-      const options = {
-          headers: {
-              "Authorization": `Bearer ${localStorage.getItem("token")}`
-          }
-      };
+        if (localStorage.getItem("token") === null) {
+            this.setState({ isLoading: false });
+            return;
+        }
 
-      fetch("http://localhost:4567/company", options)
-      .then(res => {
-          this.setState({ isLoading: false });
-          if (res.status === 200) {
-              this.setState({ isAuth: true });
-          }
-      }).catch(err => console.error(err));
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        };
+
+        fetch("http://localhost:4567/company", options)
+        .then(res => {
+            this.setState({ isLoading: false });
+            if (res.status === 200) {
+                this.setState({ isAuth: true });
+            }
+        }).catch(err => console.error(err));
     }
 
     render() {

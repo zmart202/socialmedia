@@ -23,7 +23,7 @@ class Login extends Component {
         e.preventDefault();
         const options = {
             headers: {
-              "Content-Type": "application/json"
+                "Content-Type": "application/json"
             },
             method: "POST",
             body: JSON.stringify({
