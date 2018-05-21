@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+//import _ from 'lodash';
+
 
 class IndividualApplicant extends Component{
     constructor(props) {
@@ -9,11 +11,28 @@ class IndividualApplicant extends Component{
         }
     }
 
+
+    renderApplicantSection = () => {
+        
+        if (this.state.isEditing) {
+            return (
+                <form onSubmit={this.onSaveClick.bind(this)}>
+                    <td><input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /></td>
+                    <td><input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /></td>
+                    <td><input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /></td>
+                </form>
+            );
+        } else {
+
+        }
+    }
+
+
     renderActionsSection = () => {
         if (this.state.isEditing) {
             return (
                 <td>
-                    <button>SAVE</button>
+                    <button onClick={this.onSaveClick.bind(this)}>SAVE</button>
                     <button onClick={this.onCancelClick.bind(this)}>CANCEL</button>
                 </td>
             );
@@ -21,7 +40,7 @@ class IndividualApplicant extends Component{
         return (
             <td>
                 <button onClick={this.editHandler.bind(this)}>EDIT</button>
-                <button>DELETE</button>
+                <button onClick={this.props.delete}>DELETE</button>
             </td>
         );
     }
@@ -34,15 +53,24 @@ class IndividualApplicant extends Component{
         this.setState({isEditing: false});
     }
 
+    onSaveClick(event) {
+        event.preventDefault();
+        this.props.applicant.lname = this.refs.editLName.value;
+        this.props.applicant.fname = this.refs.editFName.value;
+        this.props.applicant.email = this.refs.editEmail.value;
+        this.setState({isEditing: false});
+    }
+
     render() {
         return(
             <tr style={{fontSize: "11px"}}>
-                <td>{this.props.applicant.lname}</td>
-                <td>{this.props.applicant.fname}</td>
-                <td>{this.props.applicant.email}</td>
+                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /> : this.props.applicant.lname}</td>
+                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /> : this.props.applicant.fname}</td>
+                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
+                {/* {this.renderApplicantSection()} */}
                 <td>{this.props.applicant.password}</td>
-                <td>{this.props.applicant.status}</td>
-                <td>{this.props.applicant.status}</td>
+                <td></td>
+                <td></td>
                 {this.renderActionsSection()}
             </tr>
         );
