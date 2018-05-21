@@ -33,9 +33,12 @@ class Login extends Component {
         };
 
         fetch("http://localhost:4567/login/company", options)
-        .then(res => res.json())
+        .then(res => res.status === 403 ?
+            Promise.reject(new Error("403 access denied")) :
+            res.json())
         .then(data => {
-            console.log(data);
+            localStorage.setItem("token", data.token);
+            this.props.history.push("/company");
         }).catch(err => console.error(err));
     }
 
