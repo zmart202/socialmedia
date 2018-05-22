@@ -10,11 +10,11 @@ const router = express.Router();
 
 router.post("/signup", (req, res) => {
   const db = req.app.locals.db;
-  const Companies = db.collection("companies");
+  const Applicants = db.collection("applicants");
   const { name, email, password } = req.body;
 
   hashPassword(password).then(hash => {
-    Companies.insertOne({
+    Applicants.insertOne({
       name,
       email,
       password: hash
@@ -31,6 +31,11 @@ router.post("/signup", (req, res) => {
         email,
         name
       }, secret, (err, token) => {
+        if (err) {
+          console.error(err);
+          return res.sendStatus(403);
+        }
+
         res.json({ token });
       });
     }).catch(err => console.error(err));
@@ -39,26 +44,31 @@ router.post("/signup", (req, res) => {
 
 router.post("/login", (req, res) => {
   const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const user = req.body;
+  const Applicants = db.collection("applicants");
+  const { email, password } = req.body;
 
-  Companies.findOne({
-    email: user.email,
-  }).then(company => {
-    if (!company) {
+  Applicants.findOne({
+    email
+  }).then(applicant => {
+    if (!applicant) {
       return res.sendStatus(403);
     }
 
-    comparePasswords(user.password, company.password)
+    comparePasswords(password, applicant.password)
     .then(success => {
       if (!success) {
         return res.sendStatus(403);
       }
 
       jwt.sign({
-        email: company.email,
-        name: company.name
+        email: applicant.email,
+        name: applicant.name
       }, secret, (err, token) => {
+        if (err) {
+          console.error(err);
+          res.sendStatus(403);
+        }
+
         res.json({ token });
       });
     }).catch(err => console.error(err));

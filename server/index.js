@@ -7,6 +7,7 @@ const MongoClient = require("mongodb").MongoClient;
 const mongoUrl = require("./mongo-url");
 
 const company = require("./company");
+const applicant = require("./applicant");
 
 const app = express();
 
@@ -26,3 +27,4 @@ app.use((req, res, next) => {
 app.use(jsonParser);
 
 app.use("/company", company);
+app.use("/applicant", applicant);
