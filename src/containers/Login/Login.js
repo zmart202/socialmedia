@@ -32,7 +32,7 @@ class Login extends Component {
             })
         };
 
-        fetch("http://localhost:4567/login/company", options)
+        fetch("http://localhost:4567/company/login", options)
         .then(res => res.status === 403 ?
             Promise.reject(new Error("403 access denied")) :
             res.json())

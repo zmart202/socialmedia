@@ -43,7 +43,7 @@ class Company extends Component{
             }
         };
 
-        fetch("http://localhost:4567/company", options)
+        fetch("http://localhost:4567/company/auth", options)
         .then(res => {
             this.setState({ isLoading: false });
             if (res.status === 200) {
