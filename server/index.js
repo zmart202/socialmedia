@@ -4,9 +4,11 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const jsonParser = require("body-parser").json();
 const MongoClient = require("mongodb").MongoClient;
+const bcrypt = require("bcrypt");
 
 const mongoUrl = require("./mongo-url");
 const secret = require("./secret");
+const { hashPassword, comparePasswords } = require("./password-utils");
 
 const app = express();
 
@@ -28,20 +30,25 @@ app.listen(4567, () => console.log("Listening on port 4567..."));
 app.post("/signup/company", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { name, email, password } = req.params;
+  const { name, email, password } = req.body;
 
-  Companies.insertOne({ name, email, password })
-  .then(success => {
-    if (!success) {
-      res.json({
-        success: false,
-        msg: "Signup failed"
-      });
-      return;
-    }
+  hashPassword(password).then(hash => {
+    Companies.insertOne({
+      name,
+      email,
+      password: hash
+    }).then(success => {
+      if (!success) {
+        res.json({
+          success: false,
+          msg: "Signup failed"
+        });
+        return;
+      }
 
-    res.json({ success: true });
-  }).catch(err => console.error(err));
+      res.json({ success: true });
+    }).catch(err => console.error(err));
+  });
 });
 
 app.post("/login/company", (req, res) => {
@@ -51,17 +58,30 @@ app.post("/login/company", (req, res) => {
 
   Companies.findOne({
     email: user.email,
-    password: user.password
-  }).then(success => {
-    if (!success) {
+  }).then(company => {
+    if (!company) {
       return res.sendStatus(403);
     }
-    jwt.sign({ user }, secret, (err, token) => {
-      res.json({ token });
-    });
+
+    comparePasswords(user.password, company.password)
+    .then(success => {
+      if (!success) {
+        res.sendStatus(403);
+        return;
+      }
+
+      jwt.sign({
+        email: company.email,
+        name: company.name
+      }, secret, (err, token) => {
+        res.json({ token });
+      });
+    }).catch(err => console.error(err));
+
+
   }).catch(err => {
     res.sendStatus(403);
-    console.log(err);
+    console.error(err);
   });
 });
 
