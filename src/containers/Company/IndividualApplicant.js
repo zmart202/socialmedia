@@ -69,7 +69,7 @@ class IndividualApplicant extends Component{
                 <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
                 {/* {this.renderApplicantSection()} */}
                 <td>{this.props.applicant.password}</td>
-                <td></td>
+                <td style={{color: 'green'}}><strong>{this.props.applicant.completed? "COMPLETE" : "INCOMPLETE"}</strong></td>
                 <td></td>
                 {this.renderActionsSection()}
             </tr>

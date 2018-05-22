@@ -11,43 +11,24 @@ class Company extends Component{
             isAuth: false,
             applicants: [
                 {
-<<<<<<< HEAD
-                key: 0,
-                lname: "Martin",
-                fname: "Zachary",
-                email: "zmartin@umassd.edu",
-                password: "abcdefgh",
-                completed: false
-            },
-            {
-                key: 1,
-                lname: "Gates",
-                fname: "Bill",
-                email: "bgates@umassd.edu",
-                password: "afjdkljd",
-                completed: true
-            }
-        ],
-        keyId: 1
-=======
-                    key: 1,
+                    key: 0,
                     lname: "Martin",
                     fname: "Zachary",
                     email: "zmartin@umassd.edu",
                     password: "abcdefgh",
-                    status: false
+                    completed: false
                 },
                 {
-                    key: 2,
+                    key: 1,
                     lname: "Gates",
                     fname: "Bill",
                     email: "bgates@umassd.edu",
                     password: "afjdkljd",
-                    status: true
+                    completed: true
                 }
-            ]
-        }
->>>>>>> d1e5c78d6b75137b473dabe0fef1e057fb11fa99
+            ],
+            keyId: 1
+        };
     }
 
     componentDidMount() {
@@ -71,7 +52,6 @@ class Company extends Component{
         }).catch(err => console.error(err));
     }
 
-<<<<<<< HEAD
     deleteApplicantsHandler = (applicant) => {
         let array = [...this.state.applicants];
         let index = array.indexOf(applicant)
@@ -113,23 +93,6 @@ class Company extends Component{
     render() {
         return(
             <div style={{backgroundColor: '#d8d8d8', margin: '100px 200px 0px 200px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
-=======
-    render() {
-        if (this.state.isLoading) {
-            return (
-                <p>Loading...</p>
-            );
-        }
-
-        if (!this.state.isAuth) {
-            return (
-                <p>You are not authorized to view this page</p>
-            );
-        }
-
-        return (
-            <div>
->>>>>>> d1e5c78d6b75137b473dabe0fef1e057fb11fa99
                 <h1>All Potential Applicants</h1>
                 <NewApplicant createApplicant={this.createApplicant.bind(this)} />
                 <ApplicantList 
