@@ -6,9 +6,12 @@ import ApplicantList from './ApplicantList';
 class Company extends Component{
     constructor(props){
         super(props);
-        this.state= {
+        this.state = {
+            isLoading: true,
+            isAuth: false,
             applicants: [
                 {
+<<<<<<< HEAD
                 key: 0,
                 lname: "Martin",
                 fname: "Zachary",
@@ -26,9 +29,49 @@ class Company extends Component{
             }
         ],
         keyId: 1
-    }
+=======
+                    key: 1,
+                    lname: "Martin",
+                    fname: "Zachary",
+                    email: "zmartin@umassd.edu",
+                    password: "abcdefgh",
+                    status: false
+                },
+                {
+                    key: 2,
+                    lname: "Gates",
+                    fname: "Bill",
+                    email: "bgates@umassd.edu",
+                    password: "afjdkljd",
+                    status: true
+                }
+            ]
+        }
+>>>>>>> d1e5c78d6b75137b473dabe0fef1e057fb11fa99
     }
 
+    componentDidMount() {
+        if (localStorage.getItem("token") === null) {
+            this.setState({ isLoading: false });
+            return;
+        }
+
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            }
+        };
+
+        fetch("http://localhost:4567/company", options)
+        .then(res => {
+            this.setState({ isLoading: false });
+            if (res.status === 200) {
+                this.setState({ isAuth: true });
+            }
+        }).catch(err => console.error(err));
+    }
+
+<<<<<<< HEAD
     deleteApplicantsHandler = (applicant) => {
         let array = [...this.state.applicants];
         let index = array.indexOf(applicant)
@@ -70,6 +113,23 @@ class Company extends Component{
     render() {
         return(
             <div style={{backgroundColor: '#d8d8d8', margin: '100px 200px 0px 200px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
+=======
+    render() {
+        if (this.state.isLoading) {
+            return (
+                <p>Loading...</p>
+            );
+        }
+
+        if (!this.state.isAuth) {
+            return (
+                <p>You are not authorized to view this page</p>
+            );
+        }
+
+        return (
+            <div>
+>>>>>>> d1e5c78d6b75137b473dabe0fef1e057fb11fa99
                 <h1>All Potential Applicants</h1>
                 <NewApplicant createApplicant={this.createApplicant.bind(this)} />
                 <ApplicantList 
