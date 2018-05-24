@@ -2,6 +2,7 @@
 
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const shortid = require("shortid");
 
 const secret = require("./secret");
 const { hashPassword, comparePasswords } = require("./password-utils");
@@ -75,6 +76,112 @@ router.get("/auth", (req, res) => {
     }
 
     res.json(authData);
+  });
+});
+
+router.post("/create-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { firstName, lastName, email, password } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    hashPassword(password).then(hash => {
+      const applicant = {
+        firstName,
+        lastName,
+        email,
+        password: hash,
+        id: shortid.generate()
+      };
+
+      Applicants.insertOne(applicant).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not create applicant"
+          });
+        }
+
+        res.json({
+          success: true,
+          applicant: {
+            firstName: applicant.firstName,
+            lastName: applicant.lastName,
+            email: applicant.email,
+            id: applicant.id
+          }
+        });
+      }).catch(err => console.error(err));
+    }).catch(err => console.error(err));
+  });
+});
+
+router.post("/edit-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { firstName, lastName, email, id } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Applicants.updateOne(
+      { id },
+      {
+        $set: {
+          firstName,
+          lastName,
+          email
+        }
+      }
+    ).then(success => {
+      if (!success) {
+        return res.json({
+          success: false,
+          msg: "Could not update applicant"
+        });
+      }
+
+      res.json({ success: true });
+    }).catch(err => console.error(err));
+  });
+});
+
+router.post("/remove-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { email, id } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Applicants.removeOne({ email, id })
+    .then(success => {
+      if (!success) {
+        return res.json({ success: false });
+      }
+
+      res.json({ success: true });
+    }).catch(err => console.error(err));
   });
 });
 

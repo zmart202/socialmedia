@@ -8,40 +8,6 @@ const { hashPassword, comparePasswords } = require("./password-utils");
 
 const router = express.Router();
 
-router.post("/signup", (req, res) => {
-  const db = req.app.locals.db;
-  const Applicants = db.collection("applicants");
-  const { name, email, password } = req.body;
-
-  hashPassword(password).then(hash => {
-    Applicants.insertOne({
-      name,
-      email,
-      password: hash
-    }).then(success => {
-      if (!success) {
-        res.json({
-          success: false,
-          msg: "Signup failed"
-        });
-        return;
-      }
-
-      jwt.sign({
-        email,
-        name
-      }, secret, (err, token) => {
-        if (err) {
-          console.error(err);
-          return res.sendStatus(403);
-        }
-
-        res.json({ token });
-      });
-    }).catch(err => console.error(err));
-  }).catch(err => console.error(err));
-});
-
 router.post("/login", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
@@ -62,7 +28,8 @@ router.post("/login", (req, res) => {
 
       jwt.sign({
         email: applicant.email,
-        name: applicant.name
+        firstName: applicant.firstName,
+        lastName: applicant.lastName
       }, secret, (err, token) => {
         if (err) {
           console.error(err);
