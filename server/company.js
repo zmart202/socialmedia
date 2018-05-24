@@ -79,6 +79,36 @@ router.get("/auth", (req, res) => {
   });
 });
 
+router.get("/applicants", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Applicants.find().toArray()
+    .then(data => {
+      if (!data) {
+        return res.json([]);
+      }
+
+      const applicants = data.map(x => ({
+        firstName: x.firstName,
+        lastName: x.lastName,
+        email: x.email,
+        id: x.id
+      }));
+      return res.json(applicants);
+    }).catch(err => console.error(err));
+  });
+});
+
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
