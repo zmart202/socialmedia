@@ -102,6 +102,7 @@ router.get("/applicants", (req, res) => {
         firstName: x.firstName,
         lastName: x.lastName,
         email: x.email,
+        completed: x.completed,
         id: x.id
       }));
       return res.json(applicants);
@@ -124,15 +125,16 @@ router.post("/create-applicant", (req, res) => {
     }
 
     hashPassword(password).then(hash => {
-      const applicant = {
+      const id = shortid.generate();
+
+      Applicants.insertOne({
+        id,
         firstName,
         lastName,
         email,
-        password: hash,
-        id: shortid.generate()
-      };
-
-      Applicants.insertOne(applicant).then(success => {
+        completed: false,
+        password: hash
+      }).then(success => {
         if (!success) {
           return res.json({
             success: false,
@@ -142,11 +144,11 @@ router.post("/create-applicant", (req, res) => {
 
         res.json({
           success: true,
-          applicant: {
-            firstName: applicant.firstName,
-            lastName: applicant.lastName,
-            email: applicant.email,
-            id: applicant.id
+          createdApplicant: {
+            id,
+            firstName,
+            lastName,
+            email
           }
         });
       }).catch(err => console.error(err));
@@ -157,7 +159,7 @@ router.post("/create-applicant", (req, res) => {
 router.post("/edit-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { firstName, lastName, email, id } = req.body;
+  const { firstName, lastName, email, completed, id } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -174,7 +176,8 @@ router.post("/edit-applicant", (req, res) => {
         $set: {
           firstName,
           lastName,
-          email
+          email,
+          completed
         }
       }
     ).then(success => {
@@ -211,6 +214,31 @@ router.post("/remove-applicant", (req, res) => {
       }
 
       res.json({ success: true });
+    }).catch(err => console.error(err));
+  });
+});
+
+router.get(`/test-results/${applicantId}`, (req, res) => {
+  const db = req.app.locals.db;
+  const TestResults = db.collection("testResults");
+  const { applicantId } = req.params;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      res.sendStatus(403);
+    }
+
+    TestResults.findOne({ applicantId })
+    .then(doc => {
+      if (!doc) {
+        return res.json([]);
+      }
+
+      res.json(doc.results);
     }).catch(err => console.error(err));
   });
 });

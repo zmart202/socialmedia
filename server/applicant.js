@@ -29,7 +29,8 @@ router.post("/login", (req, res) => {
       jwt.sign({
         email: applicant.email,
         firstName: applicant.firstName,
-        lastName: applicant.lastName
+        lastName: applicant.lastName,
+        id: applicant.id
       }, secret, (err, token) => {
         if (err) {
           console.error(err);
@@ -52,6 +53,33 @@ router.get("/auth", (req, res) => {
     }
 
     res.json(authData);
+  });
+});
+
+router.post("/test-results", (req, res) => {
+  const db = req.app.locals.db;
+  const TestResults = db.collection("testResults");
+  const results = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    TestResults.insertOne({
+      applicantId: authData.id,
+      results
+    }).then(success => {
+      if (!success) {
+        return res.json({ success: false });
+      }
+
+      res.json({ success: true });
+    }).catch(err => console.error(err));
   });
 });
 
