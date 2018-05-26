@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+//import Modal from '../../components/UI/Modal/Modal';
+//import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
 
 
@@ -61,17 +63,31 @@ class IndividualApplicant extends Component{
         this.setState({isEditing: false});
     }
 
+    completionHandler = () => {
+        if (this.props.applicant.completed) {
+            return <p style={{color: 'green'}}>COMPLETE</p>;
+        } else {
+            return <p style={{color: 'red'}}>INCOMPLETE</p>;
+        }
+    }
+
+    resultsHandler = () => {
+        this.props.viewable;
+        this.props.results;
+    }
+
+
     render() {
         return(
             <tr style={{fontSize: "11px"}}>
-                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /> : this.props.applicant.lname}</td>
-                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /> : this.props.applicant.fname}</td>
-                <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                {/* {this.renderApplicantSection()} */}
-                <td>{this.props.applicant.password}</td>
-                <td style={{color: 'green'}}><strong>{this.props.applicant.completed? "COMPLETE" : "INCOMPLETE"}</strong></td>
-                <td></td>
-                {this.renderActionsSection()}
+                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /> : this.props.applicant.lname}</td>
+                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /> : this.props.applicant.fname}</td>
+                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
+                    {/* {this.renderApplicantSection()} */}
+                    <td>{this.props.applicant.password}</td>
+                    <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
+                    <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
+                    {this.renderActionsSection()}
             </tr>
         );
     }

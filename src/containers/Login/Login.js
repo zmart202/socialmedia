@@ -1,13 +1,16 @@
 import React, { Component } from 'react';
 import { Link } from 'react-router-dom';
 import './Login.css';
+import ApplicantLoginForm from './ApplicantLoginForm/ApplicantLoginForm';
+import CompanyLoginForm from './CompanyLoginForm/CompanyLoginForm';
 
 class Login extends Component {
     constructor() {
         super();
         this.state = {
             email: "",
-            password: ""
+            password: "",
+            ApplicantLogin: true
         };
 
         this.handleInput = this.handleInput.bind(this);
@@ -43,28 +46,18 @@ class Login extends Component {
         }).catch(err => console.error(err));
     }
 
+    switchLoginPage = () => {
+        let loginPage = this.state.ApplicantLogin;
+        this.setState({ApplicantLogin: !loginPage});
+    }
+
     render() {
+        let applicantLogin = <ApplicantLoginForm loginChange={this.switchLoginPage} />;
+        let companyLogin = <CompanyLoginForm loginChange={this.switchLoginPage} />;
+        let renderLogin = this.state.ApplicantLogin ? applicantLogin : companyLogin;
         return (
             <div>
-                <form style={{backgroundColor: "#dedfe0", margin: "100px 350px 0px 350px", paddingBottom: "40px", paddingTop: "40px", boxShadow: '3px 3px 2px 0px rgba(0,0,0,0.33)'}}>
-                    <div style={{padding: "10px"}}>
-                        <input
-                            type="text"
-                            placeholder="email..."
-                            name="email"
-                            onChange={this.handleInput} />
-                    </div>
-                    <div style={{padding: "10px"}}>
-                        <input
-                            type="password"
-                            placeholder="password..."
-                            name="password"
-                            onChange={this.handleInput} />
-                    </div>
-                    <div>
-                        <Link from='/' to='/company' ><button>Login</button></Link>
-                    </div>
-                </form>
+                {renderLogin}
             </div>
         );
     }

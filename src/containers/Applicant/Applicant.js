@@ -1,11 +1,12 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
 //import Test from './Test/Test';
 
-const formattedSeconds = (sec) => {
-  Math.floor(sec / 60) +
-    ':' +
-  ('0' + sec % 60).slice(-2)
-}
+// const formattedSeconds = (sec) => {
+//   Math.floor(sec / 60) +
+//     ':' +
+//   ('0' + sec % 60).slice(-2)
+// }
 
 class Applicant extends Component {
     constructor(props) {
@@ -34,10 +35,20 @@ class Applicant extends Component {
         , 1000);
     }
 
+    handleStopClick = () => {
+        clearInterval(this.incrementer);
+        this.setState({
+          lastClearedIncrementer: this.incrementer
+        });
+      }
+
       formattedSeconds = (sec) => {
         return (Math.floor(sec / 60) +
           ':' +
         ('0' + sec % 60).slice(-2));
+      }
+
+      finishedTest = () => {
       }
     
     render () {
@@ -56,11 +67,11 @@ class Applicant extends Component {
                         <h1>BEGIN TESTING NOW</h1>
                         <h1 style={{color: 'red'}}>{this.formattedSeconds(this.state.secondsElapsed)}</h1>
                         <p>Question 1</p>
-                        <textarea style={{padding: '20px 100px', textAlign: 'left'}}/>
+                        <textarea type="text" placeholder="Place response here" ref='editQuestion1' rows='4' cols='50'/>
                         <p>Question 2</p>
-                        <textarea style={{padding: '20px 100px', textAlign: 'left'}} />
+                        <textarea type="text" placeholder="Place response here" ref='editQuestion2' rows='4' cols='50' />
                         <div style={{marginTop: '20px'}}>
-                        <a style={{backgroundColor: '#6d6dc4', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}} href='#'>SUBMIT</a>
+                        <Link onClick={this.handleStopClick} from='/applicant' to='finished' style={{backgroundColor: '#6d6dc4', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>SUBMIT</Link>
                         </div>
                     </div>;
         let pageChoice = !this.state.buttonClicked ? welcomePage : test;

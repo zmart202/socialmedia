@@ -10,6 +10,7 @@ class ApplicantList extends Component {
         return this.props.applicants.map((applicant) => 
             (<IndividualApplicant applicant={applicant} 
                                         delete={() => props.deleteApplicantsHandler(applicant)}
+                                        results={() => props.viewable(applicant)}
                                         key={applicant.key} 
                                         {...props}  />)
             );
@@ -17,12 +18,14 @@ class ApplicantList extends Component {
 
     render() {
             return(
+                <div>
                 <table>
                     <ApplicantHeader />
                     <tbody >
                             {this.renderItems()}
                     </tbody>
                 </table>
+                </div>
             );
         }
 }
