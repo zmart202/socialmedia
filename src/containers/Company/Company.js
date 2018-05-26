@@ -5,6 +5,7 @@ import NewApplicant from './NewApplicant';
 import ApplicantList from './ApplicantList';
 import Modal from '../../components/UI/Modal/Modal';
 import FinalResults from '../Applicant/FinalResults/FinalResults';
+import { Link } from 'react-router-dom';
 
 class Company extends Component{
     constructor(props){
@@ -22,7 +23,7 @@ class Company extends Component{
                     question1: 'caterers are our partners',
                     question2: 'customers come first',
                     secondsElapsed: 125,
-                    completed: false
+                    completed: true
                 },
                 {
                     key: 1,
@@ -124,6 +125,7 @@ class Company extends Component{
     render() {
         return(
             <Aux>
+                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'blue', cursor: 'pointer'}}><Link from='/company' to='/'>Logout</Link></header>
                 <Modal show={this.state.viewing} modalClosed={this.viewCancelHandler}>
                     <FinalResults 
                         applicant={this.state.viewableApplicant} 
