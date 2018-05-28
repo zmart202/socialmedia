@@ -31,7 +31,7 @@ router.post("/signup", (req, res) => {
       jwt.sign({
         email,
         name
-      }, secret, (err, token) => {
+      }, secret[0], (err, token) => {
         res.json({ token });
       });
     }).catch(err => console.error(err));
@@ -41,16 +41,16 @@ router.post("/signup", (req, res) => {
 router.post("/login", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const user = req.body;
+  const { email, password } = req.body;
 
   Companies.findOne({
-    email: user.email,
+    email
   }).then(company => {
     if (!company) {
       return res.sendStatus(403);
     }
 
-    comparePasswords(user.password, company.password)
+    comparePasswords(password, company.password)
     .then(success => {
       if (!success) {
         return res.sendStatus(403);
@@ -59,7 +59,7 @@ router.post("/login", (req, res) => {
       jwt.sign({
         email: company.email,
         name: company.name
-      }, secret, (err, token) => {
+      }, secret[0], (err, token) => {
         res.json({ token });
       });
     }).catch(err => console.error(err));
@@ -69,7 +69,7 @@ router.post("/login", (req, res) => {
 router.get("/auth", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -86,7 +86,7 @@ router.get("/applicants", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -98,14 +98,7 @@ router.get("/applicants", (req, res) => {
         return res.json([]);
       }
 
-      const applicants = data.map(x => ({
-        firstName: x.firstName,
-        lastName: x.lastName,
-        email: x.email,
-        completed: x.completed,
-        id: x.id
-      }));
-      return res.json(applicants);
+      return res.json(data);
     }).catch(err => console.error(err));
   });
 });
@@ -118,40 +111,39 @@ router.post("/create-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
     }
 
-    hashPassword(password).then(hash => {
-      const id = shortid.generate();
+    const id = shortid.generate();
 
-      Applicants.insertOne({
-        id,
-        firstName,
-        lastName,
-        email,
-        completed: false,
-        password: hash
-      }).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not create applicant"
-          });
-        }
-
-        res.json({
-          success: true,
-          createdApplicant: {
-            id,
-            firstName,
-            lastName,
-            email
-          }
+    Applicants.insertOne({
+      id,
+      firstName,
+      lastName,
+      email,
+      password,
+      completed: false,
+      timestamp: new Date()
+    }).then(success => {
+      if (!success) {
+        return res.json({
+          success: false,
+          msg: "Could not create applicant"
         });
-      }).catch(err => console.error(err));
+      }
+
+      res.json({
+        success: true,
+        createdApplicant: {
+          id,
+          firstName,
+          lastName,
+          email
+        }
+      });
     }).catch(err => console.error(err));
   });
 });
@@ -159,12 +151,12 @@ router.post("/create-applicant", (req, res) => {
 router.post("/edit-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { firstName, lastName, email, completed, id } = req.body;
+  const { id, firstName, lastName, email } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -176,8 +168,7 @@ router.post("/edit-applicant", (req, res) => {
         $set: {
           firstName,
           lastName,
-          email,
-          completed
+          email
         }
       }
     ).then(success => {
@@ -201,7 +192,7 @@ router.post("/remove-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -218,7 +209,7 @@ router.post("/remove-applicant", (req, res) => {
   });
 });
 
-router.get(`/test-results/${applicantId}`, (req, res) => {
+router.get("/test-results/:applicantId", (req, res) => {
   const db = req.app.locals.db;
   const TestResults = db.collection("testResults");
   const { applicantId } = req.params;
@@ -226,7 +217,7 @@ router.get(`/test-results/${applicantId}`, (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       res.sendStatus(403);

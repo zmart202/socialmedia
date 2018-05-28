@@ -14,46 +14,43 @@ router.post("/login", (req, res) => {
   const { email, password } = req.body;
 
   Applicants.findOne({
-    email
+    email,
+    password
   }).then(applicant => {
     if (!applicant) {
       return res.sendStatus(403);
     }
 
-    comparePasswords(password, applicant.password)
-    .then(success => {
-      if (!success) {
-        return res.sendStatus(403);
+    jwt.sign({
+      email: applicant.email,
+      firstName: applicant.firstName,
+      lastName: applicant.lastName,
+      id: applicant.id
+    }, secret[1], (err, token) => {
+      if (err) {
+        return console.error(err);
       }
 
-      jwt.sign({
-        email: applicant.email,
-        firstName: applicant.firstName,
-        lastName: applicant.lastName,
-        id: applicant.id
-      }, secret, (err, token) => {
-        if (err) {
-          console.error(err);
-          res.sendStatus(403);
-        }
-
-        res.json({ token });
-      });
-    }).catch(err => console.error(err));
+      res.json({ token });
+    });
   }).catch(err => console.error(err));
 });
 
 router.get("/auth", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
+  if (token) {
+    jwt.verify(token, secret[1], (err, authData) => {
+      if (err) {
+        console.error(err);
+        return res.sendStatus(403);
+      }
 
-    res.json(authData);
-  });
+      res.json(authData);
+    });
+  } else {
+    res.sendStatus(403);
+  }
 });
 
 router.post("/test-results", (req, res) => {
@@ -64,7 +61,7 @@ router.post("/test-results", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
+  jwt.verify(token, secret[1], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
