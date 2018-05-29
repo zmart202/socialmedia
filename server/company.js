@@ -106,12 +106,12 @@ router.get("/applicants", (req, res) => {
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { firstName, lastName, email, password } = req.body;
+  const { firstName, lastName, email, token } = req.body;
 
   const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
+  const _token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(_token, secret[0], (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -124,7 +124,7 @@ router.post("/create-applicant", (req, res) => {
       firstName,
       lastName,
       email,
-      password,
+      token,
       completed: false,
       timestamp: new Date()
     }).then(success => {
@@ -141,7 +141,8 @@ router.post("/create-applicant", (req, res) => {
           id,
           firstName,
           lastName,
-          email
+          email,
+          token
         }
       });
     }).catch(err => console.error(err));

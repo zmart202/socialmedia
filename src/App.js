@@ -12,8 +12,8 @@ class App extends Component {
     return (
       <div className="App">
         <Route path="/" exact component={Login} />
+        <Route path="/applicant/:token" component={Applicant} />
         <Route path="/company" component={Company} />
-        <Route path="/applicant" component={Applicant} />
         <Route path='/finished' component={Finished}  />
         <Route path="/company-login" component={CompanyLogin} />
       </div>

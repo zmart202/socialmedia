@@ -13,14 +13,9 @@ class Applicant extends Component {
         super(props);
         this.state = {
             isLoading: true,
-            testTaker: [
-                {
-                    id: 1,
-                    name: 'Zack',
-                    question1: '',
-                    question2: ''
-                }
-            ],
+            isCompleted: false,
+            isAuth: false,
+            testTaker: {},
             buttonClicked: false,
             secondsElapsed: 0
         }
@@ -28,27 +23,29 @@ class Applicant extends Component {
     }
 
     componentDidMount() {
-        const token = localStorage.getItem("token");
+        const token = this.props.match.params.token;
         if (token === null) {
             this.props.history.push("/");
             return;
         }
 
-        const options = {
-            headers: {
-                "Authorization": `Bearer ${token}`
-            }
-        };
-
-        fetch("http://localhost:4567/applicant/auth", options)
+        fetch(`http://localhost:4567/applicant/auth/${token}`)
         .then(res => {
             this.setState({ isLoading: false });
-            if (res.status === 200) {
-                this.setState({ isAuth: true });
-            } else {
-              this.props.history.push("/");
-            }
-        }).catch(err => console.error(err));
+            return res.status === 403 ?
+                Promise.reject("Auth denied") :
+                res.json()
+        }).then(data => {
+            console.log("DATA:", data);
+            return data.completed ?
+                this.setState({ isCompleted: true }) :
+                this.setState({
+                    isAuth: true,
+                    testTaker: data
+                });
+        }
+
+        ).catch(err => console.error(err));
     }
 
     changePageHandler = () => {
@@ -77,9 +74,21 @@ class Applicant extends Component {
       }
 
     render () {
+        if (this.state.isLoading) {
+            return <p>We are loading...</p>;
+        }
+
+        if (!this.state.isAuth) {
+            return <p>Invalid token</p>;
+        }
+
+        if (this.state.isCompleted) {
+            return <p>You have already completed the test!</p>;
+        }
+
         const welcomePage = <div style={{margin: '200px 500px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                                 <div style={{paddingBottom: '10px'}}>
-                                    <p>Hey {this.state.testTaker[0].name}, thanks for showing iinterest in becoming a customer
+                                    <p>Hey {this.state.testTaker.firstName}, thanks for showing iinterest in becoming a customer
                         service ninja. We think you have the potential to be a great fit
                         at our company. Before we can take this any further, we would like
                         you to respond to a couple questions. You only have 30 minutes

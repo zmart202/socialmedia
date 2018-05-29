@@ -8,10 +8,35 @@ const { hashPassword, comparePasswords } = require("./password-utils");
 
 const router = express.Router();
 
-router.post("/login", (req, res) => {
+router.get("/auth/:token", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { email, password } = req.body;
+  const { token } = req.params;
+
+  Applicants.findOne({ token })
+  .then(applicant => {
+    if (!applicant) {
+      return res.sendStatus(403);
+    }
+
+    if (applicant.completed) {
+      return res.json({ completed: true });
+    }
+
+    res.json({
+      id: applicant.id,
+      firstName: applicant.firstName,
+      lastName: applicant.lastName,
+      email: applicant.email,
+      completed: applicant.completed
+    });
+  }).catch(err => console.error(err));
+});
+
+/*router.post("/login", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { email, token } = req.body;
 
   Applicants.findOne({
     email,
@@ -51,7 +76,7 @@ router.get("/auth", (req, res) => {
   } else {
     res.sendStatus(403);
   }
-});
+});*/
 
 router.post("/test-results", (req, res) => {
   const db = req.app.locals.db;

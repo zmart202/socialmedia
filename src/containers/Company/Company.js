@@ -86,7 +86,7 @@ class Company extends Component{
     }
 
 
-    generatePasswordHandler = () => {
+    generateTokenHandler = () => {
         var length = 8,
         charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
         retVal = "";
@@ -112,7 +112,7 @@ class Company extends Component{
                 email,
                 firstName: fname,
                 lastName: lname,
-                password: this.generatePasswordHandler()
+                token: this.generateTokenHandler()
             })
         };
 
