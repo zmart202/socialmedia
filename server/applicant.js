@@ -78,31 +78,44 @@ router.get("/auth", (req, res) => {
   }
 });*/
 
-router.post("/test-results", (req, res) => {
+router.post("/test-results/:token", (req, res) => {
   const db = req.app.locals.db;
   const TestResults = db.collection("testResults");
-  const results = req.body;
+  const Applicants = db.collection("applicants");
+  const { token } = req.params;
+  const { applicantId, answer1, answer2 } = req.body;
 
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret[1], (err, authData) => {
-    if (err) {
-      console.error(err);
+  Applicants.findOne({ token })
+  .then(applicant => {
+    if (!applicant) {
       return res.sendStatus(403);
     }
 
     TestResults.insertOne({
-      applicantId: authData.id,
-      results
+      applicantId,
+      answer1,
+      answer2
     }).then(success => {
       if (!success) {
         return res.json({ success: false });
       }
 
-      res.json({ success: true });
+      Applicants.updateOne(
+        { token },
+        {
+          $set: {
+            completed: true
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          return res.json({ success: false });
+        }
+
+        res.json({ success: true });
+      }).catch(err => console.error(err));
     }).catch(err => console.error(err));
-  });
+  }).catch(err => console.error(err));
 });
 
 module.exports = router;

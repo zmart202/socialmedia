@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import './IndividualApplicant.css'
 //import Modal from '../../components/UI/Modal/Modal';
 //import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
@@ -34,15 +35,15 @@ class IndividualApplicant extends Component{
         if (this.state.isEditing) {
             return (
                 <td>
-                    <button onClick={this.onSaveClick.bind(this)}>SAVE</button>
-                    <button onClick={this.onCancelClick.bind(this)}>CANCEL</button>
+                    <strong><a className="SaveB" style={{padding: '7px', border: 'solid #3f3c87 3px', margin: '2px', color: '#3f3c87', cursor: 'pointer'}} onClick={this.onSaveClick.bind(this)}>SAVE</a></strong>
+                    <strong><a className="CancelB" style={{padding: '7px', border: 'solid gray 3px', margin: '2px', color: 'gray', cursor: 'pointer'}} onClick={this.onCancelClick.bind(this)}>CANCEL</a></strong>
                 </td>
             );
         }
         return (
             <td>
-                <button onClick={this.editHandler.bind(this)}>EDIT</button>
-                <button onClick={this.props.delete}>DELETE</button>
+                <strong><a className="EditB" style={{padding: '7px', border: 'solid #af9121 3px', margin: '2px', color: '#af9121', cursor: 'pointer'}} onClick={this.editHandler.bind(this)}>EDIT</a></strong>
+                <strong><a className="DeleteB" style={{padding: '7px', border: 'solid #7c251d 3px', margin: '2px', color: '#7c251d', cursor: 'pointer'}} onClick={this.props.delete}>DELETE</a></strong>
             </td>
         );
     }
@@ -109,12 +110,12 @@ class IndividualApplicant extends Component{
 
     render() {
         return(
-            <tr key={this.props.applicant.id} style={{fontSize: "11px"}}>
+            <tr style={{fontSize: "11px"}} className='Applicant'>
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
                     {/* {this.renderApplicantSection()} */}
-                    <td>{this.props.applicant.token}</td>
+                    <td>http://localhost:3000/applicant/{this.props.applicant.token}</td>
                     <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                     <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
                     {this.renderActionsSection()}

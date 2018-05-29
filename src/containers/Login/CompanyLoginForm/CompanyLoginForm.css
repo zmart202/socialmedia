@@ -1,0 +1,12 @@
+.Login input {
+    width: 80%;
+    border-width: 1px;
+    border-bottom: solid gray 7px;
+    padding: 16px;
+    font-family: inherit;
+    font-size: 0.95em;
+  }
+
+  .Login input:focus {
+     border-bottom-color: purple; 
+  }

@@ -230,7 +230,7 @@ router.get("/test-results/:applicantId", (req, res) => {
         return res.json([]);
       }
 
-      res.json(doc.results);
+      res.json(doc);
     }).catch(err => console.error(err));
   });
 });

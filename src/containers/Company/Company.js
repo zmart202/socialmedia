@@ -14,7 +14,8 @@ class Company extends Component{
           isLoading: true,
           applicants: [],
           viewing: false,
-          viewableApplicant: null
+          viewableApplicant: null,
+          search: ""
       };
   }
 
@@ -136,16 +137,13 @@ class Company extends Component{
         this.setState({viewing: false});
     }
 
-    logOut = () => {
-        localStorage.removeItem("token");
-        this.props.history.push("/company-login");
+    updateSearch = (event) => {
+        this.setState({search: event.target.value.substr(0, 20)});
     }
 
     render() {
         if (this.state.isLoading) {
-            return (
-                <p>Loading...</p>
-            );
+            return <p>Loading...</p>;
         }
 
         let modal = "";
@@ -159,20 +157,29 @@ class Company extends Component{
             );
         }
 
-        return (
-          <Aux>
-              <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'blue', cursor: 'pointer'}}><a onClick={this.logOut.bind(this)}>Logout</a></header>
-              {modal}
-              <div style={{backgroundColor: '#d8d8d8', margin: '100px 200px 0px 200px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
-                  <h1>All Potential Applicants</h1>
-                  <NewApplicant createApplicant={this.createApplicant.bind(this)} />
-                  <ApplicantList
-                      applicants={this.state.applicants}
-                      deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
-                      viewable={this.viewHandler.bind(this)}
-                      refreshApplicantList={this.refreshApplicantList.bind(this)} />
-              </div>
-          </Aux>
+        return(
+            <Aux>
+                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'purple', cursor: 'pointer'}}><Link from='/company' to='/'>Logout</Link></header>
+                {modal}
+                <div style={{backgroundColor: '#d8d8d8', margin: '100px 210px 0px 210px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
+                    <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
+                    <h4 style={{color: 'purple'}}>Create New Applicant</h4>
+                    <NewApplicant createApplicant={this.createApplicant.bind(this)} />
+                    <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
+                    <h4 style={{color: 'purple'}}>Search Bar</h4>
+                    <input type="text"
+                        value={this.state.search}
+                        onChange={this.updateSearch.bind(this)}
+                        placeholder="Search by last name.." />
+                    </div>
+                    <ApplicantList
+                        applicants={this.state.applicants}
+                        deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
+                        refreshApplicantList={this.refreshApplicantList.bind(this)}
+                        viewable={this.viewHandler.bind(this)}
+                        searchedApplicant={this.state.search} />
+                </div>
+            </Aux>
         );
     }
 }
