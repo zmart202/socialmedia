@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
 import './Login.css';
 import ApplicantLoginForm from './ApplicantLoginForm/ApplicantLoginForm';
 import CompanyLoginForm from './CompanyLoginForm/CompanyLoginForm';

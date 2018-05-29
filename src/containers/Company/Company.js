@@ -49,7 +49,8 @@ class Company extends Component{
                     question2: 'customers come first',
                     secondsElapsed: 125,
                     completed: false
-            }
+            },
+            search: ''
         };
     }
 
@@ -122,22 +123,35 @@ class Company extends Component{
         this.setState({viewing: false});
     }
 
+    updateSearch = (event) => {
+        this.setState({search: event.target.value.substr(0, 20)});
+    }
+
     render() {
         return(
             <Aux>
-                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'blue', cursor: 'pointer'}}><Link from='/company' to='/'>Logout</Link></header>
+                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'purple', cursor: 'pointer'}}><Link from='/company' to='/'>Logout</Link></header>
                 <Modal show={this.state.viewing} modalClosed={this.viewCancelHandler}>
                     <FinalResults 
                         applicant={this.state.viewableApplicant} 
                         modalClosed={this.viewCancelHandler} />
                 </Modal>
-                <div style={{backgroundColor: '#d8d8d8', margin: '100px 200px 0px 200px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
-                    <h1>All Potential Applicants</h1>
+                <div style={{backgroundColor: '#d8d8d8', margin: '100px 210px 0px 210px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
+                    <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
+                    <h4 style={{color: 'purple'}}>Create New Applicant</h4>
                     <NewApplicant createApplicant={this.createApplicant.bind(this)} />
+                    <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
+                    <h4 style={{color: 'purple'}}>Search Bar</h4>
+                    <input type="text"
+                        value={this.state.search}
+                        onChange={this.updateSearch.bind(this)}
+                        placeholder="Search by last name.." />
+                    </div>
                     <ApplicantList 
                         applicants={this.state.applicants}
                         deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
-                        viewable={this.viewHandler.bind(this)} />
+                        viewable={this.viewHandler.bind(this)}
+                        searchedApplicant={this.state.search} />
                 </div>
             </Aux>
         );

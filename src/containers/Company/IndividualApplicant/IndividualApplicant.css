@@ -1,0 +1,23 @@
+.Applicant {
+    align: center;
+    text-align: center;
+}
+.Applicant:hover {
+    background-color: aliceblue;
+}
+
+.DeleteB:hover {
+    background-color: red;
+}
+
+.CancelB:hover {
+    background-color: rgb(176, 176, 176);
+}
+
+.SaveB:hover {
+    background-color: rgb(119, 112, 252);
+}
+
+.EditB:hover {
+    background-color: yellow;
+}
