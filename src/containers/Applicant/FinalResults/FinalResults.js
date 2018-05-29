@@ -33,7 +33,6 @@ class FinalResults extends React.Component {
                 Promise.reject("Auth denied") :
                 res.json()
         ).then(data => {
-            console.log(data);
             this.setState({
                 data,
                 isLoading: false

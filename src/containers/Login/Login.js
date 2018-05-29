@@ -26,13 +26,13 @@ class Login extends Component {
             }
         };
 
-        fetch("http://localhost:4567/applicant/auth", options)
+        fetch("http://localhost:4567/company/auth", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject(new Error("Auth denied")) :
                 res.json()
         ).then(data => {
-            this.props.history.push("/applicant");
+            this.props.history.push("/company");
         }).catch(err => console.error(err));
     }
 
@@ -55,13 +55,13 @@ class Login extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/applicant/login`, options)
+        fetch(`http://localhost:4567/company/login`, options)
         .then(res => res.status === 403 ?
             Promise.reject(new Error("403 access denied")) :
             res.json())
         .then(data => {
             localStorage.setItem("token", data.token);
-            this.props.history.push("/applicant");
+            this.props.history.push("/company");
         }).catch(err => console.error(err));
     }
 
@@ -70,15 +70,12 @@ class Login extends Component {
         return (
             <div>
                 <header>
-                    <ul style={{textAlign: 'right', listStyleType: 'none'}}>
-                      <li><Link to="/company-login" style={{padding: '20px 40px 20px 40px', color: 'blue', cursor: 'pointer'}}>Company Login</Link></li>
-                    </ul>
                     <ul style={{listStyleType: 'none', display: 'flex'}}>
                         <h1><li><a style={{padding: '20px 40px 20px 40px', color: 'purple', border: 'solid green 5px', borderRadius: '10px', boxShadow: '4px 4px 2px 0px rgba(0,0,0,0.75)'}}>decisionTyme</a></li></h1>
                     </ul>
                 </header>
                 <form style={{backgroundColor: "#dedfe0", margin: "100px 350px 0px 350px", paddingBottom: "40px", paddingTop: "40px", boxShadow: '3px 3px 2px 0px rgba(0,0,0,0.33)'}}>
-                    <h2>Applicant Login</h2>
+                    <h2>Company Login</h2>
                     <div style={{padding: "10px"}}>
                         <input
                             type="text"
