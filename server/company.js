@@ -5,8 +5,9 @@ const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
 const uniqid = require("uniqid");
 
-const secret = require("./secret");
 const { hashPassword, comparePasswords } = require("./password-utils");
+
+const secret = process.env.SECRET;
 
 const router = express.Router();
 
@@ -49,7 +50,7 @@ router.post("/signup", (req, res) => {
       jwt.sign({
         email,
         name
-      }, secret[0], (err, token) => {
+      }, secret, (err, token) => {
         res.json({ token });
       });
     }).catch(err => console.error(err));
@@ -77,7 +78,7 @@ router.post("/login", (req, res) => {
       jwt.sign({
         email: company.email,
         name: company.name
-      }, secret[0], (err, token) => {
+      }, secret, (err, token) => {
         res.json({ token });
       });
     }).catch(err => console.error(err));
@@ -87,7 +88,7 @@ router.post("/login", (req, res) => {
 router.get("/auth", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -104,7 +105,7 @@ router.get("/applicants", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -129,7 +130,7 @@ router.post("/create-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const _token = bearer.split(" ")[1];
 
-  jwt.verify(_token, secret[0], (err, authData) => {
+  jwt.verify(_token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -176,7 +177,7 @@ router.post("/edit-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -212,7 +213,7 @@ router.post("/remove-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
@@ -237,7 +238,7 @@ router.get("/test-results/:applicantId", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret[0], (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       res.sendStatus(403);

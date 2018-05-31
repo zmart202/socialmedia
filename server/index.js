@@ -4,10 +4,10 @@ const express = require("express");;
 const jsonParser = require("body-parser").json();
 const MongoClient = require("mongodb").MongoClient;
 
-const mongoUrl = require("./mongo-url");
-
 const company = require("./company");
 const applicant = require("./applicant");
+
+const mongoUrl = process.env.MONGO_URL;
 
 const app = express();
 
