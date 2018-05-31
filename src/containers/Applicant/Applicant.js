@@ -25,7 +25,7 @@ class Applicant extends Component {
     }
 
     componentDidMount() {
-        if (this.token === null) {
+        if (!this.token) {
             this.props.history.push("/");
             return;
         }
@@ -37,18 +37,43 @@ class Applicant extends Component {
                 Promise.reject("Auth denied") :
                 res.json()
         }).then(data => {
-            return data.completed ?
+            console.log("DATA", data);
+            if (data.completed) {
                 this.setState({
                     isAuth: true,
                     isCompleted: true
-                }) :
+                });
+            } else if (data.testTimestamp) {
+                const parsedDate = Date.parse(data.testTimestamp);
+                this.setState({
+                    secondsElapsed: Math.floor((new Date() - parsedDate) / 1000),
+                    isAuth: true,
+                    testTaker: data
+                }, this.changePageHandler);
+            } else {
                 this.setState({
                     isAuth: true,
                     testTaker: data
                 });
+            }
+        }).catch(err => console.error(err));
+    }
+
+    startTest = () => {
+        if (!this.token) {
+            this.props.history.push("/");
+            return;
         }
 
-        ).catch(err => console.error(err));
+        fetch(`http://localhost:4567/applicant/test-timestamp/${this.token}`)
+        .then(res =>
+            res.status === 403 ?
+                Promise.reject("Auth denied") :
+                res.json()
+        ).then(data => {
+            console.log(data);
+            this.changePageHandler();
+        }).catch(err => console.error(err));
     }
 
     changePageHandler = () => {
@@ -73,6 +98,7 @@ class Applicant extends Component {
             method: "POST",
             body: JSON.stringify({
                 applicantId: this.state.testTaker.id,
+                secondsElapsed: this.state.secondsElapsed,
                 answer1: this.refs.editQuestion1.value,
                 answer2: this.refs.editQuestion2.value
             })
@@ -120,7 +146,7 @@ class Applicant extends Component {
                         to finish all the questions upon the time you click “START TEST NOW”.</p>
                                     <p style={{color: 'purple'}}><strong>Best of luck!</strong></p>
                                     </div>
-                                    <a onClick={this.changePageHandler} style={{backgroundColor: 'purple', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>START TEST NOW</a>
+                                    <a onClick={this.startTest.bind(this)} style={{backgroundColor: 'purple', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>START TEST NOW</a>
                             </div>;
         const test = <div style={{margin: '200px 300px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                         <h1>BEGIN TESTING NOW</h1>

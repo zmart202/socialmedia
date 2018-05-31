@@ -55,7 +55,7 @@ class FinalResults extends React.Component {
         return (
             <Aux>
                 <h3 style={{color: 'purple'}}>Results for {this.props.applicant.firstName} {this.props.applicant.lastName}</h3>
-                <h4 style={{color: 'purple'}}>Total amount of time taken is <span style={{color: 'red', textDecoration: 'underline'}}>{this.formattedSeconds(this.props.applicant.secondsElapsed)}</span></h4>
+                <h4 style={{color: 'purple'}}>Total amount of time taken is <span style={{color: 'red', textDecoration: 'underline'}}>{this.formattedSeconds(this.state.data.secondsElapsed)}</span></h4>
                 <p>Exercise A:</p>
                 <p><em>{this.state.data.answer1}</em></p>
                 <p>Exercise B:</p>

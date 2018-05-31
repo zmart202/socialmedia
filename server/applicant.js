@@ -28,8 +28,30 @@ router.get("/auth/:token", (req, res) => {
       firstName: applicant.firstName,
       lastName: applicant.lastName,
       email: applicant.email,
-      completed: applicant.completed
+      completed: applicant.completed,
+      testTimestamp: applicant.testTimestamp
     });
+  }).catch(err => console.error(err));
+});
+
+router.get("/test-timestamp/:token", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { token } = req.params;
+
+  Applicants.updateOne(
+    { token },
+    {
+      $set: {
+        testTimestamp: new Date()
+      }
+    }
+  ).then(success => {
+    if (!success) {
+      return res.sendStatus(403);
+    }
+
+    return res.json({ success: true });
   }).catch(err => console.error(err));
 });
 
@@ -38,7 +60,7 @@ router.post("/test-results/:token", (req, res) => {
   const TestResults = db.collection("testResults");
   const Applicants = db.collection("applicants");
   const { token } = req.params;
-  const { applicantId, answer1, answer2 } = req.body;
+  const { applicantId, secondsElapsed, answer1, answer2 } = req.body;
 
   Applicants.findOne({ token })
   .then(applicant => {
@@ -48,6 +70,7 @@ router.post("/test-results/:token", (req, res) => {
 
     TestResults.insertOne({
       applicantId,
+      secondsElapsed,
       answer1,
       answer2
     }).then(success => {

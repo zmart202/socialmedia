@@ -126,7 +126,8 @@ router.post("/create-applicant", (req, res) => {
       email,
       token,
       completed: false,
-      timestamp: new Date()
+      timestamp: new Date(),
+      testTimestamp: null
     }).then(success => {
       if (!success) {
         return res.json({
