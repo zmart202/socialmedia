@@ -12,6 +12,7 @@ class NewApplicant extends Component {
         this.refs.createFName.value = '';
         this.refs.createEmail.value = '';
     }
+
     render() {
         return(
             <form>

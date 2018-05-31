@@ -8,79 +8,75 @@ import FinalResults from '../Applicant/FinalResults/FinalResults';
 import { Link } from 'react-router-dom';
 
 class Company extends Component{
-    constructor(props){
-        super(props);
-        this.state = {
-            isLoading: true,
-            isAuth: false,
-            applicants: [
-                {
-                    key: 0,
-                    lname: "Martin",
-                    fname: "Zachary",
-                    email: "zmartin@umassd.edu",
-                    password: "abcdefgh",
-                    question1: 'caterers are our partners',
-                    question2: 'customers come first',
-                    secondsElapsed: 125,
-                    completed: true
-                },
-                {
-                    key: 1,
-                    lname: "Gates",
-                    fname: "Bill",
-                    email: "bgates@umassd.edu",
-                    password: "afjdkljd",
-                    question1: 'we should confirm caterers info',
-                    question2: 'make sure the customer is always happy',
-                    secondsElapsed: 250,
-                    completed: true
-                }
-            ],
-            keyId: 2,
-            viewing: false,
-            viewableApplicant: {
-                    key: 0,
-                    lname: "Martin",
-                    fname: "Zachary",
-                    email: "zmartin@umassd.edu",
-                    password: "abcdefgh",
-                    question1: 'caterers are our partners',
-                    question2: 'customers come first',
-                    secondsElapsed: 125,
-                    completed: false
-            },
-            search: ''
-        };
-    }
+  constructor(props){
+      super(props);
+      this.state = {
+          isLoading: true,
+          applicants: [],
+          viewing: false,
+          viewableApplicant: null,
+          search: ""
+      };
+  }
 
     componentDidMount() {
-        if (localStorage.getItem("token") === null) {
-            this.setState({ isLoading: false });
+        this.refreshApplicantList();
+    }
+
+    refreshApplicantList = () => {
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            this.props.history.push("/company-login");
             return;
         }
 
         const options = {
             headers: {
-                "Authorization": `Bearer ${localStorage.getItem("token")}`
+                "Authorization": `Bearer ${token}`
             }
         };
 
-        fetch("http://localhost:4567/company", options)
-        .then(res => {
-            this.setState({ isLoading: false });
-            if (res.status === 200) {
-                this.setState({ isAuth: true });
-            }
+        fetch("http://localhost:4567/company/applicants", options)
+        .then(res =>
+            res.status === 200 ?
+                res.json() :
+                Promise.reject("Auth denied")
+        ).then(data => {
+            this.setState({
+                isLoading: false,
+                applicants: data,
+                viewableApplicant: data[0]
+            })
         }).catch(err => console.error(err));
     }
 
     deleteApplicantsHandler = (applicant) => {
-        console.log(applicant)
-        let array = [...this.state.applicants];
-        let index = array.indexOf(applicant)
-        array.splice(index, 1);
-        this.setState({applicants: array});
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            this.props.history.push("/company-login");
+            return;
+        }
+
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify({
+                email: applicant.email,
+                id: applicant.id
+            })
+        };
+
+        fetch("http://localhost:4567/company/remove-applicant", options)
+        .then(res =>
+            res.status === 403 ?
+                Promise.reject("Auth denied") :
+                res.json()
+        ).then(data => {
+            this.refreshApplicantList();
+        }).catch(err => console.error(err));
     }
 
     generateKeyId = () => {
@@ -91,7 +87,7 @@ class Company extends Component{
     }
 
 
-    generatePasswordHandler = () => {
+    generateTokenHandler = () => {
         var length = 8,
         charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",
         retVal = "";
@@ -102,15 +98,38 @@ class Company extends Component{
     }
 
     createApplicant = (lname, fname, email) => {
-        this.state.applicants.unshift({
-            key: this.generateKeyId(),
-            lname,
-            fname,
-            email,
-            password: this.generatePasswordHandler(),
-            completed: false
-        });
-        this.setState({ applicants: this.state.applicants});
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            return;
+        }
+
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify({
+                email,
+                firstName: fname,
+                lastName: lname,
+                token: this.generateTokenHandler()
+            })
+        };
+
+        fetch("http://localhost:4567/company/create-applicant", options)
+        .then(res =>
+            res.status === 403 ?
+                Promise.reject("Auth denied") :
+                res.json()
+        ).then(data => {
+            this.refreshApplicantList();
+        }).catch(err => console.error(err));
+    }
+
+    logOut = () => {
+        localStorage.removeItem("token");
+        this.props.history.push("/");
     }
 
     viewHandler = (applicant) => {
@@ -128,14 +147,25 @@ class Company extends Component{
     }
 
     render() {
+        if (this.state.isLoading) {
+            return <p>Loading...</p>;
+        }
+
+        let modal = "";
+        if (this.state.viewing) {
+            modal = (
+              <Modal show={this.state.viewing} modalClosed={this.viewCancelHandler}>
+                  <FinalResults
+                      applicant={this.state.viewableApplicant}
+                      modalClosed={this.viewCancelHandler} />
+              </Modal>
+            );
+        }
+
         return(
             <Aux>
-                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'purple', cursor: 'pointer'}}><Link from='/company' to='/'>Logout</Link></header>
-                <Modal show={this.state.viewing} modalClosed={this.viewCancelHandler}>
-                    <FinalResults 
-                        applicant={this.state.viewableApplicant} 
-                        modalClosed={this.viewCancelHandler} />
-                </Modal>
+                <header style={{textAlign: 'right', padding: '20px 40px 20px 40px', color: 'purple', cursor: 'pointer'}}><a onClick={this.logOut}>Logout</a></header>
+                {modal}
                 <div style={{backgroundColor: '#d8d8d8', margin: '100px 210px 0px 210px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                     <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
                     <h4 style={{color: 'purple'}}>Create New Applicant</h4>
@@ -147,9 +177,10 @@ class Company extends Component{
                         onChange={this.updateSearch.bind(this)}
                         placeholder="Search by last name.." />
                     </div>
-                    <ApplicantList 
+                    <ApplicantList
                         applicants={this.state.applicants}
                         deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
+                        refreshApplicantList={this.refreshApplicantList.bind(this)}
                         viewable={this.viewHandler.bind(this)}
                         searchedApplicant={this.state.search} />
                 </div>
