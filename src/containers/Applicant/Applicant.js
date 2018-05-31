@@ -47,9 +47,6 @@ class Applicant extends Component {
           ':' +
         ('0' + sec % 60).slice(-2));
       }
-
-      finishedTest = () => {
-      }
     
     render () {
         const welcomePage = <div style={{margin: '200px 500px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
