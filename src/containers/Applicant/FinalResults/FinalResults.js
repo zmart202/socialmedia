@@ -27,7 +27,7 @@ class FinalResults extends React.Component {
             }
         };
 
-        fetch(`http://localhost:4567/company/test-results/${this.props.applicant.id}`, options)
+        fetch(`https://vast-garden-33716.herokuapp.com/api/company/test-results/${this.props.applicant.id}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :

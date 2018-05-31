@@ -26,5 +26,5 @@ app.use((req, res, next) => {
 
 app.use(jsonParser);
 
-app.use("/company", company);
-app.use("/applicant", applicant);
+app.use("/api/company", company);
+app.use("/api/applicant", applicant);

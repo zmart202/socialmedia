@@ -3,11 +3,29 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
+const uniqid = require("uniqid");
 
 const secret = require("./secret");
 const { hashPassword, comparePasswords } = require("./password-utils");
 
 const router = express.Router();
+
+router.post("/create-company", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { name } = req.body;
+
+  Companies.insertOne({
+    name,
+    id: uniqid()
+  }).then(success => {
+    if (!success) {
+      return res.json({ success: false });
+    }
+
+    res.json({ success: true });
+  }).catch(err => console.error(err));
+});
 
 router.post("/signup", (req, res) => {
   const db = req.app.locals.db;

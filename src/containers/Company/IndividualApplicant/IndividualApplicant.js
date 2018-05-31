@@ -78,7 +78,7 @@ class IndividualApplicant extends Component{
             })
         };
 
-        fetch("http://localhost:4567/company/edit-applicant", options)
+        fetch("https://vast-garden-33716.herokuapp.com/api/company/edit-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :

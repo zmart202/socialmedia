@@ -30,7 +30,7 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`http://localhost:4567/applicant/auth/${this.token}`)
+        fetch(`https://vast-garden-33716.herokuapp.com/api/applicant/auth/${this.token}`)
         .then(res => {
             this.setState({ isLoading: false });
             return res.status === 403 ?
@@ -65,7 +65,7 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`http://localhost:4567/applicant/test-timestamp/${this.token}`)
+        fetch(`https://vast-garden-33716.herokuapp.com/api/applicant/test-timestamp/${this.token}`)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -104,7 +104,7 @@ class Applicant extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/applicant/test-results/${this.token}`, options)
+        fetch(`https://vast-garden-33716.herokuapp.com/api/applicant/test-results/${this.token}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
