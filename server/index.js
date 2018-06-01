@@ -29,7 +29,7 @@ app.use(jsonParser);
 app.use("/api/company", company);
 app.use("/api/applicant", applicant);
 
-app.use(express.static(path.join(__dirname, "build")));
+app.use(express.static(path.join(__dirname, "../build")));
 
 app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "../build", "index.html"));
