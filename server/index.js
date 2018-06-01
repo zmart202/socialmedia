@@ -16,7 +16,7 @@ MongoClient.connect(mongoUrl)
   app.locals.db = db.db("test");
 }).catch(err => console.error(err));
 
-app.listen(4567, () => console.log("Listening on port 4567..."));
+app.listen(process.env.PORT || 4567, () => console.log("Listening on port 4567..."));
 
 app.use((req, res, next) => {
   res.header("Access-Control-Allow-Origin", "*");
