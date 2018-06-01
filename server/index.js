@@ -3,6 +3,7 @@
 const express = require("express");;
 const jsonParser = require("body-parser").json();
 const MongoClient = require("mongodb").MongoClient;
+const path = require("path");
 
 const company = require("./company");
 const applicant = require("./applicant");
@@ -25,6 +26,9 @@ app.use((req, res, next) => {
 });
 
 app.use(jsonParser);
-
 app.use("/api/company", company);
 app.use("/api/applicant", applicant);
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../public/index.html"));
+});
