@@ -15,22 +15,6 @@ class IndividualApplicant extends Component{
     }
 
 
-    renderApplicantSection = () => {
-
-        if (this.state.isEditing) {
-            return (
-                <form onSubmit={this.onSaveClick.bind(this)}>
-                    <td><input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /></td>
-                    <td><input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /></td>
-                    <td><input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /></td>
-                </form>
-            );
-        } else {
-
-        }
-    }
-
-
     renderActionsSection = () => {
         if (this.state.isEditing) {
             return (
@@ -87,11 +71,6 @@ class IndividualApplicant extends Component{
             this.props.refreshApplicantList();
             this.setState({ isEditing: false });
         }).catch(err => console.error(err));
-
-        /*this.props.applicant.lname = this.refs.editLName.value;
-        this.props.applicant.fname = this.refs.editFName.value;
-        this.props.applicant.email = this.refs.editEmail.value;
-        this.setState({isEditing: false});*/
     }
 
     completionHandler = () => {
@@ -114,8 +93,7 @@ class IndividualApplicant extends Component{
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
                     <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                    {/* {this.renderApplicantSection()} */}
-                    <td>http://localhost:3000/applicant/{this.props.applicant.token}</td>
+                    <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
                     <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                     <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
                     {this.renderActionsSection()}
