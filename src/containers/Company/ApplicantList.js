@@ -7,18 +7,22 @@ class ApplicantList extends Component {
     renderItems = () => {
         let filteredApplicant = this.props.applicants.filter(
             (applicant) => {
-                return applicant.lname.toLowerCase().indexOf(this.props.searchedApplicant.toLowerCase()) !== -1;
+                return applicant.lastName.toLowerCase().indexOf(this.props.searchedApplicant.toLowerCase()) !== -1;
             }
         );
         const props = _.omit(this.props, 'applicants');
 
-        return filteredApplicant.map((applicant) => 
-            (<IndividualApplicant applicant={applicant} 
-                                        delete={() => props.deleteApplicantsHandler(applicant)}
-                                        results={() => props.viewable(applicant)}
-                                        key={applicant.key} 
-                                        {...props}  />)
-            );
+        const sorted = filteredApplicant.slice()
+            .sort((a, b) => Date.parse(b.timestamp) - Date.parse(a.timestamp));
+
+        return sorted.map((applicant) =>
+            <IndividualApplicant applicant={applicant}
+                                    delete={() => props.deleteApplicantsHandler(applicant)}
+                                    results={() => props.viewable(applicant)}
+                                    refreshApplicantList={props.refreshApplicantList}
+                                    key={applicant.id}
+                                    {...props}  />
+        );
     }
 
     render() {
@@ -26,7 +30,7 @@ class ApplicantList extends Component {
                 <div>
                 <table>
                     <ApplicantHeader />
-                    <tbody style={{textAlign: 'center', align: 'center', width: '100%'}}>
+                    <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
                             {this.renderItems()}
                     </tbody>
                 </table>

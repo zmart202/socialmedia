@@ -16,12 +16,12 @@ class IndividualApplicant extends Component{
 
 
     renderApplicantSection = () => {
-        
+
         if (this.state.isEditing) {
             return (
                 <form onSubmit={this.onSaveClick.bind(this)}>
-                    <td><input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /></td>
-                    <td><input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /></td>
+                    <td><input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /></td>
+                    <td><input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /></td>
                     <td><input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /></td>
                 </form>
             );
@@ -58,10 +58,40 @@ class IndividualApplicant extends Component{
 
     onSaveClick(event) {
         event.preventDefault();
-        this.props.applicant.lname = this.refs.editLName.value;
+
+        const token = localStorage.getItem("token");
+        if (token === null) {
+            return;
+        }
+
+        const options = {
+            headers: {
+                "Authorization": `Bearer ${token}`,
+                "Content-Type": "application/json"
+            },
+            method: "POST",
+            body: JSON.stringify({
+                id: this.props.applicant.id,
+                firstName: this.refs.editFName.value,
+                lastName: this.refs.editLName.value,
+                email: this.refs.editEmail.value
+            })
+        };
+
+        fetch("http://localhost:4567/company/edit-applicant", options)
+        .then(res =>
+            res.status === 403 ?
+                Promise.reject("Auth denied") :
+                res.json()
+        ).then(data => {
+            this.props.refreshApplicantList();
+            this.setState({ isEditing: false });
+        }).catch(err => console.error(err));
+
+        /*this.props.applicant.lname = this.refs.editLName.value;
         this.props.applicant.fname = this.refs.editFName.value;
         this.props.applicant.email = this.refs.editEmail.value;
-        this.setState({isEditing: false});
+        this.setState({isEditing: false});*/
     }
 
     completionHandler = () => {
@@ -80,12 +110,12 @@ class IndividualApplicant extends Component{
 
     render() {
         return(
-            <tr style={{fontSize: "11px"}} className='Applicant'>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lname} ref="editLName" /> : this.props.applicant.lname}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.fname} ref="editFName" /> : this.props.applicant.fname}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
+            <tr style={{fontSize: "12px"}} className='Applicant'>
+                    <td><strong>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</strong></td>
+                    <td><strong>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</strong></td>
+                    <td><strong>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</strong></td>
                     {/* {this.renderApplicantSection()} */}
-                    <td>{this.props.applicant.password}</td>
+                    <td><strong>http://localhost:3000/applicant/{this.props.applicant.token}</strong></td>
                     <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                     <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
                     {this.renderActionsSection()}
