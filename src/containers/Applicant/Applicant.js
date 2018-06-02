@@ -30,14 +30,13 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`http://localhost:4567/applicant/auth/${this.token}`)
+        fetch(`https://decisiontime.herokuapp.com/api/applicant/auth/${this.token}`)
         .then(res => {
             this.setState({ isLoading: false });
             return res.status === 403 ?
                 Promise.reject("Auth denied") :
                 res.json()
         }).then(data => {
-            console.log("DATA", data);
             if (data.completed) {
                 this.setState({
                     isAuth: true,
@@ -65,13 +64,12 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`http://localhost:4567/applicant/test-timestamp/${this.token}`)
+        fetch(`https://decisiontime.herokuapp.com/api/applicant/test-timestamp/${this.token}`)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
                 res.json()
         ).then(data => {
-            console.log(data);
             this.changePageHandler();
         }).catch(err => console.error(err));
     }
@@ -104,7 +102,7 @@ class Applicant extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/applicant/test-results/${this.token}`, options)
+        fetch(`https://decisiontime.herokuapp.com/api/applicant/test-results/${this.token}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :

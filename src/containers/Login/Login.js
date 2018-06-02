@@ -7,7 +7,8 @@ class Login extends Component {
         super();
         this.state = {
             email: "",
-            password: ""
+            password: "",
+            denied: false
         };
 
         this.handleInput = this.handleInput.bind(this);
@@ -26,12 +27,14 @@ class Login extends Component {
             }
         };
 
-        fetch("http://localhost:4567/company/auth", options)
-        .then(res =>
-            res.status === 403 ?
-                Promise.reject(new Error("Auth denied")) :
-                res.json()
-        ).then(data => {
+        fetch("https://decisiontime.herokuapp.com/api/company/auth", options)
+        .then(res => {
+            if (res.status === 403) {
+                return Promise.reject(new Error("Auth denied"));
+            } else {
+                return res.json()
+            }
+        }).then(data => {
             this.props.history.push("/company");
         }).catch(err => console.error(err));
     }
@@ -55,11 +58,15 @@ class Login extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/company/login`, options)
-        .then(res => res.status === 403 ?
-            Promise.reject(new Error("403 access denied")) :
-            res.json())
-        .then(data => {
+        fetch(`https://decisiontime.herokuapp.com/api/company/login`, options)
+        .then(res => {
+            if (res.status === 403) {
+                this.setState({ denied: true });
+                return Promise.reject(new Error("403 access denied"));
+            } else {
+                return res.json();
+            }
+        }).then(data => {
             localStorage.setItem("token", data.token);
             this.props.history.push("/company");
         }).catch(err => console.error(err));
@@ -67,6 +74,13 @@ class Login extends Component {
 
 
     render() {
+        let deniedMsg = "";
+        if (this.state.denied) {
+            deniedMsg = (
+                <p style={{ color: 'red' }}>Invalid login credentials</p>
+            );
+        }
+
         return (
             <div>
                 <form style={{backgroundColor: "#dedfe0", margin: "100px 350px 0px 350px", paddingBottom: "40px", paddingTop: "40px", boxShadow: '3px 3px 2px 0px rgba(0,0,0,0.33)'}}>
@@ -87,6 +101,7 @@ class Login extends Component {
                     </div>
                     <div>
                         <button onClick={this.handleSubmit}>Login</button>
+                        {deniedMsg}
                     </div>
                 </form>
             </div>
