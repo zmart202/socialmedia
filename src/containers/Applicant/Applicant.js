@@ -37,7 +37,6 @@ class Applicant extends Component {
                 Promise.reject("Auth denied") :
                 res.json()
         }).then(data => {
-            console.log("DATA", data);
             if (data.completed) {
                 this.setState({
                     isAuth: true,
@@ -71,7 +70,6 @@ class Applicant extends Component {
                 Promise.reject("Auth denied") :
                 res.json()
         ).then(data => {
-            console.log(data);
             this.changePageHandler();
         }).catch(err => console.error(err));
     }
