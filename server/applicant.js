@@ -3,8 +3,9 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 
-const secret = require("./secret");
 const { hashPassword, comparePasswords } = require("./password-utils");
+
+const secret = process.env.SECRET;
 
 const router = express.Router();
 
