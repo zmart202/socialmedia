@@ -43,7 +43,7 @@ class FinalResults extends React.Component {
 
     formattedSeconds = (sec) => {
         return (Math.floor(sec / 60) +
-            ' minutes ' +
+            ' minutes and ' +
           ('0' + sec % 60).slice(-2) + ' seconds');
     }
 

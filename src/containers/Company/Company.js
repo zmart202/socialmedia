@@ -164,20 +164,22 @@ class Company extends Component{
 
         return(
             <Aux>
-                <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer'}}><a onClick={this.logOut}>Logout</a></header>
+                    <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
                 {modal}
-                <div style={{backgroundColor: '#d8d8d8', margin: '100px 50px 0px 50px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
+                <div style={{backgroundColor: '#d8d8d8', margin: '0px 0px 0px 0px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                     <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
                     <h4 style={{color: 'purple'}}>Create New Applicant</h4>
                     <NewApplicant createApplicant={this.createApplicant.bind(this)} />
                     <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
                     <h4 style={{color: 'purple'}}>Search Bar</h4>
-                    <input type="text"
+                    <input 
+                        type="text"
+                        style={{padding: '10px'}}
                         value={this.state.search}
                         onChange={this.updateSearch.bind(this)}
                         placeholder="Search by last name.." />
                     </div>
-                    <div style={{margin: 'auto', width: '80%'}}>
+                    <div style={{width:'1100px', margin:'0 auto'}}>
                     <ApplicantList
                         applicants={this.state.applicants}
                         deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}

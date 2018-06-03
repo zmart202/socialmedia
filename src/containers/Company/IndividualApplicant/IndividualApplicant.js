@@ -96,7 +96,7 @@ class IndividualApplicant extends Component{
                     <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
                     <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                     <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
-                    {this.renderActionsSection()}
+                    <td>{this.renderActionsSection()}</td>
             </tr>
         );
     }
