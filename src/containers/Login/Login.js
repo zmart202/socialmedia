@@ -94,7 +94,7 @@ class Login extends Component {
                     </div>
                     <div style={{padding: "10px"}}>
                         <input
-                            type="text"
+                            type="password"
                             placeholder="password..."
                             name="password"
                             onChange={this.handleInput} />
