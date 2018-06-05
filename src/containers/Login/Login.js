@@ -26,7 +26,7 @@ class Login extends Component {
             }
         };
 
-        fetch("http://localhost:4567/api/company/auth", options)
+        fetch("https://decisiontime.herokuapp.com/api/company/auth", options)
         .then(res => {
             if (res.status === 403) {
                 return Promise.reject(new Error("Auth denied"));
@@ -57,7 +57,7 @@ class Login extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/api/company/login`, options)
+        fetch(`https://decisiontime.herokuapp.com/api/company/login`, options)
         .then(res => {
             if (res.status === 403) {
                 this.setState({ denied: true });

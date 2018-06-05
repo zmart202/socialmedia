@@ -63,7 +63,7 @@ class IndividualApplicant extends Component{
             })
         };
 
-        fetch("http://localhost:4567/api/company/edit-applicant", options)
+        fetch("https://decisiontime.herokuapp.com/api/company/edit-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
