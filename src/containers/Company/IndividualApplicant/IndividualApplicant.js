@@ -88,17 +88,6 @@ class IndividualApplicant extends Component{
 
     render() {
         return(
-<<<<<<< HEAD
-            <tr style={{fontSize: "11px"}} className='Applicant'>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                    <td>http://localhost:4567/applicant/{this.props.applicant.token}</td>
-                    <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
-                    <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
-                    {this.renderActionsSection()}
-            </tr>
-=======
             <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
                 <tr style={{fontSize: "11px"}} className='Applicant'>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
@@ -111,7 +100,6 @@ class IndividualApplicant extends Component{
                         <td>{this.renderActionsSection()}</td>
                 </tr>
             </tbody>
->>>>>>> 022df4dea9aec6264834f17cdcd30bbb3d4d8b1e
         );
     }
 }

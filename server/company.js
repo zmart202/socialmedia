@@ -242,16 +242,22 @@ router.get("/test-results/:applicantId", (req, res) => {
   jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
-      res.sendStatus(403);
+      return res.sendStatus(403);
     }
 
-    Applicants.findOne({ applicantId })
+    Applicants.findOne({ id: applicantId })
     .then(doc => {
       if (!doc) {
         return res.json([]);
       }
 
-      res.json(doc.results);
+      res.json({
+        results: doc.results,
+        secondsElapsed: doc.secondsElapsed,
+        firstName: doc.firstName,
+        lastName: doc.lastName,
+        id: doc.id
+      });
     }).catch(err => console.error(err));
   });
 });
