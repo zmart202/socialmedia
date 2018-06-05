@@ -146,7 +146,8 @@ router.post("/create-applicant", (req, res) => {
       token,
       completed: false,
       timestamp: new Date(),
-      testTimestamp: null
+      testTimestamp: null,
+      results: []
     }).then(success => {
       if (!success) {
         return res.json({
@@ -232,7 +233,7 @@ router.post("/remove-applicant", (req, res) => {
 
 router.get("/test-results/:applicantId", (req, res) => {
   const db = req.app.locals.db;
-  const TestResults = db.collection("testResults");
+  const Applicants = db.collection("applicants");
   const { applicantId } = req.params;
 
   const bearer = req.headers["authorization"];
@@ -244,13 +245,13 @@ router.get("/test-results/:applicantId", (req, res) => {
       res.sendStatus(403);
     }
 
-    TestResults.findOne({ applicantId })
+    Applicants.findOne({ applicantId })
     .then(doc => {
       if (!doc) {
         return res.json([]);
       }
 
-      res.json(doc);
+      res.json(doc.results);
     }).catch(err => console.error(err));
   });
 });

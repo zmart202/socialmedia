@@ -30,7 +30,7 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`https://decisiontime.herokuapp.com/api/applicant/auth/${this.token}`)
+        fetch(`http://localhost:4567/api/applicant/auth/${this.token}`)
         .then(res => {
             this.setState({ isLoading: false });
             return res.status === 403 ?
@@ -64,7 +64,7 @@ class Applicant extends Component {
             return;
         }
 
-        fetch(`https://decisiontime.herokuapp.com/api/applicant/test-timestamp/${this.token}`)
+        fetch(`http://localhost:4567/api/applicant/test-timestamp/${this.token}`)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -102,7 +102,7 @@ class Applicant extends Component {
             })
         };
 
-        fetch(`https://decisiontime.herokuapp.com/api/applicant/test-results/${this.token}`, options)
+        fetch(`http://localhost:4567/api/applicant/test-results/${this.token}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -121,7 +121,7 @@ class Applicant extends Component {
           ':' +
         ('0' + sec % 60).slice(-2));
       }
-    
+
     render () {
         if (this.state.isLoading) {
             return <p>We are loading...</p>;
