@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-//import _ from 'lodash';
 import Aux from '../../hoc/Aux/Aux';
 import NewApplicant from './NewApplicant';
 import ApplicantList from './ApplicantList';
@@ -129,12 +128,6 @@ class Company extends Component{
         this.props.history.push("/");
     }
 
-    // viewHandler = (applicant) => {
-    //     this.setState({viewing: true});
-    //     this.setState({viewableApplicant: applicant});
-    //     return this.state.viewableApplicant
-    // }
-
     viewCancelHandler = () => {
         this.setState({viewing: false});
     }
@@ -148,21 +141,9 @@ class Company extends Component{
             return <p>Loading...</p>;
         }
 
-        // let modal = "";
-        // if (this.state.viewing) {
-        //     modal = (
-        //       <Modal show={this.state.viewing} modalClosed={this.viewCancelHandler}>
-        //           <FinalResults
-        //               applicant={this.state.viewableApplicant}
-        //               modalClosed={this.viewCancelHandler} />
-        //       </Modal>
-        //     );
-        // }
-
         return(
             <Aux>
-                    <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
-                {/* {modal} */}
+                <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
                 <div style={{backgroundColor: '#d8d8d8', margin: '0px 0px 0px 0px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                     <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
                     <h4 style={{color: 'purple'}}>Create New Applicant</h4>
