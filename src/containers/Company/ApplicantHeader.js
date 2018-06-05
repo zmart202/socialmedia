@@ -8,7 +8,7 @@ class ApplicantHeader extends Component{
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Last Name</th>
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>First Name</th>
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Email</th>
-                    <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Testing Link</th>
+                    <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Link to Test</th>
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Status</th>
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Results</th>
                     <th style={{padding: "12px 30px", textDecoration: 'underline'}}>Actions</th>
