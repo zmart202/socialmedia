@@ -18,7 +18,7 @@ class ApplicantList extends Component {
         return sorted.map((applicant) =>
             <IndividualApplicant applicant={applicant}
                                     delete={() => props.deleteApplicantsHandler(applicant)}
-                                    results={() => props.viewable(applicant)}
+                                    //results={() => props.viewable(applicant)}
                                     refreshApplicantList={props.refreshApplicantList}
                                     key={applicant.id}
                                     {...props}  />
@@ -30,9 +30,7 @@ class ApplicantList extends Component {
                 <div>
                 <table>
                     <ApplicantHeader />
-                    <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                            {this.renderItems()}
-                    </tbody>
+                    {this.renderItems()}
                 </table>
                 </div>
             );

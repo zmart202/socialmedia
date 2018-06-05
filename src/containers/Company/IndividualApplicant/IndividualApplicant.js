@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import './IndividualApplicant.css'
+import { Link } from 'react-router-dom';
 //import Modal from '../../components/UI/Modal/Modal';
 //import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
@@ -81,23 +82,24 @@ class IndividualApplicant extends Component{
         }
     }
 
-    resultsHandler = () => {
-        this.props.viewable;
-        this.props.results;
+    viewApplicantResults = () => {
+        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
     }
-
 
     render() {
         return(
-            <tr style={{fontSize: "11px"}} className='Applicant'>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
-                    <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                    <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
-                    <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
-                    <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td>
-                    <td>{this.renderActionsSection()}</td>
-            </tr>
+            <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
+                <tr style={{fontSize: "11px"}} className='Applicant'>
+                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
+                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
+                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
+                        <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
+                        <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
+                        {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
+                        <td>{this.viewApplicantResults()}</td>
+                        <td>{this.renderActionsSection()}</td>
+                </tr>
+            </tbody>
         );
     }
 }

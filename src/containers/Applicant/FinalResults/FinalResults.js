@@ -1,5 +1,6 @@
 import React from 'react';
 import Aux from '../../../hoc/Aux/Aux';
+import { Link } from 'react-router-dom';
 
 class FinalResults extends React.Component {
     constructor(props) {
@@ -9,6 +10,7 @@ class FinalResults extends React.Component {
             isError: false,
             data: {}
         };
+        this.ApplicantId = this.props.match.params.ApplicantId;
     }
 
     componentDidMount() {
@@ -27,7 +29,7 @@ class FinalResults extends React.Component {
             }
         };
 
-        fetch(`https://decisiontime.herokuapp.com/api/company/test-results/${this.props.applicant.id}`, options)
+        fetch(`https://decisiontime.herokuapp.com/api/company/test-results/${this.ApplicantId}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -54,14 +56,15 @@ class FinalResults extends React.Component {
 
         return (
             <Aux>
-                <h3 style={{color: 'purple'}}>Results for {this.props.applicant.firstName} {this.props.applicant.lastName}</h3>
+                <h3 style={{color: 'purple'}}>Results for {this.state.data.firstName} {this.state.data.lastName}</h3>
                 <h4 style={{color: 'purple'}}>Total amount of time taken is <span style={{color: 'red', textDecoration: 'underline'}}>{this.formattedSeconds(this.state.data.secondsElapsed)}</span></h4>
                 <p>Exercise A:</p>
                 <p><em>{this.state.data.answer1}</em></p>
                 <p>Exercise B:</p>
                 <p><em>{this.state.data.answer2}</em></p>
                 <div style={{paddingTop: '20px'}}>
-                    <a onClick={this.props.modalClosed} style={{backgroundColor: '#6d6dc4', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</a>
+                    {/* <a onClick={this.props.modalClosed} style={{backgroundColor: '#6d6dc4', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</a> */}
+                    <Link to='/company' style={{textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</Link>
                 </div>
             </Aux>
         );
