@@ -5,7 +5,7 @@ import './App.css';
 import Company from './containers/Company/Company';
 import Applicant from './containers/Applicant/Applicant';
 import Finished from './containers/Applicant/Finished/Finished';
-import FinalResults from './containers/Applicant/FinalResults/FinalResults';
+import FinalResults from './containers/Company/FinalResults/FinalResults';
 
 class App extends Component {
   render() {
