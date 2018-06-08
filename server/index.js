@@ -4,6 +4,7 @@ const express = require("express");;
 const jsonParser = require("body-parser").json();
 const MongoClient = require("mongodb").MongoClient;
 const path = require("path");
+require("dotenv").config();
 
 const company = require("./company");
 const applicant = require("./applicant");

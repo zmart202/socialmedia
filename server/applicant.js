@@ -58,43 +58,33 @@ router.get("/test-timestamp/:token", (req, res) => {
 
 router.post("/test-results/:token", (req, res) => {
   const db = req.app.locals.db;
-  const TestResults = db.collection("testResults");
   const Applicants = db.collection("applicants");
   const { token } = req.params;
   const { applicantId, secondsElapsed, answer1, answer2 } = req.body;
 
-  Applicants.findOne({ token })
-  .then(applicant => {
-    if (!applicant) {
-      return res.sendStatus(403);
+  Applicants.updateOne(
+    { token },
+    {
+      $set: {
+        secondsElapsed,
+        completed: true
+      },
+      $push: {
+        results: {
+          $each: [answer1, answer2]
+        }
+      }
+    }
+  ).then(success => {
+    if (!success) {
+      return res.json({ success: false });
     }
 
-    TestResults.insertOne({
-      applicantId,
-      secondsElapsed,
-      answer1,
-      answer2
-    }).then(success => {
-      if (!success) {
-        return res.json({ success: false });
-      }
-
-      Applicants.updateOne(
-        { token },
-        {
-          $set: {
-            completed: true
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          return res.json({ success: false });
-        }
-
-        res.json({ success: true });
-      }).catch(err => console.error(err));
-    }).catch(err => console.error(err));
-  }).catch(err => console.error(err));
+    res.json({ success: true });
+  }).catch(err => {
+    res.json({ success: false });
+    console.error(err);
+  });
 });
 
 module.exports = router;

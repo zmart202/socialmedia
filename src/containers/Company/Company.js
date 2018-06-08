@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Aux from '../../hoc/Aux/Aux';
 import NewApplicant from './NewApplicant';
 import ApplicantList from './ApplicantList';
-import Modal from '../../components/UI/Modal/Modal';
 
 class Company extends Component{
   constructor(props){
@@ -151,7 +150,7 @@ class Company extends Component{
                     <NewApplicant createApplicant={this.createApplicant.bind(this)} />
                     <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
                     <h4 style={{color: 'purple'}}>Search Bar</h4>
-                    <input 
+                    <input
                         type="text"
                         style={{padding: '10px'}}
                         value={this.state.search}

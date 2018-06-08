@@ -120,7 +120,7 @@ class Applicant extends Component {
           ':' +
         ('0' + sec % 60).slice(-2));
       }
-    
+
     render () {
         if (this.state.isLoading) {
             return <p>We are loading...</p>;
