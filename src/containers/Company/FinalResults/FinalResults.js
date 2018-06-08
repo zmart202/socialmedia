@@ -57,7 +57,6 @@ class FinalResults extends React.Component {
         return (
             <Aux>
                 <div style={{padding: '20px', textAlign: 'left'}}>
-                    {/* <a onClick={this.props.modalClosed} style={{backgroundColor: '#6d6dc4', textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</a> */}
                     <Link to='/company' style={{textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</Link>
                 </div>
                 <h3 style={{color: 'purple'}}>Results for {this.state.data.firstName} {this.state.data.lastName}</h3>

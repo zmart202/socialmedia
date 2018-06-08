@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import './IndividualApplicant.css'
 import { Link } from 'react-router-dom';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
 //import Modal from '../../components/UI/Modal/Modal';
 //import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
@@ -86,6 +87,13 @@ class IndividualApplicant extends Component{
         return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
     }
 
+    copyURLHandler = () => {
+        let URL = `https://decisiontime.herokuapp.com/applicant/${this.props.applicant.token}`
+        return (<CopyToClipboard text={URL}>
+                <button>Click to Copy URL</button>
+        </CopyToClipboard>);     
+    }
+
     render() {
         return(
             <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
@@ -93,7 +101,7 @@ class IndividualApplicant extends Component{
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                        <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
+                        <td>{this.copyURLHandler()}</td>
                         <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                         {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
                         <td>{this.viewApplicantResults()}</td>

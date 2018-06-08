@@ -134,7 +134,7 @@ class Applicant extends Component {
             return <p>You have already completed the test!</p>;
         }
 
-        const welcomePage = <div style={{margin: '200px 500px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
+        const welcomePage = <div style={{textAlign: 'center', margin: '200px 500px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                                 <div style={{paddingBottom: '10px'}}>
                                     <p>Hey {this.state.testTaker.firstName}, thanks for showing iinterest in becoming a customer
                         service ninja. We think you have the potential to be a great fit
