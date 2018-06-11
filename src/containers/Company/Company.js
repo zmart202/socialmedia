@@ -32,7 +32,7 @@ class Company extends Component{
             }
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/applicants", options)
+        fetch("http://localhost:4567/api/company/applicants", options)
         .then(res =>
             res.status === 200 ?
                 res.json() :
@@ -65,7 +65,7 @@ class Company extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/remove-applicant", options)
+        fetch("http://localhost:4567/api/company/remove-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -113,7 +113,7 @@ class Company extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/create-applicant", options)
+        fetch("http://localhost:4567/api/company/create-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :

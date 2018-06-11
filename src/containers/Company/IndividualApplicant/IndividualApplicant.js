@@ -63,7 +63,7 @@ class IndividualApplicant extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/edit-applicant", options)
+        fetch("http://localhost:4567/api/company/edit-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -93,7 +93,7 @@ class IndividualApplicant extends Component{
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                        <td>https://decisiontime.herokuapp.com/applicant/{this.props.applicant.token}</td>
+                        <td>http://localhost:3000/applicant/{this.props.applicant.token}</td>
                         <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                         {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
                         <td>{this.viewApplicantResults()}</td>
