@@ -9,6 +9,9 @@
 # production
  /build
 
+ # notes
+ untitled
+
 # misc
 .DS_Store
 .env

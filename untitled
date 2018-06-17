@@ -1,0 +1,2 @@
+- Pull state up from Questions to Test so that we can send all answers on submit.
+    - Pass handleChange as prop

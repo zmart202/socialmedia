@@ -3,9 +3,10 @@
 const express = require("express");
 const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
-const uniqid = require("uniqid");
+const hat = require("hat");
 
 const { hashPassword, comparePasswords } = require("./password-utils");
+const sample = require("./sample-test");
 
 const secret = process.env.SECRET;
 
@@ -18,70 +19,93 @@ router.post("/create-company", (req, res) => {
 
   Companies.insertOne({
     name,
-    id: uniqid()
+    tests: [sample],
+    id: hat()
   }).then(success => {
     if (!success) {
       return res.json({ success: false });
     }
 
-    res.json({ success: true });
+    res.json({
+      success: true,
+      id: success.id
+    });
   }).catch(err => console.error(err));
 });
 
 router.post("/signup", (req, res) => {
   const db = req.app.locals.db;
+  const CompanyUsers = db.collection("companyUsers");
   const Companies = db.collection("companies");
-  const { name, email, password } = req.body;
+  const { firstName, lastName, email, companyId, password } = req.body;
 
-  hashPassword(password).then(hash => {
-    Companies.insertOne({
-      name,
-      email,
-      password: hash
-    }).then(success => {
-      if (!success) {
-        res.json({
-          success: false,
-          msg: "Signup failed"
-        });
-        return;
-      }
-
-      jwt.sign({
-        email,
-        name
-      }, secret, (err, token) => {
-        res.json({ token });
+  Companies.findOne({ id: companyId })
+  .then(success => {
+    if (!success) {
+      return res.json({
+        success: false,
+        msg: "Invalid companyId"
       });
+    }
+
+    hashPassword(password).then(hash => {
+      CompanyUsers.insertOne({
+        firstName,
+        lastName,
+        email,
+        companyId,
+        password: hash
+      }).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Signup failed"
+          });
+        }
+
+        jwt.sign({
+          email,
+          companyId
+        }, secret, (err, token) => {
+          res.json({
+            token,
+            success: true
+          });
+        });
+      }).catch(err => console.error(err));
     }).catch(err => console.error(err));
   }).catch(err => console.error(err));
 });
 
 router.post("/login", (req, res) => {
   const db = req.app.locals.db;
-  const Companies = db.collection("companies");
+  const CompanyUsers = db.collection("companyUsers");
   const { email, password } = req.body;
 
-  Companies.findOne({
+  CompanyUsers.findOne({
     email
-  }).then(company => {
-    if (!company) {
+  }).then(user => {
+    if (!user) {
       return res.sendStatus(403);
     }
 
-    comparePasswords(password, company.password)
+    comparePasswords(password, user.password)
     .then(success => {
       if (!success) {
         return res.sendStatus(403);
       }
 
       jwt.sign({
-        email: company.email,
-        name: company.name
+        email: user.email,
+        companyId: user.companyId
       }, secret, (err, token) => {
-        res.json({ token });
+        res.json({
+          token,
+          success: true,
+          companyId: user.companyId
+        });
       });
-    }).catch(err => console.error(err));
+    }).catch(err => res.sendStatus(403));
   }).catch(err => console.error(err));
 });
 
@@ -111,8 +135,8 @@ router.get("/applicants", (req, res) => {
       return res.sendStatus(403);
     }
 
-    Applicants.find().toArray()
-    .then(data => {
+    Applicants.find({ companyId: authData.companyId })
+    .toArray().then(data => {
       if (!data) {
         return res.json([]);
       }
@@ -122,8 +146,40 @@ router.get("/applicants", (req, res) => {
   });
 });
 
+router.get("/tests/:companyId", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { companyId } = req.params;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${companyId}`
+        });
+      }
+
+      res.json({
+        tests: company.tests,
+        success: true
+      });
+    }).catch(err => console.error(err));
+  });
+});
+
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
+  const Companies = db.collection("companies");
   const Applicants = db.collection("applicants");
   const { firstName, lastName, email, token } = req.body;
 
@@ -136,36 +192,49 @@ router.post("/create-applicant", (req, res) => {
       return res.sendStatus(403);
     }
 
-    const id = shortid.generate();
-
-    Applicants.insertOne({
-      id,
-      firstName,
-      lastName,
-      email,
-      token,
-      completed: false,
-      timestamp: new Date(),
-      testTimestamp: null,
-      results: []
-    }).then(success => {
-      if (!success) {
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
         return res.json({
           success: false,
-          msg: "Could not create applicant"
+          msg: "Invalid companyID"
         });
       }
 
-      res.json({
-        success: true,
-        createdApplicant: {
-          id,
-          firstName,
-          lastName,
-          email,
-          token
+      const id = shortid.generate();
+
+      Applicants.insertOne({
+        id,
+        firstName,
+        lastName,
+        email,
+        token,
+        companyId: company.id,
+        test: company.tests[0],
+        completed: false,
+        timestamp: new Date(),
+        testTimestamp: null,
+        secondsElapsed: 0,
+        answers: null
+      }).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not create applicant"
+          });
         }
-      });
+
+        res.json({
+          success: true,
+          createdApplicant: {
+            id,
+            firstName,
+            lastName,
+            email,
+            token
+          }
+        });
+      }).catch(err => console.error(err));
     }).catch(err => console.error(err));
   });
 });
@@ -252,7 +321,7 @@ router.get("/test-results/:applicantId", (req, res) => {
       }
 
       res.json({
-        results: doc.results,
+        answers: doc.answers,
         secondsElapsed: doc.secondsElapsed,
         firstName: doc.firstName,
         lastName: doc.lastName,
