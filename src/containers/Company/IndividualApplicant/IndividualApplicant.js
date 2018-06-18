@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import './IndividualApplicant.css'
 import { Link } from 'react-router-dom';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
+import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 //import Modal from '../../components/UI/Modal/Modal';
 //import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
@@ -105,7 +106,11 @@ class IndividualApplicant extends Component{
                         <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                         {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
                         <td>{this.viewApplicantResults()}</td>
-                        <td>{this.renderActionsSection()}</td>
+                        <td><ActionButtons  isEditing={this.state.isEditing}
+                                            onSaveClick={this.onSaveClick.bind(this)}
+                                            onCancelClick={this.onCancelClick.bind(this)}
+                                            editHandler={this.editHandler.bind(this)}
+                                            delete={this.props.delete} /></td>
                 </tr>
             </tbody>
         );
