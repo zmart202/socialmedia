@@ -40,8 +40,8 @@ router.post("/signup", (req, res) => {
   const { firstName, lastName, email, companyId, password } = req.body;
 
   Companies.findOne({ id: companyId })
-  .then(success => {
-    if (!success) {
+  .then(company => {
+    if (!company) {
       return res.json({
         success: false,
         msg: "Invalid companyId"
@@ -54,6 +54,7 @@ router.post("/signup", (req, res) => {
         lastName,
         email,
         companyId,
+        companyName: company.name,
         password: hash
       }).then(success => {
         if (!success) {
@@ -65,7 +66,8 @@ router.post("/signup", (req, res) => {
 
         jwt.sign({
           email,
-          companyId
+          companyId,
+          companyName: company.name
         }, secret, (err, token) => {
           res.json({
             token,
@@ -97,6 +99,7 @@ router.post("/login", (req, res) => {
 
       jwt.sign({
         email: user.email,
+        companyName: user.companyName,
         companyId: user.companyId
       }, secret, (err, token) => {
         res.json({
@@ -136,20 +139,26 @@ router.get("/applicants", (req, res) => {
     }
 
     Applicants.find({ companyId: authData.companyId })
-    .toArray().then(data => {
-      if (!data) {
-        return res.json([]);
+    .toArray().then(applicants => {
+      if (!applicants) {
+        return res.json({
+          success: false,
+          msg: `Could not find any applicants for companyId ${authData.companyId}`
+        });
       }
 
-      return res.json(data);
+      return res.json({
+        applicants,
+        success: true,
+        companyName: authData.companyName
+      });
     }).catch(err => console.error(err));
   });
 });
 
-router.get("/tests/:companyId", (req, res) => {
+router.get("/tests", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { companyId } = req.params;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -160,12 +169,12 @@ router.get("/tests/:companyId", (req, res) => {
       return res.sendStatus(403);
     }
 
-    Companies.findOne({ companyId })
+    Companies.findOne({ id: authData.companyId })
     .then(company => {
       if (!company) {
         return res.json({
           success: false,
-          msg: `Could not find company with id ${companyId}`
+          msg: `Could not find company with id ${authData.companyId}`
         });
       }
 
@@ -174,6 +183,221 @@ router.get("/tests/:companyId", (req, res) => {
         success: true
       });
     }).catch(err => console.error(err));
+  });
+});
+
+router.post("/create-question", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { questionId, testId, body, type } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${authData.companyId}`
+        });
+      }
+
+      let tests = company.tests.map(x => {
+        if (x.id === testId) {
+          return {
+            ...x,
+            questions: type === "MULTIPLE_CHOICE" ?
+              x.questions.concat({
+                type,
+                body,
+                id: questionId,
+                options: req.body.options
+              }) : x.questions.concat({
+                type,
+                body,
+                id: questionId
+              })
+          };
+        }
+        return x;
+      });
+
+      Companies.updateOne(
+        { id: authData.companyId },
+        {
+          $set: {
+            tests
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not create question in companies table"
+          });
+        }
+
+        res.json({ success: true });
+      }).catch(err => {
+        console.error(err);
+        res.json({
+          success: false,
+          msg: "Database error"
+        });
+      });
+    }).catch(err => {
+      console.error(err);
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
+    })
+  });
+});
+
+router.post("/edit-question", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { body, testId, questionId, questionType } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${authData.companyId}`
+        });
+      }
+
+      const tests = company.tests.map(x => {
+        if (x.id === testId) {
+          return {
+            ...x,
+            questions: x.questions.map(y => {
+              if (y.id === questionId) {
+                return questionType === "MULTIPLE_CHOICE" ? {
+                  ...y,
+                  body,
+                  options: req.body.options
+                } : {
+                  ...y,
+                  body
+                };
+              }
+
+              return y;
+            })
+          };
+        }
+        return x;
+      });
+
+      Companies.updateOne(
+        { id: company.id },
+        {
+          $set: {
+            tests
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Database error"
+          });
+        }
+
+        res.json({ success: true });
+      }).catch(err => {
+        console.error(err);
+        res.json({
+          success: false,
+          msg: "Database error"
+        });
+      });
+    }).catch(err => {
+      console.error(err);
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
+    });
+  });
+});
+
+router.post("/delete-question", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { testId, questionId } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${authData.companyId}`
+        });
+      }
+
+      const tests = company.tests.map(x => {
+        if (x.id === testId) {
+          return {
+            ...x,
+            questions: x.questions.filter(y => y.id !== questionId)
+          };
+        }
+        return x;
+      });
+
+      Companies.updateOne(
+        { id: company.id },
+        {
+          $set: {
+            tests
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not delete question"
+          });
+        }
+
+        res.json({ success: true });
+      })
+    }).catch(err => {
+      console.error(err);
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
+    });
   });
 });
 

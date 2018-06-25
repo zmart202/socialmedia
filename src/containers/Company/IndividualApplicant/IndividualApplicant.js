@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './IndividualApplicant.css'
 import { Link } from 'react-router-dom';
+import {CopyToClipboard} from 'react-copy-to-clipboard';
+import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 //import Modal from '../../components/UI/Modal/Modal';
 //import FinalResults from '../Applicant/FinalResults/FinalResults';
 //import _ from 'lodash';
@@ -83,7 +85,14 @@ class IndividualApplicant extends Component{
     }
 
     viewApplicantResults = () => {
-        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
+        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/results/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
+    }
+
+    copyURLHandler = () => {
+        let URL = `http://localhost:3000/applicant/${this.props.applicant.token}`
+        return (<CopyToClipboard text={URL}>
+                <button>Click to Copy URL</button>
+        </CopyToClipboard>);
     }
 
     render() {
@@ -93,11 +102,15 @@ class IndividualApplicant extends Component{
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
-                        <td>http://localhost:3000/applicant/{this.props.applicant.token}</td>
+                        <td>{this.copyURLHandler()}</td>
                         <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                         {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
                         <td>{this.viewApplicantResults()}</td>
-                        <td>{this.renderActionsSection()}</td>
+                        <td><ActionButtons  isEditing={this.state.isEditing}
+                                            onSaveClick={this.onSaveClick.bind(this)}
+                                            onCancelClick={this.onCancelClick.bind(this)}
+                                            editHandler={this.editHandler.bind(this)}
+                                            delete={this.props.delete} /></td>
                 </tr>
             </tbody>
         );
