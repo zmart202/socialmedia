@@ -4,7 +4,7 @@ import { Link } from 'react-router-dom';
 import QuestionList from './QuestionList/QuestionList';
 import QuestionForm from './QuestionForm';
 
-class Questionaire extends Component {
+class TestEditor extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -135,4 +135,4 @@ class Questionaire extends Component {
     };
 };
 
-export default Questionaire;
+export default TestEditor;
