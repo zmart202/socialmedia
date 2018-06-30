@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import { Link } from 'react-router-dom'
+
 import Aux from '../../hoc/Aux/Aux';
 import NewApplicant from './NewApplicant';
 import ApplicantList from './ApplicantList';
@@ -9,7 +11,7 @@ class Company extends Component{
       this.state = {
           isLoading: true,
           applicants: [],
-        //  viewing: false,
+          companyName: "",
           viewableApplicant: null,
           search: ""
       };
@@ -22,7 +24,7 @@ class Company extends Component{
     refreshApplicantList = () => {
         const token = localStorage.getItem("token");
         if (token === null) {
-            this.props.history.push("/company-login");
+            this.props.history.push("/");
             return;
         }
 
@@ -32,7 +34,7 @@ class Company extends Component{
             }
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/applicants", options)
+        fetch("http://localhost:4567/api/company/applicants", options)
         .then(res =>
             res.status === 200 ?
                 res.json() :
@@ -40,7 +42,8 @@ class Company extends Component{
         ).then(data => {
             this.setState({
                 isLoading: false,
-                applicants: data,
+                applicants: data.applicants,
+                companyName: data.companyName,
                 viewableApplicant: data[0]
             })
         }).catch(err => console.error(err));
@@ -65,7 +68,7 @@ class Company extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/remove-applicant", options)
+        fetch("http://localhost:4567/api/company/remove-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -74,14 +77,6 @@ class Company extends Component{
             this.refreshApplicantList();
         }).catch(err => console.error(err));
     }
-
-    generateKeyId = () => {
-        let Id = this.state.keyId;
-        Id += 1;
-        this.setState({keyId: Id});
-        return Id;
-    }
-
 
     generateTokenHandler = () => {
         var length = 8,
@@ -113,7 +108,7 @@ class Company extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/create-applicant", options)
+        fetch("http://localhost:4567/api/company/create-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -145,7 +140,8 @@ class Company extends Component{
             <Aux>
                 <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
                 <div style={{backgroundColor: '#d8d8d8', margin: '0px 0px 0px 0px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
-                    <h1 style={{color: 'purple'}}>All Potential Applicants</h1>
+                    <Link to="/company/test-editor">Test Editor</Link>
+                    <h1 style={{color: 'purple'}}>All Potential Applicants for {this.state.companyName}</h1>
                     <h4 style={{color: 'purple'}}>Create New Applicant</h4>
                     <NewApplicant createApplicant={this.createApplicant.bind(this)} />
                     <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
@@ -162,7 +158,6 @@ class Company extends Component{
                         applicants={this.state.applicants}
                         deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
                         refreshApplicantList={this.refreshApplicantList.bind(this)}
-                        //viewable={this.viewHandler.bind(this)}
                         searchedApplicant={this.state.search} />
                     </div>
                 </div>

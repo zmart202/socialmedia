@@ -65,7 +65,7 @@ class IndividualApplicant extends Component{
             })
         };
 
-        fetch("https://decisiontime.herokuapp.com/api/company/edit-applicant", options)
+        fetch("http://localhost:4567/api/company/edit-applicant", options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -85,14 +85,14 @@ class IndividualApplicant extends Component{
     }
 
     viewApplicantResults = () => {
-        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
+        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/results/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
     }
 
     copyURLHandler = () => {
-        let URL = `https://decisiontime.herokuapp.com/applicant/${this.props.applicant.token}`
+        let URL = `http://localhost:3000/applicant/${this.props.applicant.token}`
         return (<CopyToClipboard text={URL}>
                 <button>Click to Copy URL</button>
-        </CopyToClipboard>);     
+        </CopyToClipboard>);
     }
 
     render() {
