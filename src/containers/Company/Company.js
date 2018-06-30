@@ -24,7 +24,7 @@ class Company extends Component{
     refreshApplicantList = () => {
         const token = localStorage.getItem("token");
         if (token === null) {
-            this.props.history.push("/company-login");
+            this.props.history.push("/");
             return;
         }
 
@@ -77,7 +77,7 @@ class Company extends Component{
             this.refreshApplicantList();
         }).catch(err => console.error(err));
     }
-    
+
     generateTokenHandler = () => {
         var length = 8,
         charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789",

@@ -186,6 +186,111 @@ router.get("/tests", (req, res) => {
   });
 });
 
+router.post("/create-test", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { name } = req.body;
+  const id = shortid.generate();
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      return res.sendStatus(403);
+    }
+
+    Companies.updateOne(
+      { id: authData.companyId },
+      {
+        $push: {
+          tests: {
+            id,
+            name,
+            questions: []
+          }
+        }
+      }
+    ).then(success => {
+      if (!success) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${authData.companyId}`
+        });
+      }
+
+      res.json({
+          success: true,
+          createdTestId: id
+      });
+    }).catch(err => {
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
+      console.error(err);
+    });
+  });
+});
+
+router.post("/delete-test", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { id } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        res.json({
+          success: false,
+          msg: `Could not find company with ${authData.companyId}`
+        });
+      }
+
+      Companies.updateOne(
+        { id: company.id },
+        {
+          $set: {
+            tests: company.tests.filter(x =>
+              x.id !== id
+            )
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not update on delete test"
+          });
+        }
+
+        res.json({ success: true });
+      }).catch(err => {
+        console.error(err);
+        res.json({
+          success: false,
+          msg: "Database error"
+        });
+      });
+    }).catch(err => {
+      console.error(err);
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
+    });
+  });
+});
+
 router.post("/create-question", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");

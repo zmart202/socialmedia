@@ -1,2 +1,14 @@
 - Pull state up from Questions to Test so that we can send all answers on submit.
     - Pass handleChange as prop
+
+    <QuestionList
+        questions={this.state.questions}
+        inTestForm={true}
+        token={this.token}
+    />
+    {addQuestionBtn}
+    {questionForm}
+    <button
+        type="button"
+        onClick={this.handleSubmit}
+    >Submit</button>
