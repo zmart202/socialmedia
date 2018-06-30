@@ -99,14 +99,16 @@ class Questionaire extends Component {
 
     submitOR = () => {
         let question = this.refs.ORQuestion.value;
-        let questions = {
+        let questionObj = {
             key: this.keyValueHandler(),
             index: this.increaseQuestionNumberHandler(),
             type:"OPEN RESPONSE",
             question
         }
-        this.state.questions.push(questions);
-        this.setState({ORQuestion: false})
+        this.setState(prevState => ({
+            question: prevState.questions.concat(questionObj),
+            ORQuestion: false
+        }));
     }
 
     deleteQuestionHandler = (question) => {
