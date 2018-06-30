@@ -29,7 +29,7 @@ class FinalResults extends React.Component {
             }
         };
 
-        fetch(`https://decisiontime.herokuapp.com/api/company/test-results/${this.ApplicantId}`, options)
+        fetch(`http://localhost:4567/api/company/test-results/${this.ApplicantId}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -54,6 +54,19 @@ class FinalResults extends React.Component {
             return <p>Loading...</p>;
         }
 
+        let answers = this.state.data.answers;
+        let content = [];
+        let exerciseCounter = 1;
+        for (let k in answers) {
+            content.push(
+                <div key={k}>
+                    <p>Exercise {exerciseCounter}:</p>
+                    <p><em>{answers[k]}</em></p>
+                </div>
+            );
+            exerciseCounter++;
+        }
+
         return (
             <Aux>
                 <div style={{padding: '20px', textAlign: 'left'}}>
@@ -61,10 +74,7 @@ class FinalResults extends React.Component {
                 </div>
                 <h3 style={{color: 'purple'}}>Results for {this.state.data.firstName} {this.state.data.lastName}</h3>
                 <h4 style={{color: 'purple'}}>Total amount of time taken is <span style={{color: 'red', textDecoration: 'underline'}}>{this.formattedSeconds(this.state.data.secondsElapsed)}</span></h4>
-                <p>Exercise A:</p>
-                <p><em>{this.state.data.results[0]}</em></p>
-                <p>Exercise B:</p>
-                <p><em>{this.state.data.results[1]}</em></p>
+                {content}
             </Aux>
         );
     }

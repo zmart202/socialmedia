@@ -7,15 +7,18 @@ class QuestionList extends Component {
         let questions = this.props.questions;
         const props = _.omit(this.props, 'questions');
         return questions
-            .map((question) => 
+            .map((question, i) =>
             <IndividualQuestion question={question}
-                                key={question.key}
-                                delete={() => props.deleteQuestionHandler(question)} />
+                                key={question.id}
+                                index={i}
+                                token={props.token}
+                                refreshTestData={props.refreshTestData}
+                                testId={props.testId}/>
 
-            
+
         );
     }
-    
+
     render() {
         return (
             <div>

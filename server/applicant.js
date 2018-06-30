@@ -29,6 +29,8 @@ router.get("/auth/:token", (req, res) => {
       firstName: applicant.firstName,
       lastName: applicant.lastName,
       email: applicant.email,
+      companyId: applicant.companyId,
+      test: applicant.test,
       completed: applicant.completed,
       testTimestamp: applicant.testTimestamp
     });
@@ -60,19 +62,15 @@ router.post("/test-results/:token", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
   const { token } = req.params;
-  const { applicantId, secondsElapsed, answer1, answer2 } = req.body;
+  const { applicantId, secondsElapsed, answers } = req.body;
 
   Applicants.updateOne(
     { token },
     {
       $set: {
         secondsElapsed,
+        answers,
         completed: true
-      },
-      $push: {
-        results: {
-          $each: [answer1, answer2]
-        }
       }
     }
   ).then(success => {
