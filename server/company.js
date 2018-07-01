@@ -156,6 +156,124 @@ router.get("/applicants", (req, res) => {
   });
 });
 
+router.post("/create-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const Applicants = db.collection("applicants");
+
+  const bearer = req.headers["authorization"];
+  const _token = bearer.split(" ")[1];
+
+  jwt.verify(_token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: "Invalid companyID"
+        });
+      }
+
+      const id = shortid.generate();
+
+      Applicants.insertOne({
+        ...req.body,
+        companyId: company.id,
+        test: company.tests[0],
+        completed: false,
+        timestamp: new Date(),
+        testTimestamp: null,
+        secondsElapsed: 0,
+        answers: null
+      }).then(success => {
+        if (!success) {
+          return res.json({
+            success: false,
+            msg: "Could not create applicant"
+          });
+        }
+
+        res.json({
+          success: true,
+          createdApplicant: {
+            id,
+            firstName,
+            lastName,
+            email,
+            token
+          }
+        });
+      }).catch(err => console.error(err));
+    }).catch(err => console.error(err));
+  });
+});
+
+router.post("/edit-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { id, firstName, lastName, email } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Applicants.updateOne(
+      { id },
+      {
+        $set: {
+          firstName,
+          lastName,
+          email
+        }
+      }
+    ).then(success => {
+      if (!success) {
+        return res.json({
+          success: false,
+          msg: "Could not update applicant"
+        });
+      }
+
+      res.json({ success: true });
+    }).catch(err => console.error(err));
+  });
+});
+
+router.post("/remove-applicant", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { email, id } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Applicants.removeOne({ email, id })
+    .then(success => {
+      if (!success) {
+        return res.json({ success: false });
+      }
+
+      res.json({ success: true });
+    }).catch(err => console.error(err));
+  });
+});
+
 router.get("/tests", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
@@ -229,6 +347,62 @@ router.post("/create-test", (req, res) => {
         msg: "Database error"
       });
       console.error(err);
+    });
+  });
+});
+
+router.post("/edit-test-name", (req, res) => {
+  const db = req.app.locals.db;
+  const Companies = db.collection("companies");
+  const { name, testId } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    Companies.findOne({ id: authData.companyId })
+    .then(company => {
+      if (!company) {
+        return res.json({
+          success: false,
+          msg: `Could not find company with id ${authData.companyId}`
+        });
+      }
+
+      Companies.updateOne(
+        { id: company.id },
+        {
+          $set: {
+            tests: company.tests.map(x =>
+              x.id === testId ? {
+                ...x,
+                name
+              } : x
+            )
+          }
+        }
+      ).then(success => {
+        if (!success) {
+          res.json({
+            success: false,
+            msg: "Could not update name"
+          });
+        }
+
+        res.json({ success: true });
+      }).catch(err => {
+        console.error(err);
+        res.json({
+          success: false,
+          msg: "Database error"
+        });
+      });
+    }).catch(err => {
+      console.error(err);
+      res.json({
+        success: false,
+        msg: "Database error"
+      });
     });
   });
 });
@@ -503,129 +677,6 @@ router.post("/delete-question", (req, res) => {
         msg: "Database error"
       });
     });
-  });
-});
-
-router.post("/create-applicant", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const Applicants = db.collection("applicants");
-  const { firstName, lastName, email, token } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const _token = bearer.split(" ")[1];
-
-  jwt.verify(_token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: "Invalid companyID"
-        });
-      }
-
-      const id = shortid.generate();
-
-      Applicants.insertOne({
-        id,
-        firstName,
-        lastName,
-        email,
-        token,
-        companyId: company.id,
-        test: company.tests[0],
-        completed: false,
-        timestamp: new Date(),
-        testTimestamp: null,
-        secondsElapsed: 0,
-        answers: null
-      }).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not create applicant"
-          });
-        }
-
-        res.json({
-          success: true,
-          createdApplicant: {
-            id,
-            firstName,
-            lastName,
-            email,
-            token
-          }
-        });
-      }).catch(err => console.error(err));
-    }).catch(err => console.error(err));
-  });
-});
-
-router.post("/edit-applicant", (req, res) => {
-  const db = req.app.locals.db;
-  const Applicants = db.collection("applicants");
-  const { id, firstName, lastName, email } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Applicants.updateOne(
-      { id },
-      {
-        $set: {
-          firstName,
-          lastName,
-          email
-        }
-      }
-    ).then(success => {
-      if (!success) {
-        return res.json({
-          success: false,
-          msg: "Could not update applicant"
-        });
-      }
-
-      res.json({ success: true });
-    }).catch(err => console.error(err));
-  });
-});
-
-router.post("/remove-applicant", (req, res) => {
-  const db = req.app.locals.db;
-  const Applicants = db.collection("applicants");
-  const { email, id } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Applicants.removeOne({ email, id })
-    .then(success => {
-      if (!success) {
-        return res.json({ success: false });
-      }
-
-      res.json({ success: true });
-    }).catch(err => console.error(err));
   });
 });
 
