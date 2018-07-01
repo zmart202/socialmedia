@@ -22,11 +22,15 @@ class EducationProfile extends Component {
                 let school = this.refs.school.value;
                 let study = this.refs.study.value;
                 let degree = this.refs.degree.value;
+                let startTime = this.refs.startTime.value;
+                let endTime = this.refs.endTime.value;
                 let educationObj = {
                         key: this.keyValueHandler(),
                         school,
                         study,
-                        degree
+                        degree,
+                        startTime,
+                        endTime
                 }
                 this.setState({
                         education: this.state.education.concat(educationObj)
@@ -57,7 +61,6 @@ class EducationProfile extends Component {
                 if (this.state.addEducation) {
                 educationForm =
                         <div style={{backgroundColor:'#cfcfd1', padding:'10px'}}>
-                        <label>Education</label><br /><br />
                         <div>
                                 <label>School (required): </label>
                                 <input
@@ -92,17 +95,21 @@ class EducationProfile extends Component {
                                 <span>
                                         <div>
                                                 <label for="start">Start: </label>
-                                                <input type="date" id="start" name="trip"
+                                                <input type="date"
                                                 style={{padding: '5px'}}
-                                                value="YYYY-MM-DD"
+                                                onChange={this.props.handleChange}
+                                                value="yyyy-MM-dd"
+                                                ref="startTime"
                                                 min="1955-01-01" max="2090-12-31" />
                                         </div>
 
                                         <div>
                                                 <label for="end">End: </label>
-                                                <input type="date" id="end" name="trip"
+                                                <input type="date"
                                                 style={{padding: '5px'}}
-                                                value="YYYY-MM-DD"
+                                                onChange={this.props.handleChange}
+                                                value="yyyy-MM-dd"
+                                                ref="endTime"
                                                 min="1955-01-01" max="2090-12-31" />
                                         </div>
                                 </span><br />
@@ -115,11 +122,15 @@ class EducationProfile extends Component {
                 }
                 return (
                         <div style={{backgroundColor: "#cfcfd1", margin: '10px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>
+                                <div style={{padding: '10px', textDecoration: 'underline'}}>
+                                        <label>Education</label>
+                                </div>
                                 {this.state.education.map((edu) => (
                                         <div style={{backgroundColor: '#cfcfd1', padding: '5px'}} key={edu.key}>
                                         <p><strong>School: </strong>{edu.school}</p>
                                         <p><strong>Study: </strong>{edu.study}</p>
                                         <p><strong>Degree: </strong>{edu.degree}</p>
+                                        <p>From: {edu.startTime} To: {edu.endTime}</p>
                                         <button onClick={this.deleteEducationHandler.bind(this, edu)}>Delete</button>
                                         </div>
                                 ))}

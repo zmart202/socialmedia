@@ -5,6 +5,7 @@ import TestForm from './TestForm';
 import QuestionList from './QuestionList/QuestionList';
 import QuestionForm from './QuestionForm';
 import DeleteTestForm from './DeleteTestForm';
+import Spinner from '../../../components/UI/Spinner/Spinner';
 
 class TestEditor extends Component {
     constructor(props) {
@@ -130,7 +131,7 @@ class TestEditor extends Component {
         };
 
         if (this.state.isLoading) {
-            return <p>Loading...</p>
+            return <Spinner />
         }
 
         let header = this.state.tests.map(x =>

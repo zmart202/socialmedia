@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom'
 import Aux from '../../hoc/Aux/Aux';
 import NewApplicant from './NewApplicant';
 import ApplicantList from './ApplicantList';
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 class Company extends Component{
   constructor(props){
@@ -133,7 +134,7 @@ class Company extends Component{
 
     render() {
         if (this.state.isLoading) {
-            return <p>Loading...</p>;
+            return <Spinner />;
         }
 
         return(

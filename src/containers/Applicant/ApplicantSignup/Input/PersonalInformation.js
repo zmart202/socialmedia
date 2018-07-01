@@ -2,11 +2,11 @@ import React from 'react';
 
 const personalInformation = (props) => {
     return <div style={{backgroundColor: "#cfcfd1", margin: '0px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>
-        <div style={{padding: '10px'}}>
+            <div style={{padding: '20px', textDecoration: 'underline'}}>
                 <label>Personal Information</label><br />
             </div>
             <div>
-                <label>First Name: </label>
+                <label><span style={{color: 'red'}}>*</span> First Name: </label>
                 <input
                     name="firstName"
                     style={{padding: '5px'}}
@@ -17,7 +17,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>Last Name: </label>
+                <label><span style={{color: 'red'}}>*</span> Last Name: </label>
                 <input
                     name="lastName"
                     style={{padding: '5px'}}
@@ -28,7 +28,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>Address: </label>
+                <label><span style={{color: 'red'}}>*</span> Address: </label>
                 <input
                     name="address"
                     style={{padding: '5px'}}
@@ -39,7 +39,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>City: </label>
+                <label><span style={{color: 'red'}}>*</span> City: </label>
                 <input
                     name="city"
                     style={{padding: '5px'}}
@@ -50,7 +50,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>State: </label>
+                <label><span style={{color: 'red'}}>*</span> State: </label>
                 <input
                     name="state"
                     style={{padding: '5px'}}
@@ -61,7 +61,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>ZIP Code: </label>
+                <label><span style={{color: 'red'}}>*</span> ZIP Code: </label>
                 <input
                     name="zipCode"
                     style={{padding: '5px'}}
@@ -72,7 +72,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>Primary Contact: </label>
+                <label><span style={{color: 'red'}}>*</span> Primary Contact: </label>
                 <input
                     name="phone"
                     style={{padding: '5px'}}
@@ -83,7 +83,7 @@ const personalInformation = (props) => {
             </div>
             <br />
             <div>
-                <label>Email: </label>
+                <label><span style={{color: 'red'}}>*</span> Email: </label>
                 <input
                     name="email"
                     style={{padding: '5px'}}

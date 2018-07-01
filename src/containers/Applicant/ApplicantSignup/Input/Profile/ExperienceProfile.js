@@ -59,7 +59,6 @@ class ExperienceProfile extends Component {
                 if (this.state.addExperience) {
                 experienceForm =
                         <div style={{backgroundColor:'#cfcfd1', padding:'10px'}}>
-                        <label>Work Experience</label><br /><br />
                         <div>
                                 <label>Company (required): </label>
                                 <input
@@ -118,6 +117,9 @@ class ExperienceProfile extends Component {
                 }
                 return (
                         <div style={{backgroundColor: "#cfcfd1", margin: '10px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>
+                                <div style={{padding: '10px', textDecoration: 'underline'}}>
+                                        <label>Employment History</label>
+                                </div>
                                 {this.state.workExperience.map((exp) => (
                                         <div style={{backgroundColor: '#cfcfd1', padding: '5px'}} key={exp.key}>
                                         <p><strong>Company: </strong>{exp.company}</p>

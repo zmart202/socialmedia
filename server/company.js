@@ -650,7 +650,8 @@ router.get("/test-results/:applicantId", (req, res) => {
       }
 
       res.json({
-        answers: doc.answers,
+        answerData: doc.answerData,
+        test: doc.test,
         secondsElapsed: doc.secondsElapsed,
         firstName: doc.firstName,
         lastName: doc.lastName,

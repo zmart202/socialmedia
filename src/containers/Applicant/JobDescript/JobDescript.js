@@ -3,7 +3,8 @@ import React, {Component} from 'react';
 class JobDescript extends Component {
     constructor(props){
         super(props);
-        this.state ={
+        this.state = {
+            jobTitle: 'Customer Service',
             descriptInfo: 'This is where the description information will be kept.',
             requirementInfo: 'This is where the requirement information will be kept.',
             benefitInfo: 'This is where the benefit information will be kept.'
@@ -13,6 +14,7 @@ class JobDescript extends Component {
         return (
             <div style={{backgroundColor: '#d4d4d6', margin: '0px 200px'}}>
                 <h1>Job Description</h1>
+                <p>Position being applied for - <strong>{this.state.jobTitle}</strong></p>
                 <h3>DESCRIPTION</h3>
                 <p>{this.state.descriptInfo}</p>
                 <h3>REQUIREMENTS</h3>
