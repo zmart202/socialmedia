@@ -6,6 +6,7 @@ import QuestionList from './QuestionList/QuestionList';
 import QuestionForm from './QuestionForm';
 import DeleteTestForm from './DeleteTestForm';
 import Spinner from '../../../components/UI/Spinner/Spinner';
+import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 
 class TestEditor extends Component {
     constructor(props) {
@@ -18,16 +19,19 @@ class TestEditor extends Component {
             testFormMounted: false,
             testName: "",
             questions: [],
+            nameFormMounted: false,
             questionFormMounted: false,
-            deleteTestForm: false
+            deleteFormMounted: false
         };
 
         this.token = localStorage.getItem("token");
 
+        this.toggleNameForm = this.toggleNameForm.bind(this);
         this.toggleQuestionForm = this.toggleQuestionForm.bind(this);
         this.toggleTestForm = this.toggleTestForm.bind(this);
         this.toggleDeleteForm = this.toggleDeleteForm.bind(this);
         this.refreshTestData = this.refreshTestData.bind(this);
+        this.handleChange = this.handleChange.bind(this);
     }
 
     componentDidMount() {
@@ -94,6 +98,56 @@ class TestEditor extends Component {
         });
     }
 
+    saveNewName = () => {
+        this.setState({
+            isLoading: true
+        }, () => {
+            if (this.token === null) {
+                this.props.history.push("/");
+            }
+
+            const options = {
+                headers: {
+                    "Authorization": `Bearer ${this.token}`,
+                    "Content-Type": "application/json"
+                },
+                method: "POST",
+                body: JSON.stringify({
+                    name: this.state.testName,
+                    testId: this.state.editingTestId
+                })
+            };
+
+            fetch("http://localhost:4567/api/company/edit-test-name", options)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    console.log(data);
+                    return this.setState({
+                        isError: true,
+                        isLoading: false
+                    });
+                }
+
+                console.log(data);
+                this.refreshTestData();
+                this.toggleNameForm();
+            }).catch(err => {
+                this.setState({
+                    isLoading: false,
+                    isError: true
+                });
+                console.error(err);
+            });
+        });
+    }
+
+    toggleNameForm = () => {
+        this.setState(prevState => ({
+            nameFormMounted: !prevState.nameFormMounted
+        }));
+    }
+
     toggleQuestionForm = () => {
         this.setState(prevState => ({
             questionFormMounted: !prevState.questionFormMounted
@@ -118,6 +172,12 @@ class TestEditor extends Component {
         });
     }
 
+    handleChange(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        });
+    }
+
     render() {
         const style = {
             header: {
@@ -134,6 +194,10 @@ class TestEditor extends Component {
             return <Spinner />
         }
 
+        if (this.state.isError) {
+            return <p>There was an error.</p>
+        }
+
         let header = this.state.tests.map(x =>
             <span key={x.id}
                 style={style.li}
@@ -144,6 +208,44 @@ class TestEditor extends Component {
         let test = this.state.tests.find(x =>
             x.id === this.state.editingTestId
         );
+
+        let testName = "";
+        let editNameForm = "";
+        let actionBtns = "";
+        if (!this.state.nameFormMounted) {
+            testName = (
+                <div style={{ padding: '20px' }}>
+                    <h1>{test.name}</h1>
+                    <ActionButtons
+                        isEditing={false}
+                        editHandler={this.toggleNameForm}
+                        deleteHandler={this.toggleDeleteForm}
+                    />
+                </div>
+            );
+        } else {
+            editNameForm = (
+                <div style={{ padding: '20px'}}>
+                    <div style={{ padding: '20px' }}>
+                        <input type="text"
+                            style={{
+                                height: '30px',
+                                width: '300px',
+                                fontSize: '20px'
+                            }}
+                            name="testName"
+                            defaultValue={test.name}
+                            onChange={this.handleChange}
+                        />
+                    </div>
+                    <ActionButtons
+                        isEditing={true}
+                        onSaveClick={this.saveNewName}
+                        onCancel={this.toggleNameForm}
+                    />
+                </div>
+            );
+        }
 
         let newTestBtn = "";
         let newTestForm = "";
@@ -186,7 +288,6 @@ class TestEditor extends Component {
             );
         }
 
-        let deleteBtn = "";
         let deleteForm = "";
         if (this.state.deleteFormMounted) {
             deleteForm = (
@@ -198,12 +299,6 @@ class TestEditor extends Component {
                     token={this.token}
                     firstTestId={this.state.tests[0].id}
                 />
-            );
-        } else {
-            deleteBtn = (
-                <button type="button"
-                    onClick={this.toggleDeleteForm}
-                >Delete</button>
             );
         }
 
@@ -219,7 +314,9 @@ class TestEditor extends Component {
                 <div style={style.header}>
                     {header}
                 </div>
-                <h1>{test.name}</h1>
+                {testName}
+                {editNameForm}
+                {deleteForm}
                 {addQuestionBtn}
                 {questionForm}
                 <QuestionList
@@ -229,8 +326,6 @@ class TestEditor extends Component {
                     refreshTestData={this.refreshTestData}
                     token={this.token}
                 />
-                {deleteBtn}
-                {deleteForm}
             </div>
         );
     };
