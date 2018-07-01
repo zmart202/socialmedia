@@ -108,9 +108,9 @@ class IndividualApplicant extends Component{
                         <td>{this.viewApplicantResults()}</td>
                         <td><ActionButtons  isEditing={this.state.isEditing}
                                             onSaveClick={this.onSaveClick.bind(this)}
-                                            onCancelClick={this.onCancelClick.bind(this)}
+                                            onCancel={this.onCancelClick.bind(this)}
                                             editHandler={this.editHandler.bind(this)}
-                                            delete={this.props.delete} /></td>
+                                            deleteHandler={this.props.delete} /></td>
                 </tr>
             </tbody>
         );

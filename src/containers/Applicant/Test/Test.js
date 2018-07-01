@@ -1,4 +1,5 @@
 import React from 'react';
+import _ from 'lodash';
 
 import Question from '../../../components/Question';
 
@@ -35,19 +36,39 @@ class Test extends React.Component {
     handleSubmit = () => {
         clearInterval(this.incrementer);
 
+        const answerData = [];
+        for (let k in this.state.answers) {
+            let question = this.props.test.questions.find(x =>
+                x.id === k
+            );
+            if (question.type === "MULTIPLE_CHOICE") {
+                question.correct = false;
+                for (let x of question.options) {
+                    if ((x.correct && x.answer) === this.state.answers[k]) {
+                        question.correct = true;
+                        break;
+                    }
+                }
+            }
+            answerData.push({
+                ..._.omit(question, "id"),
+                answer: this.state.answers[k]
+            });
+        }
+
         const options = {
             headers: {
                 "Content-Type": "application/json"
             },
             method: "POST",
             body: JSON.stringify({
+                answerData,
                 applicantId: this.props.applicant.id,
-                secondsElapsed: this.state.secondsElapsed,
-                answers: this.state.answers
+                secondsElapsed: this.state.secondsElapsed
             })
         };
 
-        fetch(`http://localhost:4567/api/applicant/test-results/${this.props.token}`, options)
+        fetch(`http://localhost:4567/api/applicant/test-results/${this.props.id}`, options)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :

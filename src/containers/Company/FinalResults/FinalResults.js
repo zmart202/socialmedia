@@ -1,6 +1,7 @@
 import React from 'react';
 import Aux from '../../../hoc/Aux/Aux';
 import { Link } from 'react-router-dom';
+import Spinner from '../../../components/UI/Spinner/Spinner';
 
 class FinalResults extends React.Component {
     constructor(props) {
@@ -35,6 +36,7 @@ class FinalResults extends React.Component {
                 Promise.reject("Auth denied") :
                 res.json()
         ).then(data => {
+            console.log("DATA FROM FINALRESULTS", data);
             this.setState({
                 data,
                 isLoading: false
@@ -51,20 +53,20 @@ class FinalResults extends React.Component {
 
     render() {
         if (this.state.isLoading) {
-            return <p>Loading...</p>;
+            return <Spinner />;
         }
 
         let answers = this.state.data.answers;
         let content = [];
-        let exerciseCounter = 1;
         for (let k in answers) {
             content.push(
                 <div key={k}>
-                    <p>Exercise {exerciseCounter}:</p>
+                    <p>{this.state.data.test.questions.find(x =>
+                        x.id === k
+                    ).body}:</p>
                     <p><em>{answers[k]}</em></p>
                 </div>
             );
-            exerciseCounter++;
         }
 
         return (

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 
 import Test from './Test/Test';
 import WelcomePage from './WelcomePage/WelcomePage';
+import Spinner from '../../components/UI/Spinner/Spinner';
 
 class Applicant extends Component {
     constructor(props) {
@@ -20,16 +21,16 @@ class Applicant extends Component {
         this.startTest = this.startTest.bind(this);
         this.propagateError = this.propagateError.bind(this);
         this.redirectToFinished = this.redirectToFinished.bind(this);
-        this.token = this.props.match.params.token;
+        this.id = this.props.match.params.id;
     }
 
     componentDidMount() {
-        if (!this.token) {
+        if (!this.id) {
             this.props.history.push("/");
             return;
         }
 
-        fetch(`http://localhost:4567/api/applicant/auth/${this.token}`)
+        fetch(`http://localhost:4567/api/applicant/auth/${this.id}`)
         .then(res => {
             return res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -62,12 +63,12 @@ class Applicant extends Component {
     }
 
     startTest = () => {
-        if (!this.token) {
+        if (!this.id) {
             this.props.history.push("/");
             return;
         }
 
-        fetch(`http://localhost:4567/api/applicant/test-timestamp/${this.token}`)
+        fetch(`http://localhost:4567/api/applicant/test-timestamp/${this.id}`)
         .then(res =>
             res.status === 403 ?
                 Promise.reject("Auth denied") :
@@ -106,7 +107,7 @@ class Applicant extends Component {
 
     render () {
         if (this.state.isLoading) {
-            return <p>We are loading...</p>;
+            return <Spinner />;
         }
 
         if (!this.state.isAuth) {
@@ -127,7 +128,7 @@ class Applicant extends Component {
                 startTest={this.startTest}
             /> :
             <Test
-                token={this.token}
+                id={this.id}
                 test={this.state.test}
                 secondsElapsed={this.state.secondsElapsed}
                 applicant={this.state.applicant}

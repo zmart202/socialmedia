@@ -15,14 +15,13 @@ class App extends Component {
     return (
       <div className="App">
         <Route path="/" exact component={Login} />
-        <Route path="/applicant/signup/:companyId/:testId" component={ApplicantSignup} />
-        <Route path="/applicant/:token" component={Applicant} />
+        <Route path="/applicant/:id" component={Applicant} />
         <Route path="/company" exact component={Company} />
         <Route path="/company/test-editor" exact component={TestEditor} />
         <Route path="/company/results/:ApplicantId" component={FinalResults} />
         <Route path='/finished' component={Finished}  />
         <Route path='/job-description' component={JobDescript} />
-        <Route path='/app-form' component={ApplicantSignup} />
+        <Route path='/app-form/:companyId/:testId' component={ApplicantSignup} />
       </div>
     );
   }

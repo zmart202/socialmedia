@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import _ from 'lodash';
+
 import ApplicationDetails from './Input/ApplicationDetails';
 import EducationProfile from './Input/Profile/EducationProfile';
 import PersonalInformation from './Input/PersonalInformation';
@@ -29,7 +31,7 @@ class ApplicantSignup extends Component {
         };
 
         this.companyId = props.match.params.companyId;
-        this.testId = props.match.params.companyId;
+        this.testId = props.match.params.testId;
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -37,7 +39,23 @@ class ApplicantSignup extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
-        console.log(this.state);
+        const options = {
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            method: 'POST',
+            body: JSON.stringify({
+                companyId: this.companyId,
+                testId: this.testId,
+                ..._.omit(this.state, ["addEducation", "educationKey", "educationFormMounted"])
+            })
+        }
+        fetch('http://localhost:4567/api/applicant/application', options)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            this.props.history.push(`/applicant/${data.applicantId}`);
+        }).catch((err) => console.log(err));
     }
 
 
@@ -47,6 +65,7 @@ class ApplicantSignup extends Component {
         this.setState({
             [name]: value
         });
+        console.log(value);
     }
 
     over18Handler = () => {
@@ -72,19 +91,26 @@ class ApplicantSignup extends Component {
                     <EducationProfile handleChange={this.handleChange} />
                     <ExperienceProfile handleChange={this.handleChange} />
                     <ApplicationDetails handleChange={this.handleChange} />
-                    <label className="react-toggle" style={{padding: "20px 0px"}}>
-                        <span style={{padding: '10px'}}>Are you 18 years or older?</span>
-                        <Toggle 
-                            defaultChecked={this.state.over18}
-                            onChange={this.over18Handler} />
-                    </label><br />
-                    <label className="react-toggle" style={{padding: "20px 0px"}}>
-                        <span style={{padding: '10px'}}>Are you a citizen of the U.S. or do you have a legal right to work in the U.S.?</span>
-                        <Toggle 
-                            defaultChecked={this.state.legal}
-                            onChange={this.legalHandler} />
-                    </label><br />
-                    <button onClick={this.handleSubmit}>Submit</button>
+                    <div style={{backgroundColor: "#cfcfd1", margin: '0px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>
+                        <label className="react-toggle" style={{padding: "20px 0px"}}>
+                            <span style={{padding: '10px'}}>Are you 18 years or older?</span>
+                            <Toggle 
+                                defaultChecked={this.state.over18}
+                                onChange={this.over18Handler} />
+                        </label><br />
+                        <label className="react-toggle" style={{padding: "20px 0px"}}>
+                            <span style={{padding: '10px'}}>Are you a citizen of the U.S. or do you have a legal right to work in the U.S.?</span>
+                            <Toggle 
+                                defaultChecked={this.state.legal}
+                                onChange={this.legalHandler} />
+                        </label><br />
+                        <div style={{color: 'red'}}>
+                            <label>Once you have finished filling out the application and hit submit below, you will be prompted to take a timed assessment. Please answer all the questions to the best of your ability. Thank you!</label>
+                        </div>
+                        <div style={{padding: '40px'}}>
+                            <button style={{padding: '10px 30px', color: 'purple'}} onClick={this.handleSubmit}>Submit</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         );

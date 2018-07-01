@@ -2,6 +2,7 @@
 
 const express = require("express");
 const jwt = require("jsonwebtoken");
+const hat = require('hat');
 
 const { hashPassword, comparePasswords } = require("./password-utils");
 
@@ -9,12 +10,66 @@ const secret = process.env.SECRET;
 
 const router = express.Router();
 
-router.get("/auth/:token", (req, res) => {
+router.post('/application', (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { token } = req.params;
+  const Companies = db.collection('companies');
+  const {companyId, testId} = req.body;
+  const applicantId = hat();
 
-  Applicants.findOne({ token })
+  Companies.findOne({id: companyId})
+  .then((company) => {
+    if (!company) {
+      return res.json({
+        success: false,
+        msg: `Could not find Company with ID ${companyId}`
+      });
+    }
+
+    const test = company.tests.find(x =>
+      x.id === testId
+    );
+
+    Applicants.insertOne({
+      ...req.body,
+      test,
+      id: applicantId
+    }).then((applicant) => {
+      if (!applicant) {
+        return res.json({
+          success: false,
+          msg: 'Could not insert Applicant'
+        });
+      }
+
+      res.json({
+        ...req.body,
+        applicantId,
+        test,
+        success: true
+      });
+    }).catch((err) => {
+      res.json({
+        success: false,
+        msg: 'Server error'
+      });
+      console.error(err);
+    });
+  }).catch((err) => {
+    res.json({
+      success: false,
+      msg: 'Server error'
+    });
+    console.error(err);
+  });
+});
+
+router.get("/auth/:id", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { id } = req.params;
+
+  Applicants.findOne({ id })
   .then(applicant => {
     if (!applicant) {
       return res.sendStatus(403);
@@ -37,13 +92,13 @@ router.get("/auth/:token", (req, res) => {
   }).catch(err => console.error(err));
 });
 
-router.get("/test-timestamp/:token", (req, res) => {
+router.get("/test-timestamp/:id", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { token } = req.params;
+  const { id } = req.params;
 
   Applicants.updateOne(
-    { token },
+    { id },
     {
       $set: {
         testTimestamp: new Date()
@@ -58,18 +113,18 @@ router.get("/test-timestamp/:token", (req, res) => {
   }).catch(err => console.error(err));
 });
 
-router.post("/test-results/:token", (req, res) => {
+router.post("/test-results/:id", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { token } = req.params;
-  const { applicantId, secondsElapsed, answers } = req.body;
+  const { id } = req.params;
+  const { applicantId, secondsElapsed, answerData } = req.body;
 
   Applicants.updateOne(
-    { token },
+    { id },
     {
       $set: {
         secondsElapsed,
-        answers,
+        answerData,
         completed: true
       }
     }

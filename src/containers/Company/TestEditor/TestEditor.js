@@ -5,6 +5,7 @@ import TestForm from './TestForm';
 import QuestionList from './QuestionList/QuestionList';
 import QuestionForm from './QuestionForm';
 import DeleteTestForm from './DeleteTestForm';
+import Spinner from '../../../components/UI/Spinner/Spinner';
 import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 
 class TestEditor extends Component {
@@ -190,7 +191,7 @@ class TestEditor extends Component {
         };
 
         if (this.state.isLoading) {
-            return <p>Loading...</p>
+            return <Spinner />
         }
 
         if (this.state.isError) {
