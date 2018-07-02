@@ -1,60 +1,51 @@
 import React, {Component} from 'react';
 import shortid from 'shortid';
+import _ from 'lodash';
+
+import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 
 class QuestionForm extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            body: "",
-            type: "OPEN_RESPONSE",
-            options: [
-                {
-                    id: shortid.generate(),
-                    answer: "",
-                    correct: true
-                },
-                {
-                    id: shortid.generate(),
-                    answer: "",
-                    correct: false
-                }
-            ],
-            correctAnswerId: null
+
+        this.initialOption = {
+            [shortid.generate()]: "",
+            [shortid.generate()]: ""
         };
 
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
+        this.state = {
+            questionType: props.hasOwnProperty("question") ?
+            props.question.type : "OPEN_RESPONSE",
+
+            options: props.hasOwnProperty("question") ?
+            (props.question.type === "MULTIPLE_CHOICE" ?
+            props.question.options.reduce((acc, x) => ({
+                ...acc,
+                [x.id]: x.answer
+            }), {}) : this.initialOption) : this.initialOption,
+
+            correctAnswerId: props.hasOwnProperty("question") ?
+            (props.question.type === "MULTIPLE_CHOICE" ?
+            (props.question.options.find(x =>
+                x.correct
+            ) ? props.question.options.find(x =>
+                x.correct
+            ).id : null) : null) : null,
+
+            body: props.hasOwnProperty("question") ?
+            props.question.body : ""
+        };
+
+        this.onSaveClick = this.onSaveClick.bind(this);
+        this.setCorrectAnswer = this.setCorrectAnswer.bind(this);
         this.removeOption = this.removeOption.bind(this);
         this.addOption = this.addOption.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleOptionChange = this.handleOptionChange.bind(this);
     }
 
-    handleChange(e) {
-        this.setState({
-            [e.target.name]: e.target.value
-        });
-    }
-
-    removeOption(id) {
-        this.setState(prevState => ({
-            options: prevState.options.length > 2 ?
-                prevState.options.filter(x => x.id !== id) :
-                prevState.options
-        }));
-    }
-
-    addOption() {
-        this.setState(prevState => ({
-            options: prevState.options.concat({
-                id: shortid.generate(),
-                answer: "",
-                correct: false,
-                removable: true
-            })
-        }));
-    }
-
-    handleSubmit(e) {
-        e.preventDefault();
+    onSaveClick = event => {
+        event.preventDefault();
 
         const options = {
             headers: {
@@ -65,102 +56,150 @@ class QuestionForm extends Component {
         };
 
         const body = {
-            questionId: shortid.generate(),
+            questionId: this.props.hasOwnProperty("question") ?
+            this.props.question.id : shortid.generate(),
+
             testId: this.props.testId,
             body: this.state.body,
-            type: this.state.type
+            questionType: this.state.questionType
         };
 
-        switch (this.state.type) {
-            case "OPEN_RESPONSE":
-                options.body = JSON.stringify(body);
-                break;
-            case "MULTIPLE_CHOICE":
-                options.body = JSON.stringify({
-                    ...body,
-                    options: this.state.options.filter(x =>
-                        this.refs[x.id].value.length > 0
-                    ).map(x => ({
-                        ...x,
-                        answer: this.refs[x.id].value,
-                        correct: x.id === this.state.correctAnswerId ? true : false
-                    }))
-                });
-                break;
-            default:
-                console.error("Submitted invalid question type");
+        if (this.state.questionType === "MULTIPLE_CHOICE") {
+            let _options = [];
+            for (let k in this.state.options) {
+                if (this.state.options[k].length > 0) {
+                    _options.push({
+                        id: k,
+                        answer: this.state.options[k],
+                        correct: k === this.state.correctAnswerId ? true : false
+                    });
+                }
+            }
+            options.body = JSON.stringify({
+                ...body,
+                options: _options
+            });
+        } else {
+            options.body = JSON.stringify(body);
         }
 
-        fetch("http://localhost:4567/api/company/create-question", options)
+        const tail = this.props.hasOwnProperty("question") ?
+        "edit-question" : "create-question";
+        fetch(`http://localhost:4567/api/company/${tail}`, options)
         .then(res => res.json())
         .then(data => {
             console.log(data);
+            this.props.toggleEditForm();
             this.props.refreshTestData();
-            this.props.toggleQuestionForm();
         }).catch(err => console.error(err));
+    }
+
+    setCorrectAnswer(e) {
+        this.setState({
+            correctAnswerId: e.target.value
+        });
+    }
+
+    addOption() {
+        this.setState({
+            options: {
+                ...this.state.options,
+                [shortid.generate()]: ""
+            }
+        });
+    }
+
+    removeOption(id) {
+        if (Object.keys(this.state.options).length > 2) {
+            this.setState({
+                options: _.omit(this.state.options, id)
+            });
+        }
+    }
+
+    handleChange(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        });
+    }
+
+    handleOptionChange(e) {
+        this.setState({
+            options: {
+                ...this.state.options,
+                [e.target.name]: e.target.value
+            }
+        });
     }
 
     render() {
         let options = "";
         let addOptionBtn = "";
-        if (this.state.type === "MULTIPLE_CHOICE") {
-            options = this.state.options.map(x =>
-                <div key={x.id}>
-                    <input
+        if (this.state.questionType === "MULTIPLE_CHOICE") {
+            options = [];
+            for (let k in this.state.options) {
+                options.push(
+                    <div key={k}>
+                        <input
                         type="radio"
-                        name="correctAnswerId"
-                        value={x.id}
-                        onClick={this.handleChange}
+                        name="options"
+                        value={k}
+                        onClick={this.setCorrectAnswer}
+                        defaultChecked={k === this.state.correctAnswerId ? true : false}
                     />
                     <input
                         type="text"
                         style={{padding: '5px 10px'}}
-                        ref={x.id}
-                        defaultValue={x.answer}
+                        name={k}
+                        onChange={this.handleOptionChange}
+                        defaultValue={this.state.options[k]}
                     />
                     <input
                         type="button"
-                        onClick={() => this.removeOption(x.id)}
+                        onClick={() => this.removeOption(k)}
                         value="Delete"
                     />
                     <br/><br/>
-                </div>
-            );
+                    </div>
+                );
+            }
 
             addOptionBtn = (
-                <button
-                    type="button"
-                    onClick={this.addOption}
-                >Add Option</button>
+                <div style={{ padding: '5px 0px 20px 0px' }}>
+                    <button
+                        type="button"
+                        onClick={this.addOption}
+                    >Add Option</button>
+                </div>
             );
         }
 
         return (
-            <div>
-                <form>
-                    <h3>Question Type:</h3>
-                    <select name="type" value={this.state.type} onChange={this.handleChange}>
-                        <option value="OPEN_RESPONSE">Open Response</option>
-                        <option value="MULTIPLE_CHOICE">Multiple Choice</option>
-                    </select>
-                    <br/>
-                    <h3>Question Body:</h3>
-                    <textarea
-                        cols="100"
-                        rows="5"
-                        name="body"
-                        onChange={this.handleChange}
-                        placeholder="write question here"
+            <div style={{padding: '10px 0px'}}>
+                <select name="questionType" value={this.state.questionType} onChange={this.handleChange}>
+                    <option value="OPEN_RESPONSE">Open Response</option>
+                    <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+                </select>
+                <br/>
+                <br/>
+                <textarea
+                    rows='5'
+                    cols='50'
+                    name="body"
+                    defaultValue={this.props.hasOwnProperty("question") ?
+                    this.props.question.body : ""}
+                    onChange={this.handleChange}
+                    placeholder="Question body"
+                />
+                {options}
+                {addOptionBtn}
+                <div style={{padding: '20px'}}>
+                    <ActionButtons
+                        isEditing={true}
+                        onCancel={this.props.toggleEditForm}
+                        onSaveClick={this.onSaveClick}
                     />
-                    <br />
-                    {options}
-                    {addOptionBtn}
-                    <br/><br/>
-                    <span>
-                        <button type="button" onClick={this.handleSubmit}>Create</button>
-                        <button type="button" onClick={this.props.toggleQuestionForm}>Cancel</button>
-                    </span>
-                </form>
+                </div>
             </div>
         );
     }

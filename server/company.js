@@ -468,7 +468,7 @@ router.post("/delete-test", (req, res) => {
 router.post("/create-question", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { questionId, testId, body, type } = req.body;
+  const { questionId, testId, body, questionType } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -492,15 +492,15 @@ router.post("/create-question", (req, res) => {
         if (x.id === testId) {
           return {
             ...x,
-            questions: type === "MULTIPLE_CHOICE" ?
+            questions: questionType === "MULTIPLE_CHOICE" ?
               x.questions.concat({
-                type,
                 body,
+                type: questionType,
                 id: questionId,
                 options: req.body.options
               }) : x.questions.concat({
-                type,
                 body,
+                type: questionType,
                 id: questionId
               })
           };
@@ -573,10 +573,12 @@ router.post("/edit-question", (req, res) => {
                 return questionType === "MULTIPLE_CHOICE" ? {
                   ...y,
                   body,
+                  type: questionType,
                   options: req.body.options
                 } : {
                   ...y,
-                  body
+                  body,
+                  type: questionType
                 };
               }
 

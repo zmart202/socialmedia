@@ -280,7 +280,7 @@ class TestEditor extends Component {
             questionForm = (
                 <QuestionForm
                     testId={test.id}
-                    toggleQuestionForm={this.toggleQuestionForm}
+                    toggleEditForm={this.toggleQuestionForm}
                     refreshTestData={this.refreshTestData}
                     token={this.token}
                 />

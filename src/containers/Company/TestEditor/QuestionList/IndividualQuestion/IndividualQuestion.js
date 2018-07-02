@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import EditForm from '../../EditForm';
+import QuestionForm from '../../QuestionForm';
 import ActionButtons from '../../../../../components/UI/Buttons/ActionButtons';
 
 class IndividualQuestion extends Component {
@@ -79,11 +79,11 @@ class IndividualQuestion extends Component {
                 return <p>Error</p>
         }
 
-        let editForm = "";
-        let actionButtons = "";
+        let questionForm = "";
+        let actionBtns = "";
         if (this.state.editFormMounted) {
-            editForm = (
-                <EditForm
+            questionForm = (
+                <QuestionForm
                     question={this.props.question}
                     toggleEditForm={this.toggleEditForm.bind(this)}
                     testId={this.props.testId}
@@ -93,7 +93,7 @@ class IndividualQuestion extends Component {
                 />
             );
         } else {
-            actionButtons = (
+            actionBtns = (
                 <ActionButtons
                     isEditing={false}
                     editHandler={this.toggleEditForm}
@@ -106,8 +106,8 @@ class IndividualQuestion extends Component {
             <div style={{paddingBottom: '20px', border: 'solid #cccdce 2px',  margin: "20px 300px", backgroundColor: '#cccdce', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                 <span>
                     {question}
-                    {editForm}
-                    {actionButtons}
+                    {questionForm}
+                    {actionBtns}
                 </span>
             </div>
         );
