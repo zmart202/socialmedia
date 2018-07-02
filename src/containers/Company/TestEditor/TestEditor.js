@@ -211,7 +211,6 @@ class TestEditor extends Component {
 
         let testName = "";
         let editNameForm = "";
-        let actionBtns = "";
         if (!this.state.nameFormMounted) {
             testName = (
                 <div style={{ padding: '20px' }}>

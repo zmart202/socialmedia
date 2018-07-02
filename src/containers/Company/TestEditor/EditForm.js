@@ -6,19 +6,31 @@ import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 class EditForm extends Component {
     constructor(props) {
         super(props);
+
+        this.isMultipleChoice = props.question.type === "MULTIPLE_CHOICE";
+        this.found = this.isMultipleChoice ?
+            props.question.options.find(x =>
+                x.correct
+            ) : null;
+            
+
         this.state = {
             questionType: props.question.type,
-            options: props.question.options,
-            correctAnswerId: props.question.type === "MULTIPLE_CHOICE" ?
-              props.question.options.find(x => x.correct) ?
-              props.question.options.find(x => x.correct).id : null
-              : null
+            options: this.isMultipleChoice ?
+                props.question.options.reduce((acc, x) => ({
+                    ...acc,
+                    [x.id]: x.answer
+                }), {}) : null,
+            correctAnswerId: this.found ? this.found.id : null,
+            body: props.question.body
         };
 
         this.onSaveClick = this.onSaveClick.bind(this);
         this.setCorrectAnswer = this.setCorrectAnswer.bind(this);
         this.removeOption = this.removeOption.bind(this);
         this.addOption = this.addOption.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.handleOptionChange = this.handleOptionChange.bind(this);
     }
 
     onSaveClick = event => {
@@ -34,21 +46,25 @@ class EditForm extends Component {
 
         const body = {
             questionType: this.props.question.type,
-            body: this.refs.body.value,
             questionId: this.props.question.id,
-            testId: this.props.testId
+            testId: this.props.testId,
+            body: this.state.body
         };
 
         if (this.props.question.type === "MULTIPLE_CHOICE") {
+            let _options = [];
+            for (let k in this.state.options) {
+                if (this.state.options[k].length > 0) {
+                    _options.push({
+                        id: k,
+                        answer: this.state.options[k],
+                        correct: k === this.state.correctAnswerId ? true : false
+                    });
+                }
+            }
             options.body = JSON.stringify({
                 ...body,
-                options: this.state.options.filter(x =>
-                    this.refs[x.id].value.length > 0
-                ).map(x => ({
-                    ...x,
-                    answer: this.refs[x.id].value,
-                    correct: x.id === this.state.correctAnswerId ? true : false
-                }))
+                options: _options
             });
         } else {
             options.body = JSON.stringify(body);
@@ -58,8 +74,8 @@ class EditForm extends Component {
         .then(res => res.json())
         .then(data => {
             console.log(data);
-            this.props.refreshTestData();
             this.props.toggleEditForm();
+            this.props.refreshTestData();
         }).catch(err => console.error(err));
     }
 
@@ -87,33 +103,54 @@ class EditForm extends Component {
         }));
     }
 
+    handleChange(e) {
+        this.setState({
+            [e.target.name]: e.target.value
+        });
+    }
+
+    handleOptionChange(e) {
+        this.setState({
+            options: {
+                ...this.state.options,
+                [e.target.name]: e.target.value
+            }
+        });
+    }
+
     render() {
         let options = "";
         let addOptionBtn = "";
-        if (this.props.question.type === "MULTIPLE_CHOICE") {
-            options = this.state.options.map(x =>
-                <div key={x.id}>
-                    <input
+        if (this.isMultipleChoice) {
+            options = [];
+            for (let k in this.state.options) {
+                options.push(
+                    <div key={k}>
+                        <input
                         type="radio"
                         name="options"
-                        value={x.id}
+                        value={k}
                         onClick={this.setCorrectAnswer}
-                        defaultChecked={x.id === this.state.correctAnswerId ? true : false}
+                        defaultChecked={k === this.state.correctAnswerId ? true : false}
                     />
                     <input
                         type="text"
                         style={{padding: '5px 10px'}}
-                        ref={x.id}
-                        defaultValue={x.answer}
+                        name={k}
+                        onChange={this.handleOptionChange}
+                        defaultValue={this.props.question.options.find(x =>
+                           x.id === k
+                        ).answer}
                     />
                     <input
                         type="button"
-                        onClick={() => this.removeOption(x.id)}
+                        onClick={() => this.removeOption(k)}
                         value="Delete"
                     />
                     <br/><br/>
-                </div>
-            );
+                    </div>
+                );
+            }
 
             addOptionBtn = (
                 <div style={{ padding: '5px 0px 20px 0px' }}>
@@ -130,8 +167,9 @@ class EditForm extends Component {
                 <textarea
                     rows='5'
                     cols='50'
+                    name="body"
                     defaultValue={this.props.question.body}
-                    ref='body'
+                    onChange={this.handleChange}
                 />
                 {options}
                 {addOptionBtn}
