@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import shortid from 'shortid';
 
 class TestForm extends Component {
     constructor(props) {
@@ -14,6 +15,8 @@ class TestForm extends Component {
     handleSubmit(e) {
         e.preventDefault();
 
+        const id = shortid.generate();
+
         const options = {
             headers: {
                 "Authorization": `Bearer ${this.props.token}`,
@@ -21,6 +24,7 @@ class TestForm extends Component {
             },
             method: "POST",
             body: JSON.stringify({
+                id,
                 name: this.state.name
             })
         };
@@ -29,7 +33,11 @@ class TestForm extends Component {
         .then(res => res.json())
         .then(data => {
             console.log(data);
-            this.props.refreshTestData(data.createdTestId);
+            this.props.createTestInState({
+                id,
+                name: this.state.name,
+                questions: []
+            });
             this.props.toggleTestForm();
         }).catch(err => console.error(err));
     }

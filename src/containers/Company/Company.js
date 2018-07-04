@@ -142,6 +142,7 @@ class Company extends Component{
                 <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
                 <div style={{backgroundColor: '#d8d8d8', margin: '0px 0px 0px 0px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                     <Link to="/company/test-editor">Test Editor</Link>
+                    <Link to="/company/jobs">Jobs</Link>
                     <h1 style={{color: 'purple'}}>All Potential Applicants for {this.state.companyName}</h1>
                     <h4 style={{color: 'purple'}}>Create New Applicant</h4>
                     <NewApplicant createApplicant={this.createApplicant.bind(this)} />

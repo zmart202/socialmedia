@@ -34,7 +34,7 @@ class DeleteTestForm extends Component {
         .then(res => res.json())
         .then(data => {
             console.log(data);
-            this.props.refreshTestData(this.props.firstTestId);
+            this.props.deleteTestInState(this.props.id);
             this.props.toggleDeleteForm();
         }).catch(err => {
             console.error(err);

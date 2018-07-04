@@ -8,8 +8,9 @@ class JobDescript extends Component {
             descriptInfo: 'This is where the description information will be kept.',
             requirementInfo: 'This is where the requirement information will be kept.',
             benefitInfo: 'This is where the benefit information will be kept.'
-        }
+        };
     }
+
     render () {
         return (
             <div style={{backgroundColor: '#d4d4d6', margin: '0px 200px'}}>

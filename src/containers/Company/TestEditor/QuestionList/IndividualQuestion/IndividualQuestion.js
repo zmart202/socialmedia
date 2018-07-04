@@ -2,12 +2,14 @@ import React, {Component} from 'react';
 
 import QuestionForm from '../../QuestionForm';
 import ActionButtons from '../../../../../components/UI/Buttons/ActionButtons';
+import Spinner from '../../../../../components/UI/Spinner/Spinner';
 
 class IndividualQuestion extends Component {
     constructor(props) {
         super(props);
 
         this.state = {
+            isLoading: false,
             editFormMounted: false
         }
 
@@ -21,7 +23,7 @@ class IndividualQuestion extends Component {
         }));
     }
 
-    deleteQuestion = id => {
+    deleteQuestion = () => {
         const options = {
             headers: {
                 "Content-Type": "application/json",
@@ -34,12 +36,18 @@ class IndividualQuestion extends Component {
             })
         };
 
-        fetch("http://localhost:4567/api/company/delete-question", options)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            this.props.refreshTestData();
-        }).catch(err => console.error(err));
+        this.setState({
+            isLoading: true
+        }, () => {
+            fetch("http://localhost:4567/api/company/delete-question", options)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                this.setState({
+                    isLoading: false
+                }, () => this.props.deleteQuestionInState(this.props.question.id));
+            }).catch(err => console.error(err));
+        });
     }
 
     render() {
@@ -87,9 +95,9 @@ class IndividualQuestion extends Component {
                     question={this.props.question}
                     toggleEditForm={this.toggleEditForm.bind(this)}
                     testId={this.props.testId}
+                    editQuestionInState={this.props.editQuestionInState}
                     refreshTestData={this.props.refreshTestData}
                     token={this.props.token}
-                    delete={this.props.delete}
                 />
             );
         } else {
@@ -105,9 +113,15 @@ class IndividualQuestion extends Component {
         return (
             <div style={{paddingBottom: '20px', border: 'solid #cccdce 2px',  margin: "20px 300px", backgroundColor: '#cccdce', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                 <span>
-                    {question}
-                    {questionForm}
-                    {actionBtns}
+                    {
+                        this.state.isLoading ?
+                        <Spinner /> :
+                        <div>
+                            {question}
+                            {questionForm}
+                            {actionBtns}
+                        </div>
+                    }
                 </span>
             </div>
         );

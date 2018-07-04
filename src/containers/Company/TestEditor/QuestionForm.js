@@ -14,6 +14,7 @@ class QuestionForm extends Component {
         };
 
         this.state = {
+            isLoading: false,
             questionType: props.hasOwnProperty("question") ?
             props.question.type : "OPEN_RESPONSE",
 
@@ -47,51 +48,53 @@ class QuestionForm extends Component {
     onSaveClick = event => {
         event.preventDefault();
 
-        const options = {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.props.token}`
-            },
-            method: "POST"
-        };
-
-        const body = {
-            questionId: this.props.hasOwnProperty("question") ?
+        let newQuestion = {
+            id: this.props.hasOwnProperty("question") ?
             this.props.question.id : shortid.generate(),
 
-            testId: this.props.testId,
             body: this.state.body,
-            questionType: this.state.questionType
+            type: this.state.questionType,
+            testId: this.props.testId
         };
 
         if (this.state.questionType === "MULTIPLE_CHOICE") {
-            let _options = [];
+            newQuestion.options = [];
             for (let k in this.state.options) {
                 if (this.state.options[k].length > 0) {
-                    _options.push({
+                    newQuestion.options.push({
                         id: k,
                         answer: this.state.options[k],
                         correct: k === this.state.correctAnswerId ? true : false
                     });
                 }
             }
-            options.body = JSON.stringify({
-                ...body,
-                options: _options
-            });
-        } else {
-            options.body = JSON.stringify(body);
         }
+
+        const options = {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.props.token}`
+            },
+            method: "POST",
+            body: JSON.stringify(newQuestion)
+        };
 
         const tail = this.props.hasOwnProperty("question") ?
         "edit-question" : "create-question";
-        fetch(`http://localhost:4567/api/company/${tail}`, options)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            this.props.toggleEditForm();
-            this.props.refreshTestData();
-        }).catch(err => console.error(err));
+
+        this.setState({
+            isLoading: true
+        }, () => {
+            fetch(`http://localhost:4567/api/company/${tail}`, options)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                this.props.hasOwnProperty("question") ?
+                this.props.editQuestionInState(newQuestion) :
+                this.props.createQuestionInState(newQuestion);
+                this.props.toggleEditForm();
+            }).catch(err => console.error(err));
+        });
     }
 
     setCorrectAnswer(e) {

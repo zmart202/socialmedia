@@ -7,6 +7,7 @@ const path = require("path");
 require("dotenv").config();
 
 const company = require("./company");
+const job = require("./job");
 const applicant = require("./applicant");
 
 const mongoUrl = process.env.MONGO_URL;
@@ -28,6 +29,7 @@ app.use((req, res, next) => {
 
 app.use(jsonParser);
 app.use("/api/company", company);
+app.use("/api/job", job);
 app.use("/api/applicant", applicant);
 
 app.use(express.static(path.join(__dirname, "../build")));

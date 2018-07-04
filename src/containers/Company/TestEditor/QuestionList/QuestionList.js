@@ -12,6 +12,9 @@ class QuestionList extends Component {
                                 key={question.id}
                                 index={i}
                                 token={props.token}
+                                deleteQuestionInState={props.deleteQuestionInState}
+                                createQuestionInState={props.createQuestionInState}
+                                editQuestionInState={props.editQuestionInState}
                                 refreshTestData={props.refreshTestData}
                                 testId={props.testId}/>
 

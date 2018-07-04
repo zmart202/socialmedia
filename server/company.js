@@ -307,8 +307,7 @@ router.get("/tests", (req, res) => {
 router.post("/create-test", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { name } = req.body;
-  const id = shortid.generate();
+  const { name, id } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -468,7 +467,7 @@ router.post("/delete-test", (req, res) => {
 router.post("/create-question", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { questionId, testId, body, questionType } = req.body;
+  const { id, testId, body, type } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -492,16 +491,16 @@ router.post("/create-question", (req, res) => {
         if (x.id === testId) {
           return {
             ...x,
-            questions: questionType === "MULTIPLE_CHOICE" ?
+            questions: type === "MULTIPLE_CHOICE" ?
               x.questions.concat({
                 body,
-                type: questionType,
-                id: questionId,
+                type,
+                id,
                 options: req.body.options
               }) : x.questions.concat({
                 body,
-                type: questionType,
-                id: questionId
+                type,
+                id
               })
           };
         }
@@ -523,7 +522,14 @@ router.post("/create-question", (req, res) => {
           });
         }
 
-        res.json({ success: true });
+        res.json({
+          success: true,
+          createdQuestion: tests.find(x =>
+            x.id === testId
+          ).questions.find(x =>
+            x.id === id
+          )
+        });
       }).catch(err => {
         console.error(err);
         res.json({
@@ -544,7 +550,7 @@ router.post("/create-question", (req, res) => {
 router.post("/edit-question", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");
-  const { body, testId, questionId, questionType } = req.body;
+  const { body, testId, id, type } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -569,16 +575,16 @@ router.post("/edit-question", (req, res) => {
           return {
             ...x,
             questions: x.questions.map(y => {
-              if (y.id === questionId) {
-                return questionType === "MULTIPLE_CHOICE" ? {
+              if (y.id === id) {
+                return type === "MULTIPLE_CHOICE" ? {
                   ...y,
                   body,
-                  type: questionType,
+                  type,
                   options: req.body.options
                 } : {
                   ...y,
                   body,
-                  type: questionType
+                  type
                 };
               }
 
@@ -604,7 +610,12 @@ router.post("/edit-question", (req, res) => {
           });
         }
 
-        res.json({ success: true });
+        res.json({
+          success: true,
+          editedQuestion: tests.find(x =>
+            x.id === testId
+          ).questions.find(x => x.id === id)
+        });
       }).catch(err => {
         console.error(err);
         res.json({

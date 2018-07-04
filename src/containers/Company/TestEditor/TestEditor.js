@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
+import _ from 'lodash';
 
 import TestForm from './TestForm';
 import QuestionList from './QuestionList/QuestionList';
@@ -30,6 +31,11 @@ class TestEditor extends Component {
         this.toggleQuestionForm = this.toggleQuestionForm.bind(this);
         this.toggleTestForm = this.toggleTestForm.bind(this);
         this.toggleDeleteForm = this.toggleDeleteForm.bind(this);
+        this.deleteQuestionInState = this.deleteQuestionInState.bind(this);
+        this.createQuestionInState = this.createQuestionInState.bind(this);
+        this.editQuestionInState = this.editQuestionInState.bind(this);
+        this.createTestInState = this.createTestInState.bind(this);
+        this.deleteTestInState = this.deleteTestInState.bind(this);
         this.refreshTestData = this.refreshTestData.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
@@ -60,12 +66,39 @@ class TestEditor extends Component {
             this.setState({
                 isLoading: false,
                 tests: data.tests,
-                editingTestId: data.tests[0].id
+                questions: data.tests.length > 0 ?
+                data.tests[0].questions : [],
+
+                editingTestId: data.tests.length > 0 ?
+                data.tests[0].id : null
             });
         }).catch(err => console.error(err));
     }
 
-    refreshTestData = (editingTestId = this.state.editingTestId) => {
+    createTestInState(t) {
+        this.setState(prevState => ({
+            tests: prevState.tests.concat(t),
+            editingTestId: t.id,
+            questions: t.questions
+        }))
+    }
+
+    deleteTestInState(id) {
+        this.setState(prevState => {
+            let newTests = prevState.tests.filter(x => x.id !== id);
+            let sample = _.sample(newTests);
+            return {
+                tests: newTests,
+                editingTestId: newTests.length > 0 ?
+                sample.id : null,
+
+                questions: newTests.length > 0 ?
+                sample.questions: []
+            }
+        });
+    }
+
+    refreshTestData = () => {
         this.setState({
             isLoading: true
         }, () => {
@@ -90,7 +123,6 @@ class TestEditor extends Component {
                 }
 
                 this.setState({
-                    editingTestId,
                     tests: data.tests,
                     isLoading: false
                 });
@@ -142,6 +174,53 @@ class TestEditor extends Component {
         });
     }
 
+    createQuestionInState(q) {
+        this.setState(prevState => {
+            let newQuestions = prevState.questions.concat(q);
+            return {
+                tests: prevState.tests.map(x =>
+                    x.id === q.testId ? {
+                        ...x,
+                        questions: newQuestions
+                    } : x
+                ),
+                questions: newQuestions
+            };
+        });
+    }
+
+    editQuestionInState(q) {
+        this.setState(prevState => {
+            let newQuestions = prevState.questions.map(x =>
+                x.id === q.id ? q : x
+            );
+            return {
+                tests: prevState.tests.map(x =>
+                    x.id === q.testId ? {
+                        ...x,
+                        questions: newQuestions
+                    } : x
+                ),
+                questions: newQuestions
+            };
+        });
+    }
+
+    deleteQuestionInState(id) {
+        this.setState(prevState => {
+            let newQuestions = prevState.questions.filter(x => x.id !== id);
+            return {
+                tests: prevState.tests.map(x =>
+                    x.id === prevState.editingTestId ? {
+                        ...x,
+                        questions: newQuestions
+                    } : x
+                ),
+                questions: newQuestions
+            };
+        });
+    }
+
     toggleNameForm = () => {
         this.setState(prevState => ({
             nameFormMounted: !prevState.nameFormMounted
@@ -168,7 +247,8 @@ class TestEditor extends Component {
 
     setEditingTestId = (id) => {
         this.setState({
-            editingTestId: id
+            editingTestId: id,
+            questions: this.state.tests.find(x => x.id === id).questions
         });
     }
 
@@ -198,52 +278,98 @@ class TestEditor extends Component {
             return <p>There was an error.</p>
         }
 
-        let header = this.state.tests.map(x =>
-            <span key={x.id}
-                style={style.li}
-                onClick={() => this.setEditingTestId(x.id)}
-            >{x.name}</span>
-        );
-
-        let test = this.state.tests.find(x =>
-            x.id === this.state.editingTestId
-        );
-
-        let testName = "";
-        let editNameForm = "";
-        if (!this.state.nameFormMounted) {
-            testName = (
-                <div style={{ padding: '20px' }}>
-                    <h1>{test.name}</h1>
-                    <ActionButtons
-                        isEditing={false}
-                        editHandler={this.toggleNameForm}
-                        deleteHandler={this.toggleDeleteForm}
-                    />
-                </div>
+        let [header, test, testName, editNameForm,
+        addQuestionBtn, questionForm, deleteForm, questionList] = Array(8).fill("");
+        if (this.state.tests.length > 0) {
+            header = this.state.tests.map(x =>
+                <span key={x.id}
+                    style={style.li}
+                    onClick={() => this.setEditingTestId(x.id)}
+                >{x.name}</span>
             );
-        } else {
-            editNameForm = (
-                <div style={{ padding: '20px'}}>
+
+            test = this.state.tests.find(x =>
+                x.id === this.state.editingTestId
+            );
+
+            questionList = (
+                <QuestionList
+                    questions={this.state.questions}
+                    testId={this.state.editingTestId}
+                    deleteQuestionInState={this.deleteQuestionInState}
+                    createQuestionInState={this.createQuestionInState}
+                    editQuestionInState={this.editQuestionInState}
+                    refreshTestData={this.refreshTestData}
+                    token={this.token}
+                />
+            );
+
+            if (!this.state.nameFormMounted) {
+                testName = (
                     <div style={{ padding: '20px' }}>
-                        <input type="text"
-                            style={{
-                                height: '30px',
-                                width: '300px',
-                                fontSize: '20px'
-                            }}
-                            name="testName"
-                            defaultValue={test.name}
-                            onChange={this.handleChange}
+                        <h1>{test.name}</h1>
+                        <ActionButtons
+                            isEditing={false}
+                            editHandler={this.toggleNameForm}
+                            deleteHandler={this.toggleDeleteForm}
                         />
                     </div>
-                    <ActionButtons
-                        isEditing={true}
-                        onSaveClick={this.saveNewName}
-                        onCancel={this.toggleNameForm}
+                );
+            } else {
+                editNameForm = (
+                    <div style={{ padding: '20px'}}>
+                        <div style={{ padding: '20px' }}>
+                            <input type="text"
+                                style={{
+                                    height: '30px',
+                                    width: '300px',
+                                    fontSize: '20px'
+                                }}
+                                name="testName"
+                                defaultValue={test.name}
+                                onChange={this.handleChange}
+                            />
+                        </div>
+                        <ActionButtons
+                            isEditing={true}
+                            onSaveClick={this.saveNewName}
+                            onCancel={this.toggleNameForm}
+                        />
+                    </div>
+                );
+            }
+
+            if (!this.state.questionFormMounted) {
+                addQuestionBtn = (
+                    <button
+                        type="button"
+                        onClick={this.toggleQuestionForm}
+                    >Add New Question</button>
+                );
+            } else {
+                questionForm = (
+                    <QuestionForm
+                        testId={test.id}
+                        createQuestionInState={this.createQuestionInState}
+                        toggleEditForm={this.toggleQuestionForm}
+                        refreshTestData={this.refreshTestData}
+                        token={this.token}
                     />
-                </div>
-            );
+                );
+            }
+
+            if (this.state.deleteFormMounted) {
+                deleteForm = (
+                    <DeleteTestForm
+                        toggleDeleteForm={this.toggleDeleteForm}
+                        id={this.state.editingTestId}
+                        deleteTestInState={this.deleteTestInState}
+                        refreshTestData={this.refreshTestData}
+                        name={test.name}
+                        token={this.token}
+                    />
+                );
+            }
         }
 
         let newTestBtn = "";
@@ -259,45 +385,12 @@ class TestEditor extends Component {
                 <div>
                     <TestForm
                         refreshTestData={this.refreshTestData}
+                        createTestInState={this.createTestInState}
                         toggleTestForm={this.toggleTestForm}
                         token={this.token}
                         setEditingTestId={this.setEditingTestId}
                     />
                 </div>
-            );
-        }
-
-        let addQuestionBtn = "";
-        let questionForm = "";
-        if (!this.state.questionFormMounted) {
-            addQuestionBtn = (
-                <button
-                    type="button"
-                    onClick={this.toggleQuestionForm}
-                >Add New Question</button>
-            );
-        } else {
-            questionForm = (
-                <QuestionForm
-                    testId={test.id}
-                    toggleEditForm={this.toggleQuestionForm}
-                    refreshTestData={this.refreshTestData}
-                    token={this.token}
-                />
-            );
-        }
-
-        let deleteForm = "";
-        if (this.state.deleteFormMounted) {
-            deleteForm = (
-                <DeleteTestForm
-                    toggleDeleteForm={this.toggleDeleteForm}
-                    id={this.state.editingTestId}
-                    refreshTestData={this.refreshTestData}
-                    name={test.name}
-                    token={this.token}
-                    firstTestId={this.state.tests[0].id}
-                />
             );
         }
 
@@ -318,13 +411,7 @@ class TestEditor extends Component {
                 {deleteForm}
                 {addQuestionBtn}
                 {questionForm}
-                <QuestionList
-                    questions={test.questions}
-                    testId={test.id}
-                    inTestForm={false}
-                    refreshTestData={this.refreshTestData}
-                    token={this.token}
-                />
+                {questionList}
             </div>
         );
     };
