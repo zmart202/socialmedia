@@ -3,8 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@sendgrid/mail": "^6.3.1",
     "bcrypt": "^2.0.1",
     "cors": "^2.8.4",
+    "deep-extend": "^0.5.1",
     "dotenv": "^6.0.0",
     "express-jwt": "^5.3.1",
     "hat": "0.0.3",

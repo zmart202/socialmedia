@@ -1,4 +1,5 @@
 import React, {Component} from 'react';
+import Toggle from 'react-toggle';
 // import EducationInput from './EducationInput/EducationInput';
 
 class EducationProfile extends Component {
@@ -7,7 +8,8 @@ class EducationProfile extends Component {
                 this.state = {
                         educationKey: 1,
                         education: [],
-                        addEducation: false
+                        addEducation: false,
+                        finishedSchool: false
                 }
         }
         keyValueHandler = () => {
@@ -24,18 +26,24 @@ class EducationProfile extends Component {
                 let degree = this.refs.degree.value;
                 let startTime = this.refs.startTime.value;
                 let endTime = this.refs.endTime.value;
+                let finishedSchool = this.state.finishedSchool;
                 let educationObj = {
                         key: this.keyValueHandler(),
                         school,
                         study,
                         degree,
                         startTime,
-                        endTime
+                        endTime,
+                        finishedSchool
                 }
                 this.setState({
                         education: this.state.education.concat(educationObj)
                 });
-                this.setState({addEducation: false});
+                this.setState({addEducation: false, finishedSchool: false});
+        }
+
+        finishedSchoolHandler = () => {
+                this.setState({finishedSchool: !this.state.finishedSchool});
         }
 
         cancelEducationHandler = () => {
@@ -94,25 +102,31 @@ class EducationProfile extends Component {
                         <div>
                                 <span>
                                         <div>
-                                                <label for="start">Start: </label>
+                                                <label htmlFor="start">Start: </label>
                                                 <input type="date"
                                                 style={{padding: '5px'}}
                                                 onChange={this.props.handleChange}
-                                                value="yyyy-MM-dd"
+                                                defaultValue="yyyy-MM-dd"
                                                 ref="startTime"
                                                 min="1955-01-01" max="2090-12-31" />
                                         </div>
 
                                         <div>
-                                                <label for="end">End: </label>
+                                                <label htmlFor="end">End: </label>
                                                 <input type="date"
                                                 style={{padding: '5px'}}
                                                 onChange={this.props.handleChange}
-                                                value="yyyy-MM-dd"
+                                                defaultValue="yyyy-MM-dd"
                                                 ref="endTime"
                                                 min="1955-01-01" max="2090-12-31" />
                                         </div>
                                 </span><br />
+                                <label className="react-toggle" style={{padding: "20px 0px"}}>
+                                <span style={{padding: '10px'}}>Did you complete your education?</span>
+                                        <Toggle 
+                                                defaultChecked={this.state.finishedSchool}
+                                                onChange={this.finishedSchoolHandler} />
+                                </label><br />
                         </div>
                                 <span>
                                         <button onClick={this.cancelEducationHandler}>Cancel</button>
@@ -130,7 +144,7 @@ class EducationProfile extends Component {
                                         <p><strong>School: </strong>{edu.school}</p>
                                         <p><strong>Study: </strong>{edu.study}</p>
                                         <p><strong>Degree: </strong>{edu.degree}</p>
-                                        <p>From: {edu.startTime} To: {edu.endTime}</p>
+                                        <p><strong>From: </strong>{edu.startTime} <strong>To: </strong>{edu.endTime}</p>
                                         <button onClick={this.deleteEducationHandler.bind(this, edu)}>Delete</button>
                                         </div>
                                 ))}

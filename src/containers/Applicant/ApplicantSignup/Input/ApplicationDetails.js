@@ -31,7 +31,7 @@ class ApplicationDetails extends Component {
                 cols="100" 
                 rows="5" 
                 onChange={this.props.handleChange} 
-                name="coverLetter" 
+                name="salaryRequirements" 
                 placeholder="Please specify your salary requirements"/><br />
         </div>
     }

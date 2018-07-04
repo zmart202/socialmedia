@@ -214,7 +214,7 @@ class TestEditor extends Component {
         if (!this.state.nameFormMounted) {
             testName = (
                 <div style={{ padding: '20px' }}>
-                    <h1>{test.name}</h1>
+                    <h1>{test.name} Test</h1>
                     <ActionButtons
                         isEditing={false}
                         editHandler={this.toggleNameForm}
