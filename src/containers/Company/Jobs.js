@@ -1,7 +1,11 @@
 import React, {Component} from 'react';
+import { Link } from 'react-router-dom';
+import _ from 'lodash';
 
 import CreateJob from './CreateJob';
 import EditJob from './EditJob';
+import DeleteJob from './DeleteJob';
+import TestEditor from './TestEditor/TestEditor';
 import Spinner from '../../components/UI/Spinner/Spinner';
 
 class Jobs extends Component {
@@ -13,7 +17,8 @@ class Jobs extends Component {
             jobs: [],
             viewingJobId: null,
             createJobMounted: false,
-            editJobMounted: false
+            editJobMounted: false,
+            testEditorMounted: false
         }
 
         this.token = localStorage.getItem("token");
@@ -21,8 +26,14 @@ class Jobs extends Component {
         this.setViewingJobId = this.setViewingJobId.bind(this);
         this.createJobInState = this.createJobInState.bind(this);
         this.editJobInState = this.editJobInState.bind(this);
+        this.deleteJobInState = this.deleteJobInState.bind(this);
+        this.createQuestionInState = this.createQuestionInState.bind(this);
+        this.editQuestionInState = this.editQuestionInState.bind(this);
+        this.deleteQuestionInState = this.deleteQuestionInState.bind(this);
+        this.toggleTestEditor = this.toggleTestEditor.bind(this);
         this.toggleCreateJob = this.toggleCreateJob.bind(this);
         this.toggleEditJob = this.toggleEditJob.bind(this);
+        this.toggleDeleteJob = this.toggleDeleteJob.bind(this);
         this.handleChange = this.handleChange.bind(this);
     }
 
@@ -84,6 +95,60 @@ class Jobs extends Component {
         }));
     }
 
+    deleteJobInState(id) {
+        this.setState(prevState => {
+            let newJobs = prevState.jobs.filter(x => x.id !== id);
+            return {
+                jobs: newJobs,
+                viewingJobId: _.sample(newJobs).id
+            };
+        });
+    }
+
+    createQuestionInState(q) {
+        this.setState(prevState => ({
+            jobs: prevState.jobs.map(x =>
+                x.id === this.state.viewingJobId ?
+                {
+                    ...x,
+                    test: x.test.concat(q)
+                } : x
+            )
+        }));
+    }
+
+    editQuestionInState(q) {
+        this.setState(prevState => ({
+            jobs: prevState.jobs.map(x =>
+                x.id === this.state.viewingJobId ?
+                {
+                    ...x,
+                    test: x.test.map(y =>
+                        y.id === q.id ? q : y
+                    )
+                } : x
+            )
+        }));
+    }
+
+    deleteQuestionInState(id) {
+        this.setState(prevState => ({
+            jobs: prevState.jobs.map(x =>
+                x.id === this.state.viewingJobId ?
+                {
+                    ...x,
+                    test: x.test.filter(y => y.id !== id)
+                } : x
+            )
+        }));
+    }
+
+    toggleTestEditor() {
+        this.setState(prevState => ({
+            testEditorMounted: !prevState.testEditorMounted
+        }));
+    }
+
     toggleCreateJob() {
         this.setState(prevState => ({
             createJobMounted: !prevState.createJobMounted
@@ -93,6 +158,12 @@ class Jobs extends Component {
     toggleEditJob() {
         this.setState(prevState => ({
             editJobMounted: !prevState.editJobMounted
+        }));
+    }
+
+    toggleDeleteJob() {
+        this.setState(prevState => ({
+            deleteJobMounted: !prevState.deleteJobMounted
         }));
     }
 
@@ -179,8 +250,49 @@ class Jobs extends Component {
             );
         }
 
+        let testEditor = "";
+        let testEditorBtn = "";
+        if (this.state.testEditorMounted) {
+            testEditor = (
+                <TestEditor
+                    toggleTestEditor={this.toggleTestEditor}
+                    token={this.token}
+                    job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
+                    createQuestionInState={this.createQuestionInState}
+                    editQuestionInState={this.editQuestionInState}
+                    deleteQuestionInState={this.deleteQuestionInState}
+                />
+            );
+        } else {
+            testEditorBtn = (
+                <button type="button"
+                    onClick={this.toggleTestEditor}
+                >Test Editor</button>
+            );
+        }
+
+        let deleteJob = "";
+        let deleteJobBtn = "";
+        if (this.state.deleteJobMounted) {
+            deleteJob = (
+                <DeleteJob
+                    id={this.state.viewingJobId}
+                    title={this.state.jobs.find(x => x.id === this.state.viewingJobId).title}
+                    token={this.token}
+                    toggleDeleteJob={this.toggleDeleteJob}
+                    deleteJobInState={this.deleteJobInState}
+                />
+            );
+        } else {
+            deleteJobBtn = (
+                <button type="button"
+                    onClick={this.toggleDeleteJob}
+                >Delete Job</button>
+            );
+        }
+
         let description = "";
-        if (this.state.viewingJobId) {
+        if (this.state.viewingJobId && !this.state.editJobMounted && !this.state.createJobMounted && !this.state.testEditorMounted) {
             description = (
                 <p>{this.state.jobs.find(x =>
                     x.id === this.state.viewingJobId
@@ -190,6 +302,9 @@ class Jobs extends Component {
 
         return (
             <div>
+                <div style={{padding: '20px', textAlign: 'left'}}>
+                    <Link to='/company' style={{textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</Link>
+                </div>
                 <h1>Jobs for {this.state.companyName}</h1>
                 {createJobBtn}
                 {createJob}
@@ -197,6 +312,10 @@ class Jobs extends Component {
                 {description}
                 {editJobBtn}
                 {editJob}
+                {testEditorBtn}
+                {testEditor}
+                {deleteJobBtn}
+                {deleteJob}
             </div>
         );
     }

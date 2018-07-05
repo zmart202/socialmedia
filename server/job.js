@@ -135,7 +135,7 @@ router.post("/delete-job", (req, res) => {
       return res.sendStatus(403);
     }
 
-    Jobs.remove({ id })
+    Jobs.findOneAndDelete({ id })
     .then(result => {
       if (result.nRemoved === 0) {
         res.json({
@@ -146,6 +146,7 @@ router.post("/delete-job", (req, res) => {
 
       res.json({ success: true });
     }).catch(err => {
+      console.error(err);
       res.json({
         success: false,
         msg: "Server error"
@@ -154,7 +155,7 @@ router.post("/delete-job", (req, res) => {
   });
 });
 
-router.post("edit-test", (req, res) => {
+router.post("/edit-test", (req, res) => {
   const db = req.app.locals.db;
   const Jobs = db.collection("jobs");
   const { id, test } = req.body;
@@ -177,6 +178,8 @@ router.post("edit-test", (req, res) => {
           msg: "Could not edit test"
         });
       }
+
+      res.json({ success: true });
     }).catch(err => {
       res.json({
         success: false,

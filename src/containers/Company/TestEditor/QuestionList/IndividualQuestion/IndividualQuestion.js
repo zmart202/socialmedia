@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 
-import QuestionForm from '../../QuestionForm';
+import EditQuestion from '../../EditQuestion';
 import ActionButtons from '../../../../../components/UI/Buttons/ActionButtons';
 import Spinner from '../../../../../components/UI/Spinner/Spinner';
 
@@ -10,20 +10,25 @@ class IndividualQuestion extends Component {
 
         this.state = {
             isLoading: false,
-            editFormMounted: false
+            isError: false,
+            editQuestionMounted: false
         }
 
-        this.toggleEditForm = this.toggleEditForm.bind(this);
+        this.toggleEditQuestion = this.toggleEditQuestion.bind(this);
         this.deleteQuestion = this.deleteQuestion.bind(this);
     }
 
-    toggleEditForm = () => {
+    toggleEditQuestion() {
         this.setState(prevState => ({
-            editFormMounted: !prevState.editFormMounted
+            editQuestionMounted: !prevState.editQuestionMounted
         }));
     }
 
     deleteQuestion = () => {
+        const newTest = this.props.test.filter(x =>
+            x.id !== this.props.question.id
+        );
+
         const options = {
             headers: {
                 "Content-Type": "application/json",
@@ -31,17 +36,24 @@ class IndividualQuestion extends Component {
             },
             method: "POST",
             body: JSON.stringify({
-                questionId: this.props.question.id,
-                testId: this.props.testId
+                id: this.props.jobId,
+                test: newTest
             })
         };
 
         this.setState({
             isLoading: true
         }, () => {
-            fetch("http://localhost:4567/api/company/delete-question", options)
+            fetch("http://localhost:4567/api/job/edit-test", options)
             .then(res => res.json())
             .then(data => {
+                if (!data.success) {
+                    console.log(data);
+                    return this.setState({
+                        isError: true,
+                        isLoading: false
+                    });
+                }
                 console.log(data);
                 this.setState({
                     isLoading: false
@@ -51,60 +63,71 @@ class IndividualQuestion extends Component {
     }
 
     render() {
-        let question = "";
-        switch (this.props.question.type) {
-            case "OPEN_RESPONSE":
-                question = (
-                    <div>
-                        <h3>{this.props.index + 1}. {this.props.question.body}</h3>
-                    </div>
-                );
-                break;
-            case "MULTIPLE_CHOICE":
-                question = (
-                    <div>
-                        <h3>{this.props.index + 1}. {this.props.question.body}</h3>
-                        {
-                            this.props.question.options.map(x => {
-                                let highlighter = {};
-                                if (x.correct) {
-                                    highlighter = {
-                                        color: 'green'
-                                    };
-                                }
-                                return (
-                                    <div key={x.id}>
-                                        <h4 style={highlighter}>{x.answer}</h4>
-                                    </div>
-                                )
-                            })
-                        }
-                    </div>
-                );
-                break;
-            default:
-                console.error("Invalid question type");
-                return <p>Error</p>
+        if (this.state.isLoading) {
+            return (
+                <Spinner />
+            );
         }
 
-        let questionForm = "";
+        if (this.state.isError) {
+            return (
+                <p>Error</p>
+            );
+        }
+
+        let question = "";
+        let editQuestion = "";
         let actionBtns = "";
-        if (this.state.editFormMounted) {
-            questionForm = (
-                <QuestionForm
+        if (this.state.editQuestionMounted) {
+            editQuestion = (
+                <EditQuestion
                     question={this.props.question}
-                    toggleEditForm={this.toggleEditForm.bind(this)}
-                    testId={this.props.testId}
+                    toggleEditQuestion={this.toggleEditQuestion}
+                    test={this.props.test}
+                    jobId={this.props.jobId}
                     editQuestionInState={this.props.editQuestionInState}
-                    refreshTestData={this.props.refreshTestData}
                     token={this.props.token}
                 />
             );
         } else {
+            switch (this.props.question.type) {
+                case "OPEN_RESPONSE":
+                    question = (
+                        <div>
+                            <h3>{this.props.index + 1}. {this.props.question.body}</h3>
+                        </div>
+                    );
+                    break;
+                case "MULTIPLE_CHOICE":
+                    question = (
+                        <div>
+                            <h3>{this.props.index + 1}. {this.props.question.body}</h3>
+                            {
+                                this.props.question.options.map(x => {
+                                    let highlighter = {};
+                                    if (x.correct) {
+                                        highlighter = {
+                                            color: 'green'
+                                        };
+                                    }
+                                    return (
+                                        <div key={x.id}>
+                                            <h4 style={highlighter}>{x.answer}</h4>
+                                        </div>
+                                    )
+                                })
+                            }
+                        </div>
+                    );
+                    break;
+                default:
+                    console.error("Invalid question type");
+                    return <p>Error</p>
+            }
             actionBtns = (
                 <ActionButtons
                     isEditing={false}
-                    editHandler={this.toggleEditForm}
+                    editHandler={this.toggleEditQuestion}
                     deleteHandler={this.deleteQuestion}
                 />
             )
@@ -118,7 +141,7 @@ class IndividualQuestion extends Component {
                         <Spinner /> :
                         <div>
                             {question}
-                            {questionForm}
+                            {editQuestion}
                             {actionBtns}
                         </div>
                     }

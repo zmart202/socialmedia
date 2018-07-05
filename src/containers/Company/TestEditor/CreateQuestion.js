@@ -4,37 +4,21 @@ import _ from 'lodash';
 
 import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 
-class QuestionForm extends Component {
+class CreateQuestion extends Component {
     constructor(props) {
         super(props);
 
-        this.initialOption = {
+        this.initialOptions = {
             [shortid.generate()]: "",
             [shortid.generate()]: ""
         };
 
         this.state = {
             isLoading: false,
-            questionType: props.hasOwnProperty("question") ?
-            props.question.type : "OPEN_RESPONSE",
-
-            options: props.hasOwnProperty("question") ?
-            (props.question.type === "MULTIPLE_CHOICE" ?
-            props.question.options.reduce((acc, x) => ({
-                ...acc,
-                [x.id]: x.answer
-            }), {}) : this.initialOption) : this.initialOption,
-
-            correctAnswerId: props.hasOwnProperty("question") ?
-            (props.question.type === "MULTIPLE_CHOICE" ?
-            (props.question.options.find(x =>
-                x.correct
-            ) ? props.question.options.find(x =>
-                x.correct
-            ).id : null) : null) : null,
-
-            body: props.hasOwnProperty("question") ?
-            props.question.body : ""
+            questionType: "OPEN_RESPONSE",
+            options: this.initialOptions,
+            correctAnswerId: null,
+            body: ""
         };
 
         this.onSaveClick = this.onSaveClick.bind(this);
@@ -49,12 +33,9 @@ class QuestionForm extends Component {
         event.preventDefault();
 
         let newQuestion = {
-            id: this.props.hasOwnProperty("question") ?
-            this.props.question.id : shortid.generate(),
-
+            id: shortid.generate(),
             body: this.state.body,
-            type: this.state.questionType,
-            testId: this.props.testId
+            type: this.state.questionType
         };
 
         if (this.state.questionType === "MULTIPLE_CHOICE") {
@@ -76,23 +57,21 @@ class QuestionForm extends Component {
                 "Authorization": `Bearer ${this.props.token}`
             },
             method: "POST",
-            body: JSON.stringify(newQuestion)
+            body: JSON.stringify({
+                id: this.props.jobId,
+                test: this.props.test.concat(newQuestion)
+            })
         };
-
-        const tail = this.props.hasOwnProperty("question") ?
-        "edit-question" : "create-question";
 
         this.setState({
             isLoading: true
         }, () => {
-            fetch(`http://localhost:4567/api/company/${tail}`, options)
+            fetch("http://localhost:4567/api/job/edit-test", options)
             .then(res => res.json())
             .then(data => {
                 console.log(data);
-                this.props.hasOwnProperty("question") ?
-                this.props.editQuestionInState(newQuestion) :
                 this.props.createQuestionInState(newQuestion);
-                this.props.toggleEditForm();
+                this.props.toggleCreateQuestion();
             }).catch(err => console.error(err));
         });
     }
@@ -189,8 +168,6 @@ class QuestionForm extends Component {
                     rows='5'
                     cols='50'
                     name="body"
-                    defaultValue={this.props.hasOwnProperty("question") ?
-                    this.props.question.body : ""}
                     onChange={this.handleChange}
                     placeholder="Question body"
                 />
@@ -199,7 +176,7 @@ class QuestionForm extends Component {
                 <div style={{padding: '20px'}}>
                     <ActionButtons
                         isEditing={true}
-                        onCancel={this.props.toggleEditForm}
+                        onCancel={this.props.toggleCreateQuestion}
                         onSaveClick={this.onSaveClick}
                     />
                 </div>
@@ -208,4 +185,4 @@ class QuestionForm extends Component {
     }
 }
 
-export default QuestionForm;
+export default CreateQuestion;
