@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router-dom';
+import hat from 'hat';
 
 import Aux from '../../hoc/Aux/Aux';
 import NewApplicant from './NewApplicant';
@@ -11,11 +12,17 @@ class Company extends Component{
       super(props);
       this.state = {
           isLoading: true,
+          isError: false,
           applicants: [],
           companyName: "",
-          viewableApplicant: null,
-          search: ""
+          search: "",
+          createApplicantMounted: false
       };
+
+      this.token = localStorage.getItem("token");
+
+      this.createApplicant = this.createApplicant.bind(this);
+      this.toggleCreateApplicant = this.toggleCreateApplicant.bind(this);
   }
 
     componentDidMount() {
@@ -23,31 +30,39 @@ class Company extends Component{
     }
 
     refreshApplicantList = () => {
-        const token = localStorage.getItem("token");
-        if (token === null) {
+        if (this.token === null) {
             this.props.history.push("/");
             return;
         }
 
         const options = {
             headers: {
-                "Authorization": `Bearer ${token}`
+                "Authorization": `Bearer ${this.token}`
             }
         };
 
         fetch("http://localhost:4567/api/company/applicants", options)
-        .then(res =>
-            res.status === 200 ?
-                res.json() :
-                Promise.reject("Auth denied")
-        ).then(data => {
+        .then(res => res.json())
+        .then(data => {
+            if (!data.success) {
+                return this.setState({
+                    isLoading: false,
+                    isError: true
+                });
+            }
+
             this.setState({
                 isLoading: false,
                 applicants: data.applicants,
-                companyName: data.companyName,
-                viewableApplicant: data[0]
-            })
-        }).catch(err => console.error(err));
+                companyName: data.companyName
+            });
+        }).catch(err => {
+            this.setState({
+                isLoading: false,
+                isError: true
+            });
+            console.error(err)
+        });
     }
 
     deleteApplicantsHandler = (applicant) => {
@@ -89,11 +104,13 @@ class Company extends Component{
         return retVal;
     }
 
-    createApplicant = (lname, fname, email) => {
+    createApplicant(firstName, lastName, email, jobId) {
         const token = localStorage.getItem("token");
         if (token === null) {
             return;
         }
+
+        const id = hat();
 
         const options = {
             headers: {
@@ -102,21 +119,25 @@ class Company extends Component{
             },
             method: "POST",
             body: JSON.stringify({
+                id,
                 email,
-                firstName: fname,
-                lastName: lname,
-                token: this.generateTokenHandler()
+                firstName,
+                lastName,
+                jobId
             })
         };
 
         fetch("http://localhost:4567/api/company/create-applicant", options)
-        .then(res =>
-            res.status === 403 ?
-                Promise.reject("Auth denied") :
-                res.json()
-        ).then(data => {
+        .then(res => res.json())
+        .then(data => {
             this.refreshApplicantList();
         }).catch(err => console.error(err));
+    }
+
+    toggleCreateApplicant() {
+        this.setState(prevState => ({
+            createApplicantMounted: !prevState.createApplicantMounted
+        }));
     }
 
     logOut = () => {
@@ -137,22 +158,47 @@ class Company extends Component{
             return <Spinner />;
         }
 
-        return(
+        if (this.state.isError) {
+            return (
+                <p>Error loading applicants</p>
+            );
+        }
+
+        let createApplicantBtn = "";
+        let createApplicant = "";
+        if (this.state.createApplicantMounted) {
+            createApplicant = (
+                <NewApplicant
+                    token={this.token}
+                    createApplicant={this.createApplicant}
+                    toggleCreateApplicant={this.toggleCreateApplicant}
+                />
+            );
+        } else {
+            createApplicantBtn = (
+                <button type="button"
+                    onClick={this.toggleCreateApplicant}
+                    style={{ cursor: 'pointer' }}
+                ><h4 style={{color: 'purple'}}>Create New Applicant</h4></button>
+            );
+        }
+
+        return (
             <Aux>
                 <header style={{textAlign: 'right', padding: '0px 40px 20px 40px', color: 'purple', cursor: 'pointer', marginTop: '15px'}}><a onClick={this.logOut}>Logout</a></header>
                 <div style={{backgroundColor: '#d8d8d8', margin: '0px 0px 0px 0px', padding: '20px 0px', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                     <Link to="/company/jobs">Jobs</Link>
                     <h1 style={{color: 'purple'}}>All Potential Applicants for {this.state.companyName}</h1>
-                    <h4 style={{color: 'purple'}}>Create New Applicant</h4>
-                    <NewApplicant createApplicant={this.createApplicant.bind(this)} />
+                    {createApplicant}
+                    {createApplicantBtn}
                     <div style={{borderTopStyle: 'solid', margin: '20px 60px', borderColor: 'purple'}}>
-                    <h4 style={{color: 'purple'}}>Search Bar</h4>
-                    <input
-                        type="text"
-                        style={{padding: '10px'}}
-                        value={this.state.search}
-                        onChange={this.updateSearch.bind(this)}
-                        placeholder="Search by last name.." />
+                        <h4 style={{color: 'purple'}}>Search Bar</h4>
+                        <input
+                            type="text"
+                            style={{padding: '10px'}}
+                            value={this.state.search}
+                            onChange={this.updateSearch.bind(this)}
+                            placeholder="Search by last name.." />
                     </div>
                     <div style={{width:'1100px', margin:'0 auto'}}>
                     <ApplicantList

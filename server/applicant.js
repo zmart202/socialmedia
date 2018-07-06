@@ -29,7 +29,12 @@ router.post("/application", (req, res) => {
     Applicants.insertOne({
       ...req.body,
       test: job.test,
-      id: applicantId
+      id: applicantId,
+      completed: false,
+      timestamp: new Date(),
+      testTimestamp: null,
+      secondsElapsed: 0,
+      answers: null
     }).then((applicant) => {
       if (!applicant) {
         return res.json({

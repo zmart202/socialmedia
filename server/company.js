@@ -4,6 +4,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
 const hat = require("hat");
+const _ = require("lodash");
 
 const { hashPassword, comparePasswords } = require("./password-utils");
 const sample = require("./sample-test");
@@ -125,6 +126,42 @@ router.get("/auth", (req, res) => {
   });
 });
 
+router.get("/jobs", (req, res) => {
+  const db = req.app.locals.db;
+  const Jobs = db.collection("jobs");
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret, (err, authData) => {
+    if (err) {
+      console.error(err);
+      return res.sendStatus(403);
+    }
+
+    Jobs.find({ companyId: authData.companyId })
+    .toArray().then(jobs => {
+      if (!jobs) {
+        return res.json({
+          success: false,
+          msg: `Could not find any jobs under companyId ${authData.companyId}`
+        });
+      }
+
+      res.json({
+        success: true,
+        jobs: jobs.map(x => _.omit(x, "_id"))
+      });
+    }).catch(err => {
+      res.json({
+        success: false,
+        msg: "Server error"
+      });
+      console.error(err);
+    });
+  });
+});
+
 router.get("/applicants", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
@@ -158,33 +195,31 @@ router.get("/applicants", (req, res) => {
 
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
-  const Companies = db.collection("companies");
+  const Jobs = db.collection("jobs");
   const Applicants = db.collection("applicants");
 
   const bearer = req.headers["authorization"];
-  const _token = bearer.split(" ")[1];
+  const token = bearer.split(" ")[1];
 
-  jwt.verify(_token, secret, (err, authData) => {
+  jwt.verify(token, secret, (err, authData) => {
     if (err) {
       console.error(err);
       return res.sendStatus(403);
     }
 
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
+    Jobs.findOne({ id: req.body.jobId, companyId: authData.companyId })
+    .then(job => {
+      if (!job) {
         return res.json({
           success: false,
-          msg: "Invalid companyID"
+          msg: `Could not find job with id ${jobId} and companyId ${authData.companyId}`
         });
       }
 
-      const id = shortid.generate();
-
       Applicants.insertOne({
         ...req.body,
-        companyId: company.id,
-        test: company.tests[0],
+        companyId: authData.companyId,
+        test: job.test,
         completed: false,
         timestamp: new Date(),
         testTimestamp: null,
@@ -198,18 +233,21 @@ router.post("/create-applicant", (req, res) => {
           });
         }
 
+        res.json({ success: true });
+      }).catch(err => {
         res.json({
-          success: true,
-          createdApplicant: {
-            id,
-            firstName,
-            lastName,
-            email,
-            token
-          }
+          success: false,
+          msg: "Server error"
         });
-      }).catch(err => console.error(err));
-    }).catch(err => console.error(err));
+        console.error(err);
+      });
+    }).catch(err => {
+      res.json({
+        success: false,
+        msg: "Server error"
+      });
+      console.error(err);
+    });
   });
 });
 
