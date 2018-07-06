@@ -31,7 +31,7 @@ class ApplicantSignup extends Component {
         };
 
         this.companyId = props.match.params.companyId;
-        this.testId = props.match.params.testId;
+        this.jobId = props.match.params.jobId;
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
@@ -46,7 +46,7 @@ class ApplicantSignup extends Component {
             method: 'POST',
             body: JSON.stringify({
                 companyId: this.companyId,
-                testId: this.testId,
+                jobId: this.jobId,
                 ..._.omit(this.state, ["addEducation", "educationKey", "educationFormMounted"])
             })
         }
@@ -94,13 +94,13 @@ class ApplicantSignup extends Component {
                     <div style={{backgroundColor: "#cfcfd1", margin: '0px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>
                         <label className="react-toggle" style={{padding: "20px 0px"}}>
                             <span style={{padding: '10px'}}>Are you 18 years or older?</span>
-                            <Toggle 
+                            <Toggle
                                 defaultChecked={this.state.over18}
                                 onChange={this.over18Handler} />
                         </label><br />
                         <label className="react-toggle" style={{padding: "20px 0px"}}>
                             <span style={{padding: '10px'}}>Are you a citizen of the U.S. or do you have a legal right to work in the U.S.?</span>
-                            <Toggle 
+                            <Toggle
                                 defaultChecked={this.state.legal}
                                 onChange={this.legalHandler} />
                         </label><br />

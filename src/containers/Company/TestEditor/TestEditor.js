@@ -78,7 +78,6 @@ class TestEditor extends Component {
                 {createQuestionBtn}
                 {createQuestion}
                 {questionList}
-                <button type="button" onClick={this.props.toggleTestEditor}>Cancel</button>
             </div>
         );
     };

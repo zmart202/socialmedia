@@ -23,7 +23,7 @@ class App extends Component {
         <Route path="/company/results/:ApplicantId" component={FinalResults} />
         <Route path='/finished' component={Finished}  />
         <Route path='/job-description' component={JobDescript} />
-        <Route path='/app-form/:companyId/:testId' component={ApplicantSignup} />
+        <Route path='/app-form/:companyId/:jobId' component={ApplicantSignup} />
       </div>
     );
   }

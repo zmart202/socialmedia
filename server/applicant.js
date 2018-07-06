@@ -10,29 +10,25 @@ const secret = process.env.SECRET;
 
 const router = express.Router();
 
-router.post('/application', (req, res) => {
+router.post("/application", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const Companies = db.collection('companies');
-  const {companyId, testId} = req.body;
+  const Jobs = db.collection("jobs");
+  const { companyId, jobId } = req.body;
   const applicantId = hat();
 
-  Companies.findOne({id: companyId})
-  .then((company) => {
-    if (!company) {
+  Jobs.findOne({ companyId, id: jobId })
+  .then(job => {
+    if (!job) {
       return res.json({
         success: false,
-        msg: `Could not find Company with ID ${companyId}`
+        msg: `Could not find Job under jobId ${jobId} and companyId ${companyId}`
       });
     }
 
-    const test = company.tests.find(x =>
-      x.id === testId
-    );
-
     Applicants.insertOne({
       ...req.body,
-      test,
+      test: job.test,
       id: applicantId
     }).then((applicant) => {
       if (!applicant) {
@@ -45,7 +41,7 @@ router.post('/application', (req, res) => {
       res.json({
         ...req.body,
         applicantId,
-        test,
+        test: job.test,
         success: true
       });
     }).catch((err) => {
@@ -55,10 +51,10 @@ router.post('/application', (req, res) => {
       });
       console.error(err);
     });
-  }).catch((err) => {
+  }).catch(err => {
     res.json({
       success: false,
-      msg: 'Server error'
+      msg: "Server error"
     });
     console.error(err);
   });

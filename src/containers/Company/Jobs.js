@@ -251,23 +251,15 @@ class Jobs extends Component {
         }
 
         let testEditor = "";
-        let testEditorBtn = "";
         if (this.state.testEditorMounted) {
             testEditor = (
                 <TestEditor
-                    toggleTestEditor={this.toggleTestEditor}
                     token={this.token}
                     job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
                     createQuestionInState={this.createQuestionInState}
                     editQuestionInState={this.editQuestionInState}
                     deleteQuestionInState={this.deleteQuestionInState}
                 />
-            );
-        } else {
-            testEditorBtn = (
-                <button type="button"
-                    onClick={this.toggleTestEditor}
-                >Test Editor</button>
             );
         }
 
@@ -312,10 +304,14 @@ class Jobs extends Component {
                 {description}
                 {editJobBtn}
                 {editJob}
-                {testEditorBtn}
-                {testEditor}
                 {deleteJobBtn}
                 {deleteJob}
+                <div>
+                    <button type="button"
+                        onClick={this.toggleTestEditor}
+                    >Toggle Test Editor</button>
+                </div>
+                {testEditor}
             </div>
         );
     }
