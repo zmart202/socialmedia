@@ -1,28 +1,24 @@
 import React, {Component} from 'react';
 import shortid from 'shortid';
+import _ from 'lodash';
 
 import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
 
-class EditForm extends Component {
+class CreateQuestion extends Component {
     constructor(props) {
         super(props);
 
-        this.isMultipleChoice = props.question.type === "MULTIPLE_CHOICE";
-        this.found = this.isMultipleChoice ?
-            props.question.options.find(x =>
-                x.correct
-            ) : null;
-            
+        this.initialOptions = {
+            [shortid.generate()]: "",
+            [shortid.generate()]: ""
+        };
 
         this.state = {
-            questionType: props.question.type,
-            options: this.isMultipleChoice ?
-                props.question.options.reduce((acc, x) => ({
-                    ...acc,
-                    [x.id]: x.answer
-                }), {}) : null,
-            correctAnswerId: this.found ? this.found.id : null,
-            body: props.question.body
+            isLoading: false,
+            questionType: "OPEN_RESPONSE",
+            options: this.initialOptions,
+            correctAnswerId: null,
+            body: ""
         };
 
         this.onSaveClick = this.onSaveClick.bind(this);
@@ -36,47 +32,48 @@ class EditForm extends Component {
     onSaveClick = event => {
         event.preventDefault();
 
-        const options = {
-            headers: {
-                "Content-Type": "application/json",
-                "Authorization": `Bearer ${this.props.token}`
-            },
-            method: "POST"
+        let newQuestion = {
+            id: shortid.generate(),
+            body: this.state.body,
+            type: this.state.questionType
         };
 
-        const body = {
-            questionType: this.props.question.type,
-            questionId: this.props.question.id,
-            testId: this.props.testId,
-            body: this.state.body
-        };
-
-        if (this.props.question.type === "MULTIPLE_CHOICE") {
-            let _options = [];
+        if (this.state.questionType === "MULTIPLE_CHOICE") {
+            newQuestion.options = [];
             for (let k in this.state.options) {
                 if (this.state.options[k].length > 0) {
-                    _options.push({
+                    newQuestion.options.push({
                         id: k,
                         answer: this.state.options[k],
                         correct: k === this.state.correctAnswerId ? true : false
                     });
                 }
             }
-            options.body = JSON.stringify({
-                ...body,
-                options: _options
-            });
-        } else {
-            options.body = JSON.stringify(body);
         }
 
-        fetch("http://localhost:4567/api/company/edit-question", options)
-        .then(res => res.json())
-        .then(data => {
-            console.log(data);
-            this.props.toggleEditForm();
-            this.props.refreshTestData();
-        }).catch(err => console.error(err));
+        const options = {
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${this.props.token}`
+            },
+            method: "POST",
+            body: JSON.stringify({
+                id: this.props.jobId,
+                test: this.props.test.concat(newQuestion)
+            })
+        };
+
+        this.setState({
+            isLoading: true
+        }, () => {
+            fetch("http://localhost:4567/api/job/edit-test", options)
+            .then(res => res.json())
+            .then(data => {
+                console.log(data);
+                this.props.createQuestionInState(newQuestion);
+                this.props.toggleCreateQuestion();
+            }).catch(err => console.error(err));
+        });
     }
 
     setCorrectAnswer(e) {
@@ -86,21 +83,20 @@ class EditForm extends Component {
     }
 
     addOption() {
-        this.setState(prevState => ({
-            options: prevState.options.concat({
-                id: shortid.generate(),
-                answer: "",
-                correct: false
-            })
-        }));
+        this.setState({
+            options: {
+                ...this.state.options,
+                [shortid.generate()]: ""
+            }
+        });
     }
 
     removeOption(id) {
-        this.setState(prevState => ({
-            options: prevState.options.length > 2 ?
-                prevState.options.filter(x => x.id !== id) :
-                prevState.options
-        }));
+        if (Object.keys(this.state.options).length > 2) {
+            this.setState({
+                options: _.omit(this.state.options, id)
+            });
+        }
     }
 
     handleChange(e) {
@@ -121,7 +117,7 @@ class EditForm extends Component {
     render() {
         let options = "";
         let addOptionBtn = "";
-        if (this.isMultipleChoice) {
+        if (this.state.questionType === "MULTIPLE_CHOICE") {
             options = [];
             for (let k in this.state.options) {
                 options.push(
@@ -138,9 +134,7 @@ class EditForm extends Component {
                         style={{padding: '5px 10px'}}
                         name={k}
                         onChange={this.handleOptionChange}
-                        defaultValue={this.props.question.options.find(x =>
-                           x.id === k
-                        ).answer}
+                        defaultValue={this.state.options[k]}
                     />
                     <input
                         type="button"
@@ -157,26 +151,32 @@ class EditForm extends Component {
                     <button
                         type="button"
                         onClick={this.addOption}
-                    >Add</button>
+                    >Add Option</button>
                 </div>
             );
         }
 
         return (
             <div style={{padding: '10px 0px'}}>
+                <select name="questionType" value={this.state.questionType} onChange={this.handleChange}>
+                    <option value="OPEN_RESPONSE">Open Response</option>
+                    <option value="MULTIPLE_CHOICE">Multiple Choice</option>
+                </select>
+                <br/>
+                <br/>
                 <textarea
                     rows='5'
                     cols='50'
                     name="body"
-                    defaultValue={this.props.question.body}
                     onChange={this.handleChange}
+                    placeholder="Question body"
                 />
                 {options}
                 {addOptionBtn}
                 <div style={{padding: '20px'}}>
                     <ActionButtons
                         isEditing={true}
-                        onCancel={this.props.toggleEditForm}
+                        onCancel={this.props.toggleCreateQuestion}
                         onSaveClick={this.onSaveClick}
                     />
                 </div>
@@ -185,4 +185,4 @@ class EditForm extends Component {
     }
 }
 
-export default EditForm;
+export default CreateQuestion;

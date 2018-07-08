@@ -4,16 +4,19 @@ import IndividualQuestion from './IndividualQuestion/IndividualQuestion';
 
 class QuestionList extends Component {
     renderQuestions = () => {
-        let questions = this.props.questions;
-        const props = _.omit(this.props, 'questions');
-        return questions
+        let test = this.props.test;
+        const props = _.omit(this.props, 'test');
+        return test
             .map((question, i) =>
             <IndividualQuestion question={question}
                                 key={question.id}
                                 index={i}
                                 token={props.token}
-                                refreshTestData={props.refreshTestData}
-                                testId={props.testId}/>
+                                jobId={props.jobId}
+                                deleteQuestionInState={props.deleteQuestionInState}
+                                createQuestionInState={props.createQuestionInState}
+                                editQuestionInState={props.editQuestionInState}
+                                test={test}/>
 
 
         );

@@ -3,9 +3,6 @@ import './IndividualApplicant.css'
 import { Link } from 'react-router-dom';
 import {CopyToClipboard} from 'react-copy-to-clipboard';
 import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
-//import Modal from '../../components/UI/Modal/Modal';
-//import FinalResults from '../Applicant/FinalResults/FinalResults';
-//import _ from 'lodash';
 
 
 class IndividualApplicant extends Component{
@@ -89,7 +86,7 @@ class IndividualApplicant extends Component{
     }
 
     copyURLHandler = () => {
-        let URL = `http://localhost:3000/applicant/${this.props.applicant.token}`
+        let URL = `http://localhost:3000/applicant/${this.props.applicant.id}`
         return (<CopyToClipboard text={URL}>
                 <button>Click to Copy URL</button>
         </CopyToClipboard>);

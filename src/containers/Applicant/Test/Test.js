@@ -38,7 +38,7 @@ class Test extends React.Component {
 
         const answerData = [];
         for (let k in this.state.answers) {
-            let question = this.props.test.questions.find(x =>
+            let question = this.props.test.find(x =>
                 x.id === k
             );
             if (question.type === "MULTIPLE_CHOICE") {
@@ -100,7 +100,7 @@ class Test extends React.Component {
             }
         };
 
-        const questions = this.props.test.questions.map((x, i) =>
+        const test = this.props.test.map((x, i) =>
             <div key={x.id}>
                 <Question
                     question={x}
@@ -114,7 +114,7 @@ class Test extends React.Component {
             <div style={{margin: '200px 500px', padding: '10px 30px 35px 30px', backgroundColor: '#cfcfd1', boxShadow: '1px 1px 1px 0px rgba(0,0,0,0.75)'}}>
                 <h1>BEGIN TESTING NOW</h1>
                 <h1 style={{color: 'red'}}>{this.formattedSeconds(this.state.secondsElapsed)}</h1>
-                {questions}
+                {test}
                 <a onClick={this.handleSubmit} style={style.submit}>SUBMIT</a>
             </div>
         );
