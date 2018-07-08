@@ -24,10 +24,10 @@ class ApplicantSignup extends Component {
             education: [],
             coverLetter: '',
             over18: false,
+            legal: false,
             educationFormMounted: false,
             educationKey: 1,
-            addEducation: false,
-            legal: false
+            addEducation: false
         };
 
         this.companyId = props.match.params.companyId;
