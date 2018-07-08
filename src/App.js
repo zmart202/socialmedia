@@ -10,6 +10,7 @@ import Jobs from './containers/Company/Jobs';
 import TestEditor from './containers/Company/TestEditor/TestEditor';
 import JobDescript from './containers/Applicant/JobDescript/JobDescript';
 import ApplicantSignup from './containers/Applicant/ApplicantSignup/ApplicantSignup';
+import SubmittedApplication from './containers/Company/FinalResults/SubmittedApplication/SubmittedApplication';
 
 class App extends Component {
   render() {
@@ -20,7 +21,9 @@ class App extends Component {
         <Route path="/company" exact component={Company} />
         <Route path="/company/jobs" exact component={Jobs} />
         <Route path="/company/test-editor" exact component={TestEditor} />
-        <Route path="/company/results/:ApplicantId" component={FinalResults} />
+        {/* <Route path="/company/results/:ApplicantId" component={FinalResults} /> */}
+        <Route path="/company/results" component={FinalResults} />
+        <Route path="/company/application" component={SubmittedApplication} />
         <Route path='/finished' component={Finished}  />
         <Route path='/job-description' component={JobDescript} />
         <Route path='/app-form/:companyId/:jobId' component={ApplicantSignup} />

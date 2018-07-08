@@ -23,12 +23,14 @@ class ExperienceProfile extends Component {
                 let industry = this.refs.industry.value;
                 let title = this.refs.title.value;
                 let summary = this.refs.summary.value;
+                let leaving = this.refs.leaving.value;
                 let experienceObj = {
                         key: this.keyValueHandler(),
                         company,
                         industry,
                         title,
-                        summary
+                        summary,
+                        leaving
                 }
                 this.setState({
                         workExperience: this.state.workExperience.concat(experienceObj)
@@ -78,7 +80,7 @@ class ExperienceProfile extends Component {
                         </div>
                         <br />
                         <div>
-                                <label>Your title</label>
+                                <label>Your title: </label>
                                 <input
                                         ref="title"
                                         type="text"
@@ -90,26 +92,41 @@ class ExperienceProfile extends Component {
                                 <label>Summary: </label>
                                 <textarea
                                         ref="summary"
-                                        cols="100"
+                                        cols="50"
                                         rows="5"
                                         type="text"
                                         placeholder="Summary of what you did.."
                                         onChange={this.props.handleChange} />
                         </div>
                         <br />
+                        <div>
+                                <label>Reason for leaving: </label>
+                                <textarea
+                                        ref="leaving"
+                                        cols="50"
+                                        rows="5"
+                                        type="text"
+                                        placeholder="What were the reasons for leaving the job.."
+                                        onChange={this.props.handleChange} />
+                        </div>
+                        <br />
                         <span>
                                 <div>
-                                        <label for="start">Start: </label>
+                                        <label htmlFor="start">Start: </label>
                                         <input type="date" id="start" name="trip"
-                                        value="YYYY-MM-DD"
+                                        ref="startTime"
+                                        defaultValue="YYYY-MM-DD"
+                                        onChange={this.props.handleChange}
                                         min="1955-01-01" max="2090-12-31" />
                                 </div>
 
                                 <div>
-                                        <label for="end">End: </label>
+                                        <label htmlFor="end">End: </label>
                                         <input type="date" id="end" name="trip"
-                                        value="YYYY-MM-DD"
-                                        min="1955-01-01" max="2090-12-31"/ >
+                                        ref="endTime"
+                                        defaultValue="YYYY-MM-DD"
+                                        onChange={this.props.handleChange}
+                                        min="1955-01-01" max="2090-12-31" />
                                 </div><br />
                         </span>
                                 <span><button onClick={this.cancelExperienceHandler}>Cancel</button><button onClick={this.submitExperienceHandler}>Complete</button></span>

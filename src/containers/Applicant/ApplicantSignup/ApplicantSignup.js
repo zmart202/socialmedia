@@ -23,6 +23,7 @@ class ApplicantSignup extends Component {
             workExperience: [],
             education: [],
             coverLetter: '',
+            salaryRequirements: '',
             over18: false,
             legal: false,
             educationFormMounted: false,
@@ -39,6 +40,7 @@ class ApplicantSignup extends Component {
 
     handleSubmit = (event) => {
         event.preventDefault();
+        console.log(this.state);
         const options = {
             headers: {
                 'Content-Type': 'application/json'
