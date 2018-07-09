@@ -2,13 +2,29 @@
 
 const express = require("express");
 const jwt = require("jsonwebtoken");
-const hat = require('hat');
+const hat = require("hat");
 
 const { hashPassword, comparePasswords } = require("./password-utils");
 
 const secret = process.env.SECRET;
 
 const router = express.Router();
+
+router.get("/application/:id", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { id } = req.params;
+
+  Applicants.findOne({ id })
+    .then(applicant => {
+      if (!applicant) {
+        return res.status(403);
+      }
+
+      res.json(applicant);
+    })
+    .catch(err => res.status(400).json(err));
+});
 
 router.post("/application", (req, res) => {
   const db = req.app.locals.db;
@@ -18,51 +34,54 @@ router.post("/application", (req, res) => {
   const applicantId = hat();
 
   Jobs.findOne({ companyId, id: jobId })
-  .then(job => {
-    if (!job) {
-      return res.json({
-        success: false,
-        msg: `Could not find Job under jobId ${jobId} and companyId ${companyId}`
-      });
-    }
-
-    Applicants.insertOne({
-      ...req.body,
-      test: job.test,
-      id: applicantId,
-      completed: false,
-      timestamp: new Date(),
-      testTimestamp: null,
-      secondsElapsed: 0,
-      answers: null
-    }).then((applicant) => {
-      if (!applicant) {
+    .then(job => {
+      if (!job) {
         return res.json({
           success: false,
-          msg: 'Could not insert Applicant'
+          msg: `Could not find Job under jobId ${jobId} and companyId ${companyId}`
         });
       }
 
-      res.json({
+      Applicants.insertOne({
         ...req.body,
-        applicantId,
         test: job.test,
-        success: true
-      });
-    }).catch((err) => {
+        id: applicantId,
+        completed: false,
+        timestamp: new Date(),
+        testTimestamp: null,
+        secondsElapsed: 0,
+        answers: null
+      })
+        .then(applicant => {
+          if (!applicant) {
+            return res.json({
+              success: false,
+              msg: "Could not insert Applicant"
+            });
+          }
+
+          res.json({
+            ...req.body,
+            applicantId,
+            test: job.test,
+            success: true
+          });
+        })
+        .catch(err => {
+          res.json({
+            success: false,
+            msg: "Server error"
+          });
+          console.error(err);
+        });
+    })
+    .catch(err => {
       res.json({
         success: false,
-        msg: 'Server error'
+        msg: "Server error"
       });
       console.error(err);
     });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: "Server error"
-    });
-    console.error(err);
-  });
 });
 
 router.get("/auth/:id", (req, res) => {
@@ -71,26 +90,27 @@ router.get("/auth/:id", (req, res) => {
   const { id } = req.params;
 
   Applicants.findOne({ id })
-  .then(applicant => {
-    if (!applicant) {
-      return res.sendStatus(403);
-    }
+    .then(applicant => {
+      if (!applicant) {
+        return res.sendStatus(403);
+      }
 
-    if (applicant.completed) {
-      return res.json({ completed: true });
-    }
+      if (applicant.completed) {
+        return res.json({ completed: true });
+      }
 
-    res.json({
-      id: applicant.id,
-      firstName: applicant.firstName,
-      lastName: applicant.lastName,
-      email: applicant.email,
-      companyId: applicant.companyId,
-      test: applicant.test,
-      completed: applicant.completed,
-      testTimestamp: applicant.testTimestamp
-    });
-  }).catch(err => console.error(err));
+      res.json({
+        id: applicant.id,
+        firstName: applicant.firstName,
+        lastName: applicant.lastName,
+        email: applicant.email,
+        companyId: applicant.companyId,
+        test: applicant.test,
+        completed: applicant.completed,
+        testTimestamp: applicant.testTimestamp
+      });
+    })
+    .catch(err => console.error(err));
 });
 
 router.get("/test-timestamp/:id", (req, res) => {
@@ -105,13 +125,15 @@ router.get("/test-timestamp/:id", (req, res) => {
         testTimestamp: new Date()
       }
     }
-  ).then(success => {
-    if (!success) {
-      return res.sendStatus(403);
-    }
+  )
+    .then(success => {
+      if (!success) {
+        return res.sendStatus(403);
+      }
 
-    return res.json({ success: true });
-  }).catch(err => console.error(err));
+      return res.json({ success: true });
+    })
+    .catch(err => console.error(err));
 });
 
 router.post("/test-results/:id", (req, res) => {
@@ -129,16 +151,18 @@ router.post("/test-results/:id", (req, res) => {
         completed: true
       }
     }
-  ).then(success => {
-    if (!success) {
-      return res.json({ success: false });
-    }
+  )
+    .then(success => {
+      if (!success) {
+        return res.json({ success: false });
+      }
 
-    res.json({ success: true });
-  }).catch(err => {
-    res.json({ success: false });
-    console.error(err);
-  });
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({ success: false });
+      console.error(err);
+    });
 });
 
 module.exports = router;

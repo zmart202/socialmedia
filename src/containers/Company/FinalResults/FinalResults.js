@@ -1,8 +1,7 @@
 import React from "react";
-// import Aux from '../../../hoc/Aux/Aux';
-// import { Link } from 'react-router-dom';
+import Aux from "../../../hoc/Aux/Aux";
 import Spinner from "../../../components/UI/Spinner/Spinner";
-import TestResults from "./TestResults/TestResults";
+import ResultsHeader from "./ResultsHeader";
 
 class FinalResults extends React.Component {
   constructor(props) {
@@ -11,7 +10,8 @@ class FinalResults extends React.Component {
       isLoading: true,
       isError: false,
       data: {},
-      applicants: []
+      applicants: [],
+      showMultipleChoice: false
     };
     this.ApplicantId = this.props.match.params.ApplicantId;
   }
@@ -32,7 +32,10 @@ class FinalResults extends React.Component {
       }
     };
 
-    fetch("http://localhost:4567/api/company/test-results/SkjxVtEZX", options)
+    fetch(
+      `http://localhost:4567/api/company/test-results/${this.ApplicantId}`,
+      options
+    )
       .then(
         res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
       )
@@ -42,21 +45,118 @@ class FinalResults extends React.Component {
           data,
           isLoading: false
         });
-        console.log(this.state.data);
       })
       .catch(err => console.error(err));
   }
 
-  // formattedSeconds = (sec) => {
-  //     return (Math.floor(sec / 60) +
-  //         ' minutes and ' +
-  //       ('0' + sec % 60).slice(-2) + ' seconds');
-  // }
+  formattedSeconds = sec => {
+    return (
+      Math.floor(sec / 60) +
+      " minutes and " +
+      ("0" + (sec % 60)).slice(-2) +
+      " seconds"
+    );
+  };
+
+  showMultipleChoiceHandler = () => {
+    this.setState({ showMultipleChoice: !this.state.showMultipleChoice });
+  };
 
   render() {
-    // if (this.state.isLoading) {
-    //     return <Spinner />;
-    // }
+    let answerData = this.state.data.answerData;
+    let allMCResponses = [];
+    let correctMCResponses = [];
+    let ORQuestionsArray = [];
+    let multipleChoiceQuestions = null;
+    let style;
+    let MCButtonStyle = {
+      cursor: "pointer",
+      color: "blue",
+      textDecoration: "underline"
+    };
+    let questionStyle = {
+      backgroundColor: "#cfcfd1",
+      margin: "10px 300px",
+      boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)",
+      padding: "5px"
+    };
+
+    if (!answerData) {
+      return null;
+    } else {
+      answerData.map(answer => {
+        if (answer.type === "MULTIPLE_CHOICE") {
+          allMCResponses.push(answer);
+
+          if (answer.answer === "true") {
+            correctMCResponses.push(answer);
+          }
+          return correctMCResponses;
+        }
+
+        return allMCResponses;
+      });
+      answerData.map(answer => {
+        if (answer.type === "OPEN_RESPONSE") {
+          ORQuestionsArray.push(answer);
+        }
+
+        return ORQuestionsArray;
+      });
+    }
+
+    let openResponseQuestions = ORQuestionsArray.map(question => {
+      return (
+        <div key={question.body} style={questionStyle}>
+          <h3>{question.body}</h3>
+          <p>{question.answer}</p>
+        </div>
+      );
+    });
+
+    if (this.state.showMultipleChoice) {
+      multipleChoiceQuestions = allMCResponses.map(question => {
+        return (
+          <div key={question.body}>
+            <h3>{question.body}</h3>
+            {question.options.map(option => {
+              if (question.answer === option.answer && option.correct) {
+                style = {
+                  color: "green"
+                };
+              } else if (question.answer === option.answer && !option.correct) {
+                style = {
+                  color: "red"
+                };
+              }
+              return (
+                <div key={option.id} style={style}>
+                  {option.answer}
+                </div>
+              );
+            })}
+          </div>
+        );
+      });
+    }
+
+    let multipleChoiceButton = this.state.showMultipleChoice ? (
+      <a onClick={this.showMultipleChoiceHandler} style={MCButtonStyle}>
+        Hide Multiple Choice Questions
+      </a>
+    ) : (
+      <a onClick={this.showMultipleChoiceHandler} style={MCButtonStyle}>
+        Show Multiple Choice Questions
+      </a>
+    );
+
+    let MCScore = `(${correctMCResponses.length}/${
+      allMCResponses.length
+    }) of the multiple choice questions were answered correctly!`;
+
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
 
     // let answers = this.state.data.answers;
     // let content = [];
@@ -72,15 +172,25 @@ class FinalResults extends React.Component {
     // }
 
     return (
-      <TestResults />
-      // <Aux>
-      //     <div style={{padding: '20px', textAlign: 'left'}}>
-      //         <Link to='/company' style={{textDecoration: 'none', color: 'white', padding: '10px', cursor: 'pointer', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', backgroundColor: 'purple'}}>BACK</Link>
-      //     </div>
-      //     <h3 style={{color: 'purple'}}>Results for {this.state.data.firstName} {this.state.data.lastName}</h3>
-      //     <h4 style={{color: 'purple'}}>Total amount of time taken is <span style={{color: 'red', textDecoration: 'underline'}}>{this.formattedSeconds(this.state.data.secondsElapsed)}</span></h4>
-      //     {content}
-      // </Aux>
+      <Aux>
+        <ResultsHeader ApplicantId={this.ApplicantId} />
+        <h3 style={{ color: "purple" }}>
+          Results for {this.state.data.firstName} {this.state.data.lastName}
+        </h3>
+        <h4 style={{ color: "purple" }}>
+          Total amount of time taken is{" "}
+          <span style={{ color: "red", textDecoration: "underline" }}>
+            {this.formattedSeconds(this.state.data.secondsElapsed)}
+          </span>
+        </h4>
+        <div style={questionStyle}>
+          {MCScore}
+          <br />
+          {multipleChoiceQuestions}
+          {multipleChoiceButton}
+        </div>
+        {openResponseQuestions}
+      </Aux>
     );
   }
 }
