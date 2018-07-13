@@ -9,7 +9,7 @@ import FinalResults from "./containers/Company/FinalResults/FinalResults";
 import Jobs from "./containers/Company/Jobs";
 import TestEditor from "./containers/Company/TestEditor/TestEditor";
 import JobDescript from "./containers/Applicant/JobDescript/JobDescript";
-import ApplicantSignup from "./containers/Applicant/ApplicantSignup/ApplicantSignup";
+import Application from "./containers/Applicant/Application/Application";
 import SubmittedApplication from "./containers/Company/FinalResults/SubmittedApplication/SubmittedApplication";
 
 class App extends Component {
@@ -29,7 +29,7 @@ class App extends Component {
         />
         <Route path="/finished" component={Finished} />
         <Route path="/job-description" component={JobDescript} />
-        <Route path="/app-form/:companyId/:jobId" component={ApplicantSignup} />
+        <Route path="/application/:companyId/:jobId" component={Application} />
       </div>
     );
   }
