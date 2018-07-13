@@ -28,7 +28,7 @@ class App extends Component {
           component={SubmittedApplication}
         />
         <Route path="/finished" component={Finished} />
-        <Route path="/job-description" component={JobDescript} />
+        <Route path="/job-description/:companyId/:jobId" component={JobDescript} />
         <Route path="/application/:companyId/:jobId" component={Application} />
       </div>
     );

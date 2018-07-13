@@ -1,29 +1,86 @@
 import React, {Component} from 'react';
 
+import Spinner from '../../../components/UI/Spinner/Spinner';
+
 class JobDescript extends Component {
     constructor(props){
         super(props);
         this.state = {
-            jobTitle: 'Customer Service',
-            descriptInfo: 'This is where the description information will be kept.',
-            requirementInfo: 'This is where the requirement information will be kept.',
-            benefitInfo: 'This is where the benefit information will be kept.'
+            isLoading: true,
+            isError: false,
+            companyName: "",
+            title: "",
+            description: ""
         };
+
+        this.companyId = props.match.params.companyId;
+        this.jobId = props.match.params.jobId;
+
+        this.routeToApplication = this.routeToApplication.bind(this);
     }
 
-    render () {
+    componentDidMount() {
+        if (!this.companyId || !this.jobId) {
+            return this.setState({
+                isLoading: false,
+                isError: true
+            });
+        }
+
+        fetch(`http://localhost:4567/api/job/job/${this.companyId}/${this.jobId}`)
+        .then(res => res.json())
+        .then(data => {
+            console.log(data);
+            if (!data.success) {
+                return this.setState({
+                    isLoading: false,
+                    isError: true
+                });
+            }
+
+            this.setState({
+                isLoading: false,
+                companyName: data.job.companyName,
+                title: data.job.title,
+                description: data.job.description
+            });
+        }).catch(err => {
+            console.error(err);
+            this.setState({
+                isLoading: false,
+                isError: true
+            });
+        });
+    }
+
+    routeToApplication() {
+        this.props.history.push(
+            `/application/${this.companyId}/${this.jobId}`
+        );
+    }
+
+    render() {
+        if (this.state.isLoading) {
+            return <Spinner />;
+        }
+
+        if (this.state.isError) {
+            return (
+                <p>Error: could not fetch Job Description. URL may be malformed</p>
+            );
+        }
+
         return (
             <div style={{backgroundColor: '#d4d4d6', margin: '0px 200px'}}>
-                <h1>Job Description</h1>
-                <p>Position being applied for - <strong>{this.state.jobTitle}</strong></p>
+                <h1>{this.state.companyName}</h1>
+                <p>Position being applied for - <strong>{this.state.title}</strong></p>
                 <h3>DESCRIPTION</h3>
-                <p>{this.state.descriptInfo}</p>
-                <h3>REQUIREMENTS</h3>
-                <p>{this.state.requirementInfo}</p>
-                <h3>BENEFITS</h3>
-                <p>{this.state.benefitInfo}</p>
+                <p>{this.state.description}</p>
                 <div style={{padding: '10px'}}>
-                    <button style={{padding: '10px'}}>Apply for this job</button>
+                    <button type="button"
+                        style={{padding: '10px', cursor: 'pointer'}}
+                        onClick={this.routeToApplication}
+                    >Apply for this job</button>
                 </div>
             </div>
         )

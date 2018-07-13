@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { Link } from 'react-router-dom';
 import _ from 'lodash';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import CreateJob from './CreateJob';
 import EditJob from './EditJob';
@@ -13,6 +14,8 @@ class Jobs extends Component {
         super(props);
         this.state = {
             isLoading: true,
+            isError: false,
+            companyId: "",
             companyName: "",
             jobs: [],
             viewingJobId: null,
@@ -38,7 +41,6 @@ class Jobs extends Component {
     }
 
     componentDidMount() {
-        console.log("Lemme see that token...", this.token);
         if (this.token === null) {
             return this.props.history.push("/");
         }
@@ -55,7 +57,8 @@ class Jobs extends Component {
             console.log("Data from jobs", data);
             if (!data.success) {
                 return this.setState({
-                    isLoading: false
+                    isLoading: false,
+                    isError: true
                 });
             }
 
@@ -65,8 +68,15 @@ class Jobs extends Component {
                 viewingJobId: data.jobs.length > 0 ?
                 data.jobs[0].id : null,
 
+                companyId: data.companyId,
                 companyName: data.companyName
-            })
+            });
+        }).catch(err => {
+            console.error(err);
+            this.setState({
+                isLoading: false,
+                isError: true
+            });
         })
     }
 
@@ -100,7 +110,8 @@ class Jobs extends Component {
             let newJobs = prevState.jobs.filter(x => x.id !== id);
             return {
                 jobs: newJobs,
-                viewingJobId: _.sample(newJobs).id
+                viewingJobId: newJobs.length > 0 ?
+                _.sample(newJobs).id : null
             };
         });
     }
@@ -179,6 +190,12 @@ class Jobs extends Component {
                 <div>
                     <Spinner />
                 </div>
+            );
+        }
+
+        if (this.state.isError) {
+            return (
+                <p>Error loading Jobs</p>
             );
         }
 
@@ -284,11 +301,19 @@ class Jobs extends Component {
         }
 
         let description = "";
+        let copyLinkBtn = "";
         if (this.state.viewingJobId && !this.state.editJobMounted && !this.state.createJobMounted && !this.state.testEditorMounted) {
             description = (
                 <p>{this.state.jobs.find(x =>
                     x.id === this.state.viewingJobId
                 ).description}</p>
+            );
+
+            let url = `http://localhost:3000/job-description/${this.state.companyId}/${this.state.viewingJobId}`
+            copyLinkBtn = (
+                <CopyToClipboard text={url}>
+                    <button type="button">Copy Link to Application</button>
+                </CopyToClipboard>
             )
         }
 
@@ -302,6 +327,7 @@ class Jobs extends Component {
                 {createJob}
                 {navbar}
                 {description}
+                {copyLinkBtn}
                 {editJobBtn}
                 {editJob}
                 {deleteJobBtn}
