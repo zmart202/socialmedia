@@ -1,10 +1,15 @@
 import React, { Component } from 'react';
+
+import Spinner from '../../components/UI/Spinner/Spinner';
+
 import './Login.css';
 
 class Login extends Component {
     constructor() {
         super();
         this.state = {
+            isLoading: false,
+            isError: false,
             email: "",
             password: "",
             denied: false
@@ -26,16 +31,23 @@ class Login extends Component {
             }
         };
 
-        fetch("http://localhost:4567/api/company/auth", options)
-        .then(res => {
-            if (res.status === 403) {
-                return Promise.reject(new Error("Auth denied"));
-            } else {
-                return res.json()
-            }
-        }).then(data => {
-            this.props.history.push("/company");
-        }).catch(err => console.error(err));
+        this.setState({
+            isLoading: true
+        }, () => {
+            fetch("http://localhost:4567/api/company/auth", options)
+            .then(res => {
+                if (res.status === 403) {
+                    return Promise.reject(new Error("Auth denied"));
+                } else {
+                    return res.json()
+                }
+            }).then(_ => {
+                this.props.history.push("/company");
+            }).catch(err => {
+                console.error(err);
+                this.setState({ isLoading: false });
+            });
+        });
     }
 
     handleInput(e) {
@@ -57,26 +69,47 @@ class Login extends Component {
             })
         };
 
-        fetch(`http://localhost:4567/api/company/login`, options)
-        .then(res => {
-            if (res.status === 403) {
-                this.setState({ denied: true });
-                return Promise.reject(new Error("403 access denied"));
-            } else {
-                return res.json();
-            }
-        }).then(data => {
-            localStorage.setItem("token", data.token);
-            this.props.history.push("/company");
-        }).catch(err => console.error(err));
+        this.setState({
+            isLoading: true
+        }, () => {
+            fetch(`http://localhost:4567/api/company/login`, options)
+            .then(res => {
+                if (res.status === 403) {
+                    this.setState({ denied: true });
+                    return Promise.reject(new Error("403 access denied"));
+                } else {
+                    return res.json();
+                }
+            }).then(data => {
+                localStorage.setItem("token", data.token);
+                this.props.history.push("/company");
+            }).catch(err => {
+                console.error(err);
+                this.setState({
+                    isLoading: false,
+                    isError: true
+                });
+            });
+        });
     }
 
 
     render() {
+        if (this.state.isLoading) {
+            return <Spinner />;
+        }
+
         let deniedMsg = "";
         if (this.state.denied) {
             deniedMsg = (
                 <p style={{ color: 'red' }}>Invalid login credentials</p>
+            );
+        }
+
+        let errorMsg = "";
+        if (this.state.isError) {
+            errorMsg = (
+                <p style={{ color: 'red' }}>Login failed</p>
             );
         }
 
@@ -101,6 +134,7 @@ class Login extends Component {
                     <div>
                         <button onClick={this.handleSubmit}>Login</button>
                         {deniedMsg}
+                        {errorMsg}
                     </div>
                 </form>
             </div>
