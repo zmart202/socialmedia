@@ -6,12 +6,11 @@ class NewApplicant extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            isLoading: true,
+            isLoading: false,
             isError: false,
             firstName: "",
             lastName: "",
             email: "",
-            jobs: [],
             selectedJobId: ""
         };
 
@@ -20,33 +19,39 @@ class NewApplicant extends Component {
     }
 
     componentDidMount() {
-        const options = {
-            headers: {
-                "Authorization": `Bearer ${this.props.token}`
-            }
-        };
+        if (this.props.jobs.length > 0) {
+            return;
+        }
 
-        fetch("http://localhost:4567/api/company/jobs", options)
-        .then(res => res.json())
-        .then(data => {
-            if (!data.success) {
+        this.setState({
+            isLoading: true
+        }, () => {
+            const options = {
+                headers: {
+                    "Authorization": `Bearer ${this.props.token}`
+                }
+            };
+
+            fetch("http://localhost:4567/api/company/jobs", options)
+            .then(res => res.json())
+            .then(data => {
+                if (!data.success) {
+                    console.log(data);
+                    return this.setState({
+                        isLoading: false,
+                        isError: true
+                    });
+                }
+
                 console.log(data);
-                return this.setState({
-                    isLoading: false,
-                    isError: true
+                this.props.putJobsInState(data.jobs);
+                this.setState({ isLoading: false });
+            }).catch(err => {
+                console.error(err);
+                this.setState({
+                    isError: true,
+                    isLoading: false
                 });
-            }
-
-            console.log(data);
-            this.setState({
-                isLoading: false,
-                jobs: data.jobs
-            });
-        }).catch(err => {
-            console.error(err);
-            this.setState({
-                isError: true,
-                isLoading: false
             });
         });
     }
@@ -110,10 +115,10 @@ class NewApplicant extends Component {
                     name="email"
                     onChange={this.handleChange}
                 />
-                <select name="selectedJobId" defaultValue="" value={this.state.jobId} onChange={this.handleChange}>
+                <select name="selectedJobId" defaultValue="" onChange={this.handleChange}>
                     <option value="" disabled hidden>Assign Job</option>
                     {
-                        this.state.jobs.map(x =>
+                        this.props.jobs.map(x =>
                             <option key={x.id} value={x.id}>{x.title}</option>
                         )
                     }

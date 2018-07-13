@@ -14,6 +14,7 @@ class Company extends Component{
           isLoading: true,
           isError: false,
           applicants: [],
+          jobs: [],
           companyName: "",
           search: "",
           createApplicantMounted: false
@@ -23,6 +24,7 @@ class Company extends Component{
 
       this.createApplicant = this.createApplicant.bind(this);
       this.toggleCreateApplicant = this.toggleCreateApplicant.bind(this);
+      this.putJobsInState = this.putJobsInState.bind(this);
   }
 
     componentDidMount() {
@@ -63,6 +65,10 @@ class Company extends Component{
             });
             console.error(err)
         });
+    }
+
+    putJobsInState(jobs) {
+        this.setState({ jobs });
     }
 
     deleteApplicantsHandler = (applicant) => {
@@ -172,6 +178,8 @@ class Company extends Component{
                     token={this.token}
                     createApplicant={this.createApplicant}
                     toggleCreateApplicant={this.toggleCreateApplicant}
+                    putJobsInState={this.putJobsInState}
+                    jobs={this.state.jobs}
                 />
             );
         } else {
