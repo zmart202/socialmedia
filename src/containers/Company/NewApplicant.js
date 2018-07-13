@@ -8,6 +8,7 @@ class NewApplicant extends Component {
         this.state = {
             isLoading: false,
             isError: false,
+            errorMsg: "",
             firstName: "",
             lastName: "",
             email: "",
@@ -57,6 +58,12 @@ class NewApplicant extends Component {
     }
 
     createHandler(e) {
+        if (this.state.selectedJobId.length === 0) {
+            return this.setState({
+                errorMsg: "Please select a job"
+            });
+        }
+
         this.props.createApplicant(this.state.firstName, this.state.lastName, this.state.email, this.state.selectedJobId);
         this.props.toggleCreateApplicant();
     }
@@ -78,6 +85,15 @@ class NewApplicant extends Component {
             );
         }
 
+        if (this.props.jobs.length === 0) {
+            return (
+                <div>
+                    <p>No jobs yet created for this company.</p>
+                    <p>Please create at least one job before creating applicants</p>
+                </div>
+            );
+        }
+
         const style = {
             field: {
                 margin: '5px',
@@ -94,6 +110,15 @@ class NewApplicant extends Component {
                 fontSize: '10px'
             }
         };
+
+        let errorMsg = "";
+        if (this.state.errorMsg.length > 0) {
+            errorMsg = (
+                <p style={{ color: 'red' }}>
+                    {this.state.errorMsg}
+                </p>
+            );
+        }
 
         return (
             <form>
@@ -125,6 +150,8 @@ class NewApplicant extends Component {
                 </select>
                 <a onClick={this.createHandler} style={style.submit}>Create</a>
                 <a onClick={this.props.toggleCreateApplicant} style={style.submit}>Cancel</a>
+                <br/>
+                {errorMsg}
             </form>
         );
     }
