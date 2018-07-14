@@ -254,7 +254,7 @@ router.post("/create-applicant", (req, res) => {
 router.post("/edit-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
-  const { id, firstName, lastName, email } = req.body;
+  const { id, firstName, lastName } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -270,8 +270,7 @@ router.post("/edit-applicant", (req, res) => {
       {
         $set: {
           firstName,
-          lastName,
-          email
+          lastName
         }
       }
     ).then(success => {

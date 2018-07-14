@@ -11,7 +11,7 @@ class IndividualApplicant extends Component{
 
         this.state = {
             isEditing: false
-        }
+        };
     }
 
 
@@ -57,8 +57,7 @@ class IndividualApplicant extends Component{
             body: JSON.stringify({
                 id: this.props.applicant.id,
                 firstName: this.refs.editFName.value,
-                lastName: this.refs.editLName.value,
-                email: this.refs.editEmail.value
+                lastName: this.refs.editLName.value
             })
         };
 
@@ -98,7 +97,7 @@ class IndividualApplicant extends Component{
                 <tr style={{fontSize: "11px"}} className='Applicant'>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
                         <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
-                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.email} ref="editEmail" /> : this.props.applicant.email}</td>
+                        <td>{this.props.applicant.email}</td>
                         <td>{this.copyURLHandler()}</td>
                         <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
                         {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
