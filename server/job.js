@@ -35,6 +35,7 @@ router.get("/jobs", (req, res) => {
       res.json({
         success: true,
         jobs: jobs.map(x => _.omit(x, "_id")),
+        companyId: authData.companyId,
         companyName: authData.companyName
       });
     }).catch(err => {
@@ -44,6 +45,33 @@ router.get("/jobs", (req, res) => {
       });
       console.error(err);
     });
+  });
+});
+
+router.get("/job/:companyId/:id", (req, res) => {
+  const db = req.app.locals.db;
+  const Jobs = db.collection("jobs");
+  const { companyId, id } = req.params;
+
+  Jobs.findOne({ companyId, id })
+  .then(job => {
+    if (!job) {
+      return res.json({
+        success: false,
+        msg: `Could not find job with id ${id} under companyId ${companyId}`
+      });
+    }
+
+    res.json({
+      success: true,
+      job: _.omit(job, "_id")
+    });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: "Server error"
+    });
+    console.error(err);
   });
 });
 
@@ -66,6 +94,7 @@ router.post("/create-job", (req, res) => {
       title,
       description,
       companyId: authData.companyId,
+      companyName: authData.companyName,
       test: []
     }).then(result => {
       if (!result) {

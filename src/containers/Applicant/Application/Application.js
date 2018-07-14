@@ -6,9 +6,9 @@ import EducationProfile from './Input/Profile/EducationProfile';
 import PersonalInformation from './Input/PersonalInformation';
 import ExperienceProfile from './Input/Profile/ExperienceProfile';
 import Toggle from 'react-toggle';
-import './ApplicantSignup.css';
+import './Application.css';
 
-class ApplicantSignup extends Component {
+class Application extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -67,7 +67,6 @@ class ApplicantSignup extends Component {
         this.setState({
             [name]: value
         });
-        console.log(value);
     }
 
     over18Handler = () => {
@@ -119,4 +118,4 @@ class ApplicantSignup extends Component {
     }
 }
 
-export default ApplicantSignup;
+export default Application;
