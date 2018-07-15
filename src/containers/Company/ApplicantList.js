@@ -1,6 +1,5 @@
 import _ from "lodash";
 import React, { Component } from "react";
-import ApplicantHeader from "./ApplicantHeader/ApplicantHeader";
 import IndividualApplicant from "./IndividualApplicant/IndividualApplicant";
 
 class ApplicantList extends Component {

@@ -6,14 +6,14 @@ const CompanyNav = () => {
   return (
     <div className="topcompanynav">
       <div>
-        <div>
-          <a href="">Manual</a>
+        <div className="border1">
+          <Link to="/company/messaging">Manual</Link>
         </div>
         <div>
           <Link to="/company/jobs">Editor</Link>
         </div>
-        <div>
-          <a href="">Applicants</a>
+        <div className="border2">
+          <Link to="/company">Applicants</Link>
         </div>
       </div>
     </div>

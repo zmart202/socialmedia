@@ -12,21 +12,6 @@ const resultsHeader = props => {
   };
   return (
     <div>
-      <div style={{ padding: "20px", textAlign: "left" }}>
-        <Link
-          to="/company"
-          style={{
-            textDecoration: "none",
-            color: "white",
-            padding: "10px",
-            cursor: "pointer",
-            boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)",
-            backgroundColor: "purple"
-          }}
-        >
-          BACK
-        </Link>
-      </div>
       <nav>
         <Link
           style={style}

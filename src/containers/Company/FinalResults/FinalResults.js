@@ -2,6 +2,7 @@ import React from "react";
 import Aux from "../../../hoc/Aux/Aux";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import ResultsHeader from "./ResultsHeader";
+import CompanyNav from "../CompanyNav/CompanyNav";
 
 class FinalResults extends React.Component {
   constructor(props) {
@@ -173,6 +174,7 @@ class FinalResults extends React.Component {
 
     return (
       <Aux>
+        <CompanyNav />
         <ResultsHeader ApplicantId={this.ApplicantId} />
         <h3 style={{ color: "purple" }}>
           Results for {this.state.data.firstName} {this.state.data.lastName}

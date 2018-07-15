@@ -8,6 +8,15 @@ body {
   background-color: #dddddd;
 }
 
+.right-nav {
+  color: white;
+  cursor: pointer;
+}
+
+.right-nav:hover {
+  color: black;
+}
+
 .topcompanynav a {
   float: right;
   display: block;

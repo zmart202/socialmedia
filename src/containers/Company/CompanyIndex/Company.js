@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { Link } from "react-router-dom";
 import hat from "hat";
 
 import Aux from "../../../hoc/Aux/Aux";
@@ -201,17 +200,6 @@ class Company extends Component {
     return (
       <div className="Company">
         <Aux>
-          <header
-            style={{
-              textAlign: "right",
-              padding: "0px 40px 20px 40px",
-              color: "purple",
-              cursor: "pointer",
-              marginTop: "15px"
-            }}
-          >
-            <a onClick={this.logOut}>Logout</a>
-          </header>
           <div>
             <CompanyNav />
             <div className="CompanyName">
@@ -220,7 +208,9 @@ class Company extends Component {
             {createApplicant}
             {createApplicantBtn}
             <div className="applicantList">
-              <h5>Search Applicant by Last Name</h5>
+              <p>
+                <strong>Search Applicant by Last Name</strong>
+              </p>
               <input
                 type="text"
                 value={this.state.search}

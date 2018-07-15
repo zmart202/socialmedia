@@ -12,18 +12,20 @@ import JobDescript from "./containers/Applicant/JobDescript/JobDescript";
 import Application from "./containers/Applicant/Application/Application";
 import SubmittedApplication from "./containers/Company/FinalResults/SubmittedApplication/SubmittedApplication";
 import Navbar from "./components/UI/layout/Navbar";
+import Messaging from "./containers/Company/Messaging/Messaging";
 // import Footer from "./components/UI/layout/Footer";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar />
+        <Navbar history={this.props.history} />
         <Route path="/" exact component={Login} />
         <Route path="/applicant/:id" component={Applicant} />
         <Route path="/company" exact component={Company} />
         <Route path="/company/jobs" exact component={Jobs} />
         <Route path="/company/test-editor" exact component={TestEditor} />
+        <Route path="/company/messaging" exact component={Messaging} />
         <Route path="/company/results/:ApplicantId" component={FinalResults} />
         {/* <Route path="/company/results" component={FinalResults} /> */}
         <Route

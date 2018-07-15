@@ -121,7 +121,9 @@ class IndividualApplicant extends Component {
           )}
         </div>
         <div className="align">
-          <div>{this.props.applicant.email}</div>
+          <div className="email">
+            <p>{this.props.applicant.email}</p>
+          </div>
           <div className="padding">
             {!this.props.applicant.completed ? this.copyURLHandler() : null}
           </div>
