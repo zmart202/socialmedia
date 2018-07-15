@@ -88,7 +88,7 @@ class FinalResults extends React.Component {
         if (answer.type === "MULTIPLE_CHOICE") {
           allMCResponses.push(answer);
 
-          if (answer.answer === "true") {
+          if (answer.correct) {
             correctMCResponses.push(answer);
           }
           return correctMCResponses;
@@ -115,6 +115,7 @@ class FinalResults extends React.Component {
     });
 
     if (this.state.showMultipleChoice) {
+      console.log("ALL MC RESPONSES", allMCResponses);
       multipleChoiceQuestions = allMCResponses.map(question => {
         return (
           <div key={question.body}>
@@ -128,6 +129,8 @@ class FinalResults extends React.Component {
                 style = {
                   color: "red"
                 };
+              } else {
+                style = {};
               }
               return (
                 <div key={option.id} style={style}>
@@ -157,19 +160,6 @@ class FinalResults extends React.Component {
     if (this.state.isLoading) {
       return <Spinner />;
     }
-
-    // let answers = this.state.data.answers;
-    // let content = [];
-    // for (let k in answers) {
-    //     content.push(
-    //         <div key={k}>
-    //             <p>{this.state.data.test.questions.find(x =>
-    //                 x.id === k
-    //             ).body}:</p>
-    //             <p><em>{answers[k]}</em></p>
-    //         </div>
-    //     );
-    // }
 
     return (
       <Aux>
