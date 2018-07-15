@@ -1,116 +1,145 @@
-import React, { Component } from 'react';
-import './IndividualApplicant.css'
-import { Link } from 'react-router-dom';
-import {CopyToClipboard} from 'react-copy-to-clipboard';
-import ActionButtons from '../../../components/UI/Buttons/ActionButtons';
+import React, { Component } from "react";
+import "./IndividualApplicant.css";
+import { Link } from "react-router-dom";
+import { CopyToClipboard } from "react-copy-to-clipboard";
+import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
 
+class IndividualApplicant extends Component {
+  constructor(props) {
+    super(props);
 
-class IndividualApplicant extends Component{
-    constructor(props) {
-        super(props);
+    this.state = {
+      isEditing: false
+    };
+  }
 
-        this.state = {
-            isEditing: false
-        };
+  editHandler = () => {
+    this.setState({ isEditing: true });
+  };
+
+  onCancelClick = () => {
+    this.setState({ isEditing: false });
+  };
+
+  onSaveClick(event) {
+    event.preventDefault();
+
+    const token = localStorage.getItem("token");
+    if (token === null) {
+      return;
     }
 
+    const options = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify({
+        id: this.props.applicant.id,
+        firstName: this.refs.editFName.value,
+        lastName: this.refs.editLName.value
+      })
+    };
 
-    renderActionsSection = () => {
-        if (this.state.isEditing) {
-            return (
-                <td>
-                    <strong><a className="SaveB" style={{padding: '7px', border: 'solid #3f3c87 3px', margin: '2px', color: '#3f3c87', cursor: 'pointer'}} onClick={this.onSaveClick.bind(this)}>SAVE</a></strong>
-                    <strong><a className="CancelB" style={{padding: '7px', border: 'solid gray 3px', margin: '2px', color: 'gray', cursor: 'pointer'}} onClick={this.onCancelClick.bind(this)}>CANCEL</a></strong>
-                </td>
-            );
-        }
-        return (
-            <td>
-                <strong><a className="EditB" style={{padding: '7px', border: 'solid #af9121 3px', margin: '2px', color: '#af9121', cursor: 'pointer'}} onClick={this.editHandler.bind(this)}>EDIT</a></strong>
-                <strong><a className="DeleteB" style={{padding: '7px', border: 'solid #7c251d 3px', margin: '2px', color: '#7c251d', cursor: 'pointer'}} onClick={this.props.delete}>DELETE</a></strong>
-            </td>
-        );
+    fetch("http://localhost:4567/api/company/edit-applicant", options)
+      .then(
+        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
+      )
+      .then(data => {
+        this.props.refreshApplicantList();
+        this.setState({ isEditing: false });
+      })
+      .catch(err => console.error(err));
+  }
+
+  completionHandler = () => {
+    if (this.props.applicant.completed) {
+      return <p style={{ color: "green" }}>COMPLETE</p>;
+    } else {
+      return <p style={{ color: "red" }}>INCOMPLETE</p>;
     }
+  };
 
-    editHandler = () => {
-        this.setState({ isEditing: true});
-    }
+  viewApplicantResults = () => {
+    return (
+      <div>
+        {this.props.applicant.completed ? (
+          <strong>
+            <Link
+              style={{
+                cursor: "pointer",
+                color: "blue",
+                textDecoration: "underline"
+              }}
+              to={`/company/results/${this.props.applicant.id}`}
+            >
+              <div style={{ paddingBottom: "5px" }}>VIEW</div>
+            </Link>
+          </strong>
+        ) : null}
+      </div>
+    );
+  };
 
-    onCancelClick = () => {
-        this.setState({isEditing: false});
-    }
+  copyURLHandler = () => {
+    let URL = `http://localhost:3000/applicant/${this.props.applicant.id}`;
+    return (
+      <CopyToClipboard text={URL}>
+        <button>Click to Copy URL</button>
+      </CopyToClipboard>
+    );
+  };
 
-    onSaveClick(event) {
-        event.preventDefault();
-
-        const token = localStorage.getItem("token");
-        if (token === null) {
-            return;
-        }
-
-        const options = {
-            headers: {
-                "Authorization": `Bearer ${token}`,
-                "Content-Type": "application/json"
-            },
-            method: "POST",
-            body: JSON.stringify({
-                id: this.props.applicant.id,
-                firstName: this.refs.editFName.value,
-                lastName: this.refs.editLName.value
-            })
-        };
-
-        fetch("http://localhost:4567/api/company/edit-applicant", options)
-        .then(res =>
-            res.status === 403 ?
-                Promise.reject("Auth denied") :
-                res.json()
-        ).then(data => {
-            this.props.refreshApplicantList();
-            this.setState({ isEditing: false });
-        }).catch(err => console.error(err));
-    }
-
-    completionHandler = () => {
-        if (this.props.applicant.completed) {
-            return <p style={{color: 'green'}}>COMPLETE</p>;
-        } else {
-            return <p style={{color: 'red'}}>INCOMPLETE</p>;
-        }
-    }
-
-    viewApplicantResults = () => {
-        return <div>{this.props.applicant.completed ?<strong><Link style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} to={`/company/results/${this.props.applicant.id}`}>VIEW</Link></strong>: null}</div>;
-    }
-
-    copyURLHandler = () => {
-        let URL = `http://localhost:3000/applicant/${this.props.applicant.id}`
-        return (<CopyToClipboard text={URL}>
-                <button>Click to Copy URL</button>
-        </CopyToClipboard>);
-    }
-
-    render() {
-        return(
-            <tbody style={{marginLeft: 'auto', marginRight: 'auto'}}>
-                <tr style={{fontSize: "11px"}} className='Applicant'>
-                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.lastName} ref="editLName" /> : this.props.applicant.lastName}</td>
-                        <td>{this.state.isEditing ? <input type="text" defaultValue={this.props.applicant.firstName} ref="editFName" /> : this.props.applicant.firstName}</td>
-                        <td>{this.props.applicant.email}</td>
-                        <td>{this.copyURLHandler()}</td>
-                        <td style={{color: 'green'}}><strong>{this.completionHandler()}</strong></td>
-                        {/* <td>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</td> */}
-                        <td>{this.viewApplicantResults()}</td>
-                        <td><ActionButtons  isEditing={this.state.isEditing}
-                                            onSaveClick={this.onSaveClick.bind(this)}
-                                            onCancel={this.onCancelClick.bind(this)}
-                                            editHandler={this.editHandler.bind(this)}
-                                            deleteHandler={this.props.delete} /></td>
-                </tr>
-            </tbody>
-        );
-    }
+  render() {
+    return (
+      <div className="Applicant">
+        <div className="padding" style={{ color: "green" }}>
+          <strong>{this.completionHandler()}</strong>
+        </div>
+        <div className="name">
+          {this.state.isEditing ? (
+            <div>
+              <input
+                type="text"
+                defaultValue={this.props.applicant.lastName}
+                ref="editLName"
+              />
+              <br />
+            </div>
+          ) : (
+            this.props.applicant.lastName
+          )},
+          {this.state.isEditing ? (
+            <input
+              type="text"
+              defaultValue={this.props.applicant.firstName}
+              ref="editFName"
+            />
+          ) : (
+            " " + this.props.applicant.firstName
+          )}
+        </div>
+        <div className="align">
+          <div>{this.props.applicant.email}</div>
+          <div className="padding">
+            {!this.props.applicant.completed ? this.copyURLHandler() : null}
+          </div>
+          {/* <div>{this.props.applicant.completed ?<strong><a style={{cursor: 'pointer', color: 'blue', textDecoration: 'underline'}} onClick={this.props.results}>VIEW</a></strong>: null}</div> */}
+          <div className="padding">{this.viewApplicantResults()}</div>
+          <div className="padding">
+            <ActionButtons
+              isEditing={this.state.isEditing}
+              onSaveClick={this.onSaveClick.bind(this)}
+              onCancel={this.onCancelClick.bind(this)}
+              editHandler={this.editHandler.bind(this)}
+              deleteHandler={this.props.delete}
+            />
+          </div>
+        </div>
+      </div>
+    );
+  }
 }
 
 export default IndividualApplicant;
