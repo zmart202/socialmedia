@@ -20,7 +20,6 @@ router.post("/create-company", (req, res) => {
 
   Companies.insertOne({
     name,
-    tests: [sample],
     id: hat()
   }).then(success => {
     if (!success) {
