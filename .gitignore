@@ -26,3 +26,5 @@ yarn-error.log*
 
 mongo-url.js
 secret.js
+
+run-collMods.js
