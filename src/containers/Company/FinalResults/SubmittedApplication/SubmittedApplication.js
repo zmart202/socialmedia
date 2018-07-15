@@ -76,7 +76,7 @@ class SubmittedApplication extends Component {
     };
 
     fetch(
-      `http://localhost:4567/api/applicat/application/${this.ApplicantId}`,
+      `http://localhost:4567/api/applicant/application/${this.ApplicantId}`,
       options
     )
       .then(

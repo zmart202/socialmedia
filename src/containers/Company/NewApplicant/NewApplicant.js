@@ -36,7 +36,7 @@ class NewApplicant extends Component {
           }
         };
 
-        fetch("http://localhost:4567/api/company/jobs", options)
+        fetch("http://localhost:4567/api/job/jobs", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {
