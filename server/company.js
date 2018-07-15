@@ -1,12 +1,11 @@
 "use strict";
 
 const express = require("express");
-const jwt = require("jsonwebtoken");
 const shortid = require("shortid");
 const hat = require("hat");
 const _ = require("lodash");
 
-const { hashPassword, comparePasswords } = require("./password-utils");
+const { hashPassword, comparePasswords, jwt } = require("./promisified-utils");
 const sample = require("./sample-test");
 
 const secret = process.env.SECRET;
@@ -20,18 +19,23 @@ router.post("/create-company", (req, res) => {
 
   Companies.insertOne({
     name,
-    tests: [sample],
     id: hat()
   }).then(success => {
     if (!success) {
-      return res.json({ success: false });
+      throw new Error("Could not insert company")
     }
 
     res.json({
       success: true,
       id: success.id
     });
-  }).catch(err => console.error(err));
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
+  });
 });
 
 router.post("/signup", (req, res) => {
@@ -40,44 +44,47 @@ router.post("/signup", (req, res) => {
   const Companies = db.collection("companies");
   const { firstName, lastName, email, companyId, password } = req.body;
 
+  let companyName;
   Companies.findOne({ id: companyId })
   .then(company => {
     if (!company) {
-      return res.json({
-        success: false,
-        msg: "Invalid companyId"
-      });
+      throw new Error(`Could not find company with id ${companyId}. Signup failed`);
     }
 
-    hashPassword(password).then(hash => {
-      CompanyUsers.insertOne({
-        firstName,
-        lastName,
-        email,
-        companyId,
-        companyName: company.name,
-        password: hash
-      }).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Signup failed"
-          });
-        }
+    companyName = company.name;
 
-        jwt.sign({
-          email,
-          companyId,
-          companyName: company.name
-        }, secret, (err, token) => {
-          res.json({
-            token,
-            success: true
-          });
-        });
-      }).catch(err => console.error(err));
-    }).catch(err => console.error(err));
-  }).catch(err => console.error(err));
+    return hashPassword(password);
+  }).then(hash =>
+    CompanyUsers.insertOne({
+      firstName,
+      lastName,
+      email,
+      companyId,
+      companyName,
+      password: hash
+    })
+  ).then(success => {
+    if (!success) {
+      throw new Error("Server error: could not insert user");
+    }
+
+    return jwt.sign({
+      email,
+      companyId,
+      companyName
+    }, secret);
+  }).then(token => {
+    res.json({
+      token,
+      success: true
+    });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err)
+  });
 });
 
 router.post("/login", (req, res) => {
@@ -85,79 +92,57 @@ router.post("/login", (req, res) => {
   const CompanyUsers = db.collection("companyUsers");
   const { email, password } = req.body;
 
+  let companyName, companyId;
   CompanyUsers.findOne({
     email
   }).then(user => {
     if (!user) {
-      return res.sendStatus(403);
+      throw new Error(`Could not find user with email ${email}`);
     }
 
-    comparePasswords(password, user.password)
-    .then(success => {
-      if (!success) {
-        return res.sendStatus(403);
-      }
+    companyName = user.companyName;
+    companyId = user.companyId;
 
-      jwt.sign({
-        email: user.email,
-        companyName: user.companyName,
-        companyId: user.companyId
-      }, secret, (err, token) => {
-        res.json({
-          token,
-          success: true,
-          companyId: user.companyId
-        });
-      });
-    }).catch(err => res.sendStatus(403));
-  }).catch(err => console.error(err));
+    return comparePasswords(password, user.password);
+  }).then(success => {
+    if (!success) {
+      throw new Error("Password does not match records");
+    }
+
+    return jwt.sign({
+      email,
+      companyName,
+      companyId
+    }, secret);
+  }).then(token => {
+    res.json({
+      token,
+      companyId,
+      success: true
+    });
+  }).catch(err => {
+    res.status(403).json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
+  });
 });
 
 router.get("/auth", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
 
-    res.json(authData);
-  });
-});
-
-router.get("/jobs", (req, res) => {
-  const db = req.app.locals.db;
-  const Jobs = db.collection("jobs");
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Jobs.find({ companyId: authData.companyId })
-    .toArray().then(jobs => {
-      if (!jobs) {
-        return res.json({
-          success: false,
-          msg: `Could not find any jobs under companyId ${authData.companyId}`
-        });
-      }
-
-      res.json({
-        success: true,
-        jobs: jobs.map(x => _.omit(x, "_id"))
-      });
-    }).catch(err => {
-      res.json({
-        success: false,
-        msg: "Server error"
-      });
-      console.error(err);
+  jwt.verify(token, secret)
+  .then(authData => {
+    res.json({
+      ...authData,
+      success: true
+    });
+  }).catch(err => {
+    res.status(403).json({
+      success: false,
+      msg: err.message
     });
   });
 });
@@ -169,27 +154,29 @@ router.get("/applicants", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
+  let companyName;
+  jwt.verify(token, secret)
+  .then(authData => {
+    companyName = authData.companyName;
+
+    return Applicants.find({
+      companyId: authData.companyId
+    }).toArray();
+  }).then(applicants => {
+    if (!applicants) {
+      throw new Error(`Could not find any applicants for companyId ${authData.companyId}`);
     }
 
-    Applicants.find({ companyId: authData.companyId })
-    .toArray().then(applicants => {
-      if (!applicants) {
-        return res.json({
-          success: false,
-          msg: `Could not find any applicants for companyId ${authData.companyId}`
-        });
-      }
-
-      return res.json({
-        applicants,
-        success: true,
-        companyName: authData.companyName
-      });
-    }).catch(err => console.error(err));
+    res.json({
+      applicants,
+      companyName,
+      success: true
+    });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
   });
 });
 
@@ -201,53 +188,42 @@ router.post("/create-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
+  let companyId;
+  jwt.verify(token, secret)
+  .then(authData => {
+    companyId = authData.companyId;
+
+    return Jobs.findOne({
+      companyId,
+      id: req.body.jobId
+    });
+  }).then(job => {
+    if (!job) {
+      throw new Error(`Could not find job with id ${req.body.jobId} and companyId ${companyId}`);
     }
 
-    Jobs.findOne({ id: req.body.jobId, companyId: authData.companyId })
-    .then(job => {
-      if (!job) {
-        return res.json({
-          success: false,
-          msg: `Could not find job with id ${jobId} and companyId ${authData.companyId}`
-        });
-      }
-
-      Applicants.insertOne({
-        ...req.body,
-        companyId: authData.companyId,
-        test: job.test,
-        completed: false,
-        timestamp: new Date(),
-        testTimestamp: null,
-        secondsElapsed: 0,
-        answers: null
-      }).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not create applicant"
-          });
-        }
-
-        res.json({ success: true });
-      }).catch(err => {
-        res.json({
-          success: false,
-          msg: "Server error"
-        });
-        console.error(err);
-      });
-    }).catch(err => {
-      res.json({
-        success: false,
-        msg: "Server error"
-      });
-      console.error(err);
+    return Applicants.insertOne({
+      ...req.body,
+      companyId,
+      test: job.test,
+      completed: false,
+      timestamp: new Date(),
+      testTimestamp: null,
+      secondsElapsed: 0,
+      answers: null
     });
+  }).then(success => {
+    if (!success) {
+      throw new Error("Could not create applicant");
+    }
+
+    res.json({ success: true });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
   });
 });
 
@@ -259,12 +235,8 @@ router.post("/edit-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
+  jwt.verify(token, secret)
+  .then(authData =>
     Applicants.updateOne(
       { id },
       {
@@ -273,16 +245,18 @@ router.post("/edit-applicant", (req, res) => {
           lastName
         }
       }
-    ).then(success => {
-      if (!success) {
-        return res.json({
-          success: false,
-          msg: "Could not update applicant"
-        });
-      }
+    )
+  ).then(success => {
+    if (!success) {
+      throw new Error("Could not update applicant");
+    }
 
-      res.json({ success: true });
-    }).catch(err => console.error(err));
+    res.json({ success: true });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
   });
 });
 
@@ -294,438 +268,19 @@ router.post("/remove-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
+  jwt.verify(token, secret)
+  .then(authData =>
     Applicants.removeOne({ email, id })
-    .then(success => {
-      if (!success) {
-        return res.json({ success: false });
-      }
-
-      res.json({ success: true });
-    }).catch(err => console.error(err));
-  });
-});
-
-router.get("/tests", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
+  ).then(success => {
+    if (!success) {
+      throw new Error("Could not remove applicant");
     }
 
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      res.json({
-        tests: company.tests,
-        success: true
-      });
-    }).catch(err => console.error(err));
-  });
-});
-
-router.post("/create-test", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { name, id } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      return res.sendStatus(403);
-    }
-
-    Companies.updateOne(
-      { id: authData.companyId },
-      {
-        $push: {
-          tests: {
-            id,
-            name,
-            questions: []
-          }
-        }
-      }
-    ).then(success => {
-      if (!success) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      res.json({
-          success: true,
-          createdTestId: id
-      });
-    }).catch(err => {
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
-      console.error(err);
-    });
-  });
-});
-
-router.post("/edit-test-name", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { name, testId } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      Companies.updateOne(
-        { id: company.id },
-        {
-          $set: {
-            tests: company.tests.map(x =>
-              x.id === testId ? {
-                ...x,
-                name
-              } : x
-            )
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          res.json({
-            success: false,
-            msg: "Could not update name"
-          });
-        }
-
-        res.json({ success: true });
-      }).catch(err => {
-        console.error(err);
-        res.json({
-          success: false,
-          msg: "Database error"
-        });
-      });
-    }).catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
-    });
-  });
-});
-
-router.post("/delete-test", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { id } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        res.json({
-          success: false,
-          msg: `Could not find company with ${authData.companyId}`
-        });
-      }
-
-      Companies.updateOne(
-        { id: company.id },
-        {
-          $set: {
-            tests: company.tests.filter(x =>
-              x.id !== id
-            )
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not update on delete test"
-          });
-        }
-
-        res.json({ success: true });
-      }).catch(err => {
-        console.error(err);
-        res.json({
-          success: false,
-          msg: "Database error"
-        });
-      });
-    }).catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
-    });
-  });
-});
-
-router.post("/create-question", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { id, testId, body, type } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      let tests = company.tests.map(x => {
-        if (x.id === testId) {
-          return {
-            ...x,
-            questions: type === "MULTIPLE_CHOICE" ?
-              x.questions.concat({
-                body,
-                type,
-                id,
-                options: req.body.options
-              }) : x.questions.concat({
-                body,
-                type,
-                id
-              })
-          };
-        }
-        return x;
-      });
-
-      Companies.updateOne(
-        { id: authData.companyId },
-        {
-          $set: {
-            tests
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not create question in companies table"
-          });
-        }
-
-        res.json({
-          success: true,
-          createdQuestion: tests.find(x =>
-            x.id === testId
-          ).questions.find(x =>
-            x.id === id
-          )
-        });
-      }).catch(err => {
-        console.error(err);
-        res.json({
-          success: false,
-          msg: "Database error"
-        });
-      });
-    }).catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
-    })
-  });
-});
-
-router.post("/edit-question", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { body, testId, id, type } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      const tests = company.tests.map(x => {
-        if (x.id === testId) {
-          return {
-            ...x,
-            questions: x.questions.map(y => {
-              if (y.id === id) {
-                return type === "MULTIPLE_CHOICE" ? {
-                  ...y,
-                  body,
-                  type,
-                  options: req.body.options
-                } : {
-                  ...y,
-                  body,
-                  type
-                };
-              }
-
-              return y;
-            })
-          };
-        }
-        return x;
-      });
-
-      Companies.updateOne(
-        { id: company.id },
-        {
-          $set: {
-            tests
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Database error"
-          });
-        }
-
-        res.json({
-          success: true,
-          editedQuestion: tests.find(x =>
-            x.id === testId
-          ).questions.find(x => x.id === id)
-        });
-      }).catch(err => {
-        console.error(err);
-        res.json({
-          success: false,
-          msg: "Database error"
-        });
-      });
-    }).catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
-    });
-  });
-});
-
-router.post("/delete-question", (req, res) => {
-  const db = req.app.locals.db;
-  const Companies = db.collection("companies");
-  const { testId, questionId } = req.body;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
-    }
-
-    Companies.findOne({ id: authData.companyId })
-    .then(company => {
-      if (!company) {
-        return res.json({
-          success: false,
-          msg: `Could not find company with id ${authData.companyId}`
-        });
-      }
-
-      const tests = company.tests.map(x => {
-        if (x.id === testId) {
-          return {
-            ...x,
-            questions: x.questions.filter(y => y.id !== questionId)
-          };
-        }
-        return x;
-      });
-
-      Companies.updateOne(
-        { id: company.id },
-        {
-          $set: {
-            tests
-          }
-        }
-      ).then(success => {
-        if (!success) {
-          return res.json({
-            success: false,
-            msg: "Could not delete question"
-          });
-        }
-
-        res.json({ success: true });
-      })
-    }).catch(err => {
-      console.error(err);
-      res.json({
-        success: false,
-        msg: "Database error"
-      });
+    res.json({ success: true });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
     });
   });
 });
@@ -738,27 +293,28 @@ router.get("/test-results/:applicantId", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret, (err, authData) => {
-    if (err) {
-      console.error(err);
-      return res.sendStatus(403);
+  jwt.verify(token, secret)
+  .then(authData =>
+    Applicants.findOne({ id: applicantId })
+  ).then(doc => {
+    if (!doc) {
+      throw new Error(`Could not find applicant with id ${applicantId}`);
     }
 
-    Applicants.findOne({ id: applicantId })
-    .then(doc => {
-      if (!doc) {
-        return res.json([]);
-      }
-
-      res.json({
-        answerData: doc.answerData,
-        test: doc.test,
-        secondsElapsed: doc.secondsElapsed,
-        firstName: doc.firstName,
-        lastName: doc.lastName,
-        id: doc.id
-      });
-    }).catch(err => console.error(err));
+    res.json({
+      success: true,
+      answerData: doc.answerData,
+      test: doc.test,
+      secondsElapsed: doc.secondsElapsed,
+      firstName: doc.firstName,
+      lastName: doc.lastName,
+      id: doc.id
+    });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
   });
 });
 

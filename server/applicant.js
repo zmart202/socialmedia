@@ -4,7 +4,7 @@ const express = require("express");
 const jwt = require("jsonwebtoken");
 const hat = require("hat");
 
-const { hashPassword, comparePasswords } = require("./password-utils");
+const { hashPassword, comparePasswords } = require("./promisified-utils");
 
 const secret = process.env.SECRET;
 
