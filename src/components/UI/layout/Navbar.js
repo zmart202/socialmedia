@@ -9,7 +9,7 @@ const Navbar = props => {
   return (
     <div className="topnav" id="myTopnav">
       <a href="#home" className="active">
-        <h3>DecistionTyme</h3>
+        <h3>DecisionTyme</h3>
       </a>
       <div className="right-nav">
         <a onClick={logOut}>Logout</a>

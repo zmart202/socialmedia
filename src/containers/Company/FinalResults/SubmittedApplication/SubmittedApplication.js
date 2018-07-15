@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import ResultsHeader from "../ResultsHeader";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
+import CompanyNav from "../../CompanyNav/CompanyNav";
 
 class SubmittedApplication extends Component {
   constructor(props) {
@@ -158,6 +159,7 @@ class SubmittedApplication extends Component {
     }
     return (
       <div>
+        <CompanyNav />
         <ResultsHeader ApplicantId={this.ApplicantId} />
         <h1>Submitted Application</h1>
         <div style={style}>
