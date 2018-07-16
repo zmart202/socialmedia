@@ -82,7 +82,7 @@ class Applicant extends Component {
   };
 
   redirectToFinished = () => {
-    this.props.history.push("/finished");
+    this.props.history.push("/test-finished");
   };
 
   propagateError = () => {

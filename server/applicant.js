@@ -40,15 +40,18 @@ router.post("/application", (req, res) => {
   const { companyId, jobId } = req.body;
   const applicantId = hat();
 
+  let test;
   Jobs.findOne({ companyId, id: jobId })
   .then(job => {
     if (!job) {
       throw new Error(`Could not find Job under jobId ${jobId} and companyId ${companyId}`);
     }
 
+    test = job.test;
+
     return Applicants.insertOne({
       ...req.body,
-      test: job.test,
+      test,
       id: applicantId,
       completed: false,
       timestamp: new Date(),
@@ -64,7 +67,7 @@ router.post("/application", (req, res) => {
     res.json({
       ...req.body,
       applicantId,
-      test: job.test,
+      test,
       success: true
     });
   }).catch(err => {

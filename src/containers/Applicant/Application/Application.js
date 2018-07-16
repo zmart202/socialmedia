@@ -52,6 +52,7 @@ class Application extends Component {
                 ..._.omit(this.state, ["addEducation", "educationKey", "educationFormMounted"])
             })
         }
+        
         fetch('http://localhost:4567/api/applicant/application', options)
         .then(res => res.json())
         .then(data => {
