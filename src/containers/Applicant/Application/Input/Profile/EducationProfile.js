@@ -1,5 +1,6 @@
 import React, {Component} from 'react';
 import Toggle from 'react-toggle';
+import shortid from 'shortid';
 // import EducationInput from './EducationInput/EducationInput';
 
 class EducationProfile extends Component {
@@ -7,7 +8,6 @@ class EducationProfile extends Component {
                 super(props);
                 this.state = {
                         educationKey: 1,
-                        education: [],
                         addEducation: false,
                         finishedSchool: false
                 }
@@ -36,9 +36,7 @@ class EducationProfile extends Component {
                         endTime,
                         finishedSchool
                 }
-                this.setState({
-                        education: this.state.education.concat(educationObj)
-                });
+                this.props.addEducation(educationObj);
                 this.setState({addEducation: false, finishedSchool: false});
         }
 
@@ -55,15 +53,6 @@ class EducationProfile extends Component {
                 this.setState({addEducation: true});
         }
 
-        deleteEducationHandler = (edu, event) => {
-                event.preventDefault();
-                let educate = this.state.education.indexOf(edu);
-                let education = this.state.education;
-                education.splice(educate, 1);
-                this.setState({
-                    education
-                });
-        }
         render () {
                 let educationForm = null;
                 if (this.state.addEducation) {
@@ -139,13 +128,13 @@ class EducationProfile extends Component {
                                 <div style={{padding: '10px', textDecoration: 'underline'}}>
                                         <label>Education</label>
                                 </div>
-                                {this.state.education.map((edu) => (
-                                        <div style={{backgroundColor: '#cfcfd1', padding: '5px'}} key={edu.key}>
+                                {this.props.education.map((edu) => (
+                                        <div style={{backgroundColor: '#cfcfd1', padding: '5px'}} key={shortid.generate()}>
                                         <p><strong>School: </strong>{edu.school}</p>
                                         <p><strong>Study: </strong>{edu.study}</p>
                                         <p><strong>Degree: </strong>{edu.degree}</p>
                                         <p><strong>From: </strong>{edu.startTime} <strong>To: </strong>{edu.endTime}</p>
-                                        <button onClick={this.deleteEducationHandler.bind(this, edu)}>Delete</button>
+                                        <button type="button" onClick={() => this.props.removeEducation(edu)}>Delete</button>
                                         </div>
                                 ))}
                                 {educationForm}

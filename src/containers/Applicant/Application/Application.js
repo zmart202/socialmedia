@@ -36,6 +36,8 @@ class Application extends Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.addEducation = this.addEducation.bind(this);
+        this.removeEducation = this.removeEducation.bind(this);
     }
 
     handleSubmit = (event) => {
@@ -52,7 +54,7 @@ class Application extends Component {
                 ..._.omit(this.state, ["addEducation", "educationKey", "educationFormMounted"])
             })
         }
-        
+
         fetch('http://localhost:4567/api/applicant/application', options)
         .then(res => res.json())
         .then(data => {
@@ -84,13 +86,33 @@ class Application extends Component {
         });
     }
 
+    addEducation(educationObj) {
+        this.setState(prevState => ({
+            education: prevState.education.concat(educationObj)
+        }));
+    }
+
+    removeEducation(educationObj) {
+        const index = this.state.education.indexOf(educationObj);
+        this.setState(prevState => ({
+            education: prevState.education.filter((x, i) =>
+                i !== index
+            )
+        }));
+    }
+
     render() {
         return (
             <div className="Form">
                 <h3>Application Form</h3>
                 <form>
                     <PersonalInformation handleChange={this.handleChange} />
-                    <EducationProfile handleChange={this.handleChange} />
+                    <EducationProfile
+                        handleChange={this.handleChange}
+                        education={this.state.education}
+                        addEducation={this.addEducation}
+                        removeEducation={this.removeEducation}
+                    />
                     <ExperienceProfile handleChange={this.handleChange} />
                     <ApplicationDetails handleChange={this.handleChange} />
                     <div style={{backgroundColor: "#cfcfd1", margin: '0px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)'}}>

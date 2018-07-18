@@ -77,7 +77,7 @@ class SubmittedApplication extends Component {
     };
 
     fetch(
-      `http://localhost:4567/api/applicant/application/${this.ApplicantId}`,
+      `http://localhost:4567/api/applicant/applicant/${this.ApplicantId}`,
       options
     )
       .then(
@@ -94,17 +94,21 @@ class SubmittedApplication extends Component {
   }
 
   render() {
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
+
     let style = {
       backgroundColor: "#cfcfd1",
       margin: "0px 300px",
       boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)"
     };
 
-    let isOver18 = this.state.over18 ? "Yes" : "No";
+    let isOver18 = this.state.data.over18 ? "Yes" : "No";
 
-    let isLegal = this.state.legal ? "Yes" : "No";
+    let isLegal = this.state.data.egal ? "Yes" : "No";
 
-    let education = this.state.education.map(edu => {
+    let education = this.state.data.education.map(edu => {
       return (
         <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
           <p>
@@ -126,7 +130,7 @@ class SubmittedApplication extends Component {
       );
     });
 
-    let workExperience = this.state.workExperience.map(exp => {
+    let workExperience = this.state.data.workExperience.map(exp => {
       return (
         <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
           <p>
@@ -153,10 +157,7 @@ class SubmittedApplication extends Component {
         </div>
       );
     });
-
-    if (this.state.isLoading) {
-      return <Spinner />;
-    }
+    
     return (
       <div>
         <CompanyNav />
@@ -168,25 +169,25 @@ class SubmittedApplication extends Component {
             <strong>First Name:</strong> {this.state.data.firstName}
           </p>
           <p>
-            <strong>Last Name:</strong> {this.state.lastName}
+            <strong>Last Name:</strong> {this.state.data.lastName}
           </p>
           <p>
-            <strong>Address:</strong> {this.state.address}
+            <strong>Address:</strong> {this.state.data.address}
           </p>
           <p>
-            <strong>City:</strong> {this.state.city}
+            <strong>City:</strong> {this.state.data.city}
           </p>
           <p>
-            <strong>State:</strong> {this.state.state}
+            <strong>State:</strong> {this.state.data.state}
           </p>
           <p>
-            <strong>ZIP Code:</strong> {this.state.zipCode}
+            <strong>ZIP Code:</strong> {this.state.data.zipCode}
           </p>
           <p>
-            <strong>Primary Contact:</strong> {this.state.phone}
+            <strong>Primary Contact:</strong> {this.state.data.phone}
           </p>
           <p>
-            <strong>Email:</strong> {this.state.email}
+            <strong>Email:</strong> {this.state.data.email}
           </p>
         </div>
         <div style={style}>
@@ -200,11 +201,11 @@ class SubmittedApplication extends Component {
         <div style={style}>
           <h3>Applicant Details</h3>
           <p>
-            <strong>Cover Letter:</strong> {this.state.coverLetter}
+            <strong>Cover Letter:</strong> {this.state.data.coverLetter}
           </p>
           <p>
             <strong>Salary Requirements:</strong>{" "}
-            {this.state.salaryRequirements}
+            {this.state.data.salaryRequirements}
           </p>
           <p>
             <strong>Is The Candidate Over The Age of 18:</strong> {isOver18}
