@@ -1,13 +1,101 @@
-import React from "react";
+import React, { Component } from "react";
 import CompanyNav from "../CompanyNav/CompanyNav";
+import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
+import PostFeed from "./PostFeed";
 
-const Messaging = () => {
-  return (
-    <div>
-      <CompanyNav />
-      <h1>This will be a page for messaging</h1>
-    </div>
-  );
-};
+class Messaging extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      text: "",
+      posts: [
+        {
+          id: 0,
+          text: "how does this work",
+          reply: [
+            {
+              id: 0,
+              text: "this is how it works"
+            },
+            {
+              id: 1,
+              text: "Oh that makes sense"
+            }
+          ]
+        },
+        {
+          id: 1,
+          text: "can this software do this??",
+          reply: [
+            {
+              id: 0,
+              text: "not yet but we can start working on that now"
+            }
+          ]
+        }
+      ],
+      keyId: 2
+    };
+
+    this.keyIdHandler = this.keyIdHandler.bind(this);
+  }
+
+  onChange = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  keyIdHandler = () => {
+    let keyId = this.state.keyId;
+    keyId += 1;
+    this.setState({ keyId });
+    return keyId;
+  };
+
+  onSubmit = event => {
+    event.preventDefault();
+    const newPost = {
+      id: this.keyIdHandler(),
+      text: this.state.text,
+      reply: []
+    };
+
+    this.setState(
+      prevState => ({
+        posts: [newPost].concat(prevState.posts)
+      }),
+      () => console.log(JSON.stringify(this.state.posts, null, 2))
+    );
+  };
+
+  render() {
+    let postContent = <PostFeed posts={this.state.posts} />;
+    return (
+      <div>
+        <CompanyNav />
+        <div className="post-form mb-3">
+          <div className="card card-info">
+            <div className="card-header bg-muted text-black">Questions</div>
+            <div className="card-body">
+              <form onSubmit={this.onSubmit}>
+                <div className="form-group">
+                  <TextAreaFieldGroup
+                    placeholder="Have a question? Ask it here..."
+                    name="text"
+                    value={this.state.text}
+                    onChange={this.onChange}
+                  />
+                </div>
+                <button type="submit" className="btn btn-success">
+                  Submit
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+        {postContent}
+      </div>
+    );
+  }
+}
 
 export default Messaging;
