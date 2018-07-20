@@ -8,6 +8,7 @@ import DeleteJob from "./DeleteJob";
 import TestEditor from "./TestEditor/TestEditor";
 import Spinner from "../../components/UI/Spinner/Spinner";
 import CompanyNav from "./CompanyNav/CompanyNav";
+import "./Jobs.css";
 
 class Jobs extends Component {
   constructor(props) {
@@ -20,8 +21,7 @@ class Jobs extends Component {
       jobs: [],
       viewingJobId: null,
       createJobMounted: false,
-      editJobMounted: false,
-      testEditorMounted: false
+      editJobMounted: false
     };
 
     this.token = localStorage.getItem("token");
@@ -33,7 +33,6 @@ class Jobs extends Component {
     this.createQuestionInState = this.createQuestionInState.bind(this);
     this.editQuestionInState = this.editQuestionInState.bind(this);
     this.deleteQuestionInState = this.deleteQuestionInState.bind(this);
-    this.toggleTestEditor = this.toggleTestEditor.bind(this);
     this.toggleCreateJob = this.toggleCreateJob.bind(this);
     this.toggleEditJob = this.toggleEditJob.bind(this);
     this.toggleDeleteJob = this.toggleDeleteJob.bind(this);
@@ -160,12 +159,6 @@ class Jobs extends Component {
     }));
   }
 
-  toggleTestEditor() {
-    this.setState(prevState => ({
-      testEditorMounted: !prevState.testEditorMounted
-    }));
-  }
-
   toggleCreateJob() {
     this.setState(prevState => ({
       createJobMounted: !prevState.createJobMounted
@@ -210,20 +203,30 @@ class Jobs extends Component {
           x.id === this.state.viewingJobId
             ? {
                 cursor: "pointer",
-                color: "green"
+                color: "green",
+                backgroundColor: "#def9c0",
+                paddingLeft: "10px"
               }
             : {
                 cursor: "pointer"
               };
 
         return (
-          <span
+          <div
             key={x.id}
+            className="jobs"
             style={style}
             onClick={() => this.setViewingJobId(x.id)}
           >
             {x.title}
-          </span>
+            <button
+              style={{ float: "right" }}
+              type="button"
+              onClick={this.toggleEditJob}
+            >
+              Edit
+            </button>
+          </div>
         );
       });
     } else {
@@ -274,17 +277,15 @@ class Jobs extends Component {
     }
 
     let testEditor = "";
-    if (this.state.testEditorMounted) {
-      testEditor = (
-        <TestEditor
-          token={this.token}
-          job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
-          createQuestionInState={this.createQuestionInState}
-          editQuestionInState={this.editQuestionInState}
-          deleteQuestionInState={this.deleteQuestionInState}
-        />
-      );
-    }
+    testEditor = (
+      <TestEditor
+        token={this.token}
+        job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
+        createQuestionInState={this.createQuestionInState}
+        editQuestionInState={this.editQuestionInState}
+        deleteQuestionInState={this.deleteQuestionInState}
+      />
+    );
 
     let deleteJob = "";
     let deleteJobBtn = "";
@@ -338,22 +339,29 @@ class Jobs extends Component {
     return (
       <div>
         <CompanyNav />
-        <h1>Jobs for {this.state.companyName}</h1>
-        {createJobBtn}
-        {createJob}
-        {navbar}
-        {description}
-        {copyLinkBtn}
-        {editJobBtn}
-        {editJob}
-        {deleteJobBtn}
-        {deleteJob}
-        <div>
-          <button type="button" onClick={this.toggleTestEditor}>
-            Toggle Test Editor
-          </button>
+        <div className="row">
+          <div className="column1">
+            <h3>List of Jobs</h3>
+            {createJobBtn}
+            <div className="jobnavbar">{navbar}</div>
+          </div>
+          <div className="column2">
+            <div className="joblink">
+              {copyLinkBtn} | {deleteJobBtn}
+            </div>
+            <div className="jobdescription">
+              {createJob}
+              <h5 style={{ textDecoration: "underline" }}>Job Description</h5>
+              <p>
+                <em>{description}</em>
+              </p>
+            </div>
+            {editJob}
+            <div />
+            {deleteJob}
+            {testEditor}
+          </div>
         </div>
-        {testEditor}
       </div>
     );
   }

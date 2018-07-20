@@ -208,9 +208,8 @@ class Company extends Component {
             {createApplicant}
             {createApplicantBtn}
             <div className="applicantList">
-              <p>
-                <strong>Search Applicant by Last Name</strong>
-              </p>
+              <strong>Search Applicant by Last Name</strong>
+              <br />
               <input
                 type="text"
                 value={this.state.search}
