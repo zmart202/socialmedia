@@ -28,3 +28,5 @@ mongo-url.js
 secret.js
 
 run-collMods.js
+
+mongo-client-tests.js

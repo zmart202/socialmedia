@@ -26,10 +26,6 @@ router.get("/jobs", (req, res) => {
 
     return Jobs.find({ companyId }).toArray();
   }).then(jobs => {
-    if (!jobs) {
-      throw new Error(`Could not find any jobs under companyId ${companyId}`);
-    }
-
     res.json({
       companyId,
       companyName,
@@ -87,8 +83,8 @@ router.post("/create-job", (req, res) => {
       companyName: authData.companyName,
       test: []
     })
-  ).then(success => {
-    if (!success) {
+  ).then(result => {
+    if (result.insertedCount === 0) {
       throw new Error("Could not insert Job");
     }
 
@@ -146,7 +142,7 @@ router.post("/delete-job", (req, res) => {
   .then(authData =>
     Jobs.findOneAndDelete({ id })
   ).then(result => {
-    if (result.nRemoved === 0) {
+    if (result.ok !== 1) {
       throw new Error(`Could not delete job with id ${id}`);
     }
 

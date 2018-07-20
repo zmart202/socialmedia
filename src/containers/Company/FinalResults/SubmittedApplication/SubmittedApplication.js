@@ -10,52 +10,6 @@ class SubmittedApplication extends Component {
       isLoading: true,
       isError: false,
       data: {},
-      firstName: "Jackson",
-      lastName: "Lenhart",
-      address: "12 Braemore Street",
-      city: "Natick",
-      state: "MA",
-      zipCode: "01760",
-      phone: "508-999-9191",
-      email: "jacksonlenhart@gmail.com",
-      education: [
-        {
-          key: 1,
-          school: "Harvard",
-          study: "Marketing",
-          degree: "Bachelor",
-          startTime: "2011-09-07",
-          endTime: "2015-12-10",
-          finishedSchool: true
-        }
-      ],
-      workExperience: [
-        {
-          key: 1,
-          company: "Something farms",
-          industry: "agriculture",
-          title: "Cashier",
-          summary: "I helped ring out customers",
-          leaving: "I wanted to try something new",
-          startTime: "2013-01-24",
-          endTime: "2017-08-15"
-        },
-        {
-          key: 2,
-          company: "Music Instructor",
-          industry: "Music",
-          title: "Instructor",
-          summary: "I teach students how to learn different instruments",
-          leaving:
-            "I still do this on the side for extra money and because I enjoy it!",
-          startTime: "2016-08-20",
-          endTime: "2018-07-04"
-        }
-      ],
-      coverLetter: "I will be the best there ever was",
-      salaryRequirements: "I need to make enough money to survive",
-      over18: true,
-      legal: true
     };
     this.ApplicantId = this.props.match.params.ApplicantId;
   }
@@ -104,11 +58,15 @@ class SubmittedApplication extends Component {
       boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)"
     };
 
-    let isOver18 = this.state.data.over18 ? "Yes" : "No";
+    let isOver18 = Object.hasOwnProperty(this.state.data, "over18") ?
+    (this.state.data.over18 ? "Yes" : "No") : "Unknown";
 
-    let isLegal = this.state.data.egal ? "Yes" : "No";
+    let isLegal = Object.hasOwnProperty(this.state.data, "isLegal") ?
+    (this.state.data.isLegal ? "Yes" : "No") : "Unknown";
 
-    let education = this.state.data.education.map(edu => {
+    let education = Object.hasOwnProperty(this.state.data, "education") ?
+    (this.state.data.education.length > 0 ?
+    this.state.data.education.map(edu => {
       return (
         <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
           <p>
@@ -128,9 +86,11 @@ class SubmittedApplication extends Component {
           </p>
         </div>
       );
-    });
+    }) : "None") : "Unknown";
 
-    let workExperience = this.state.data.workExperience.map(exp => {
+    let workExperience = Object.hasOwnProperty(this.state.data, "workExperience") ?
+    (this.state.data.workExperience.length > 0 ?
+    this.state.data.workExperience.map(exp => {
       return (
         <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
           <p>
@@ -156,7 +116,7 @@ class SubmittedApplication extends Component {
           </p>
         </div>
       );
-    });
+    }) : "None") : "Unknown";
     
     return (
       <div>
@@ -172,19 +132,19 @@ class SubmittedApplication extends Component {
             <strong>Last Name:</strong> {this.state.data.lastName}
           </p>
           <p>
-            <strong>Address:</strong> {this.state.data.address}
+            <strong>Address:</strong> {this.state.data.address || "Unknown"}
           </p>
           <p>
-            <strong>City:</strong> {this.state.data.city}
+            <strong>City:</strong> {this.state.data.city || "Unknown"}
           </p>
           <p>
-            <strong>State:</strong> {this.state.data.state}
+            <strong>State:</strong> {this.state.data.state || "Unknown"}
           </p>
           <p>
-            <strong>ZIP Code:</strong> {this.state.data.zipCode}
+            <strong>ZIP Code:</strong> {this.state.data.zipCode || "Unknown"}
           </p>
           <p>
-            <strong>Primary Contact:</strong> {this.state.data.phone}
+            <strong>Primary Contact:</strong> {this.state.data.phone || "Unknown"}
           </p>
           <p>
             <strong>Email:</strong> {this.state.data.email}
@@ -201,11 +161,11 @@ class SubmittedApplication extends Component {
         <div style={style}>
           <h3>Applicant Details</h3>
           <p>
-            <strong>Cover Letter:</strong> {this.state.data.coverLetter}
+            <strong>Cover Letter:</strong> {this.state.data.coverLetter || "None"}
           </p>
           <p>
             <strong>Salary Requirements:</strong>{" "}
-            {this.state.data.salaryRequirements}
+            {this.state.data.salaryRequirements || "None"}
           </p>
           <p>
             <strong>Is The Candidate Over The Age of 18:</strong> {isOver18}

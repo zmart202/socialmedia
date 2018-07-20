@@ -59,8 +59,8 @@ router.post("/application", (req, res) => {
       secondsElapsed: 0,
       answers: null
     });
-  }).then(applicant => {
-    if (!applicant) {
+  }).then(result => {
+    if (result.insertedCount === 0) {
       throw new Error("Could not insert applicant");
     }
 
@@ -126,8 +126,8 @@ router.get("/test-timestamp/:id", (req, res) => {
         testTimestamp: new Date()
       }
     }
-  ).then(success => {
-    if (!success) {
+  ).then(result => {
+    if (result.matchedCount === 0 || result.modifiedCount === 0) {
       throw new Error(`Could not update applicant with id ${id}`);
     }
 
