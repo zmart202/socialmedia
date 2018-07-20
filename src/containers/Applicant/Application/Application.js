@@ -37,6 +37,8 @@ class Application extends Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.addEducation = this.addEducation.bind(this);
+    this.removeEducation = this.removeEducation.bind(this);
   }
 
   handleSubmit = event => {
@@ -88,13 +90,31 @@ class Application extends Component {
     });
   }
 
+  addEducation(educationObj) {
+    this.setState(prevState => ({
+      education: prevState.education.concat(educationObj)
+    }));
+  }
+
+  removeEducation(educationObj) {
+    const index = this.state.education.indexOf(educationObj);
+    this.setState(prevState => ({
+      education: prevState.education.filter((x, i) =>
+        i !== index
+      )
+    }));
+  }
+
   render() {
     return (
       <div className="Form">
         <h3 className="applicationheader">Application Form</h3>
         <form>
           <PersonalInformation handleChange={this.handleChange} />
-          <EducationProfile handleChange={this.handleChange} />
+          <EducationProfile
+            education={this.state.education}
+            handleChange={this.handleChange} 
+          />
           <ExperienceProfile handleChange={this.handleChange} />
           <ApplicationDetails handleChange={this.handleChange} />
           <div className="personalinfo">

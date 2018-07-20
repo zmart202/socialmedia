@@ -253,8 +253,7 @@ class Jobs extends Component {
         </div>
       );
     }
-
-    let editJobBtn = "";
+    
     let editJob = "";
     if (this.state.editJobMounted) {
       editJob = (
@@ -265,14 +264,6 @@ class Jobs extends Component {
           id={this.state.viewingJobId}
           token={this.token}
         />
-      );
-    } else if (this.state.viewingJobId) {
-      editJobBtn = (
-        <div>
-          <button type="button" onClick={this.toggleEditJob}>
-            Edit Job
-          </button>
-        </div>
       );
     }
 
@@ -317,14 +308,7 @@ class Jobs extends Component {
       !this.state.createJobMounted &&
       !this.state.testEditorMounted
     ) {
-      description = (
-        <p>
-          {
-            this.state.jobs.find(x => x.id === this.state.viewingJobId)
-              .description
-          }
-        </p>
-      );
+      description = this.state.jobs.find(x => x.id === this.state.viewingJobId).description;
 
       let url = `http://localhost:3000/job-description/${
         this.state.companyId

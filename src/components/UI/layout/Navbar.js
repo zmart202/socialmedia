@@ -6,9 +6,14 @@ const Navbar = props => {
     localStorage.removeItem("token");
     props.history.push("/");
   };
+
+  const goHome = () => {
+    props.history.push("/company");
+  }
+
   return (
     <div className="topnav" id="myTopnav">
-      <a href="#home" className="active">
+      <a onClick={goHome} style={{ cursor: 'pointer' }} className="active">
         <h3>DecisionTyme</h3>
       </a>
       <div className="right-nav">

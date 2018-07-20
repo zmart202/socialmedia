@@ -1,6 +1,5 @@
 import React, { Component } from "react";
 import Toggle from "react-toggle";
-import TextFieldGroup from "../../../../../components/UI/Form/TextFieldGroup";
 import "./Profile.css";
 
 // import EducationInput from './EducationInput/EducationInput';
@@ -10,7 +9,6 @@ class EducationProfile extends Component {
     super(props);
     this.state = {
       educationKey: 1,
-      education: [],
       addEducation: false,
       finishedSchool: false
     };
@@ -39,9 +37,7 @@ class EducationProfile extends Component {
       endTime,
       finishedSchool
     };
-    this.setState({
-      education: this.state.education.concat(educationObj)
-    });
+    this.props.addEducation(educationObj);
     this.setState({ addEducation: false, finishedSchool: false });
   };
 
@@ -58,15 +54,6 @@ class EducationProfile extends Component {
     this.setState({ addEducation: true });
   };
 
-  deleteEducationHandler = (edu, event) => {
-    event.preventDefault();
-    let educate = this.state.education.indexOf(edu);
-    let education = this.state.education;
-    education.splice(educate, 1);
-    this.setState({
-      education
-    });
-  };
   render() {
     let educationForm = null;
     if (this.state.addEducation) {
@@ -162,7 +149,7 @@ class EducationProfile extends Component {
         <div className="subheader">
           <label>Education</label>
         </div>
-        {this.state.education.map(edu => (
+        {this.props.education.map(edu => (
           <div className="completed" key={edu.key}>
             <p>
               <strong>School: </strong>
@@ -185,7 +172,7 @@ class EducationProfile extends Component {
               <strong>Education Completed: </strong>
               {this.state.finishedSchool ? "Yes" : "No"}
             </p>
-            <button onClick={this.deleteEducationHandler.bind(this, edu)}>
+            <button onClick={this.props.removeEducation(edu)}>
               Delete
             </button>
           </div>

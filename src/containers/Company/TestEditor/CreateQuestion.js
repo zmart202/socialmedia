@@ -123,25 +123,25 @@ class CreateQuestion extends Component {
                 options.push(
                     <div key={k}>
                         <input
-                        type="radio"
-                        name="options"
-                        value={k}
-                        onClick={this.setCorrectAnswer}
-                        defaultChecked={k === this.state.correctAnswerId ? true : false}
-                    />
-                    <input
-                        type="text"
-                        style={{padding: '5px 10px'}}
-                        name={k}
-                        onChange={this.handleOptionChange}
-                        defaultValue={this.state.options[k]}
-                    />
-                    <input
-                        type="button"
-                        onClick={() => this.removeOption(k)}
-                        value="Delete"
-                    />
-                    <br/><br/>
+                            type="radio"
+                            name="options"
+                            value={k}
+                            onClick={this.setCorrectAnswer}
+                            defaultChecked={k === this.state.correctAnswerId ? true : false}
+                        />
+                        <input
+                            type="text"
+                            style={{padding: '5px 10px'}}
+                            name={k}
+                            onChange={this.handleOptionChange}
+                            defaultValue={this.state.options[k]}
+                        />
+                        <input
+                            type="button"
+                            onClick={() => this.removeOption(k)}
+                            value="Delete"
+                        />
+                        <br/><br/>
                     </div>
                 );
             }
