@@ -1,40 +1,44 @@
-import React, {Component} from 'react';
+import React, { Component } from "react";
+import TextAreaFieldGroup from "../../../../components/UI/Form/TextAreaFieldGroup";
+import "./Profile/Profile.css";
 
 class ApplicationDetails extends Component {
-    constructor(props){
-        super(props);
-        this.state = {
-            selectedFile: null
-        }
-    }
-    fileSelectHandler = (event) => {
-        this.setState({selectedFile: event.target.files[0]});
-    }
-    render () {
-        return <div style={{backgroundColor: "#cfcfd1", margin: '10px 300px', boxShadow: '2px 2px 1px 0px rgba(0,0,0,0.75)', padding: '20px 0px'}}>
-            <div style={{padding: '10px', textDecoration: 'underline'}}>
-                <label>Application Details</label><br />
-            </div>
-            <div style={{padding: '10px'}}>
-                <label>Upload Resume: </label>
-                <input 
-                    type="file"
-                    onChange={this.fileSelectHandler} />
-            </div>
-            <textarea 
-                cols="100" 
-                rows="5" 
-                onChange={this.props.handleChange} 
-                name="coverLetter" 
-                placeholder="Cover letter"/><br />
-            <textarea 
-                cols="100" 
-                rows="5" 
-                onChange={this.props.handleChange} 
-                name="salaryRequirements" 
-                placeholder="Please specify your salary requirements"/><br />
+  constructor(props) {
+    super(props);
+    this.state = {
+      selectedFile: null
+    };
+  }
+  fileSelectHandler = event => {
+    this.setState({ selectedFile: event.target.files[0] });
+  };
+  render() {
+    return (
+      <div className="profileinfo">
+        <div className="subheader">
+          <label>Application Details</label>
         </div>
-    }
+        <div className="profileinput">
+          <div style={{ padding: "20px 0px" }}>
+            <label>Upload Resume: </label>
+            <input type="file" onChange={this.fileSelectHandler} />
+          </div>
+          <TextAreaFieldGroup
+            name="coverLetter"
+            placeholder="Cover Letter"
+            onChange={this.props.handleChange}
+            info="Please put together a cover letter describing why you would be a fit at this company"
+          />
+          <TextAreaFieldGroup
+            name="salaryRequirements"
+            placeholder="Salary Requirements"
+            onChange={this.props.handleChange}
+            info="Please specify any salary requirents you may have"
+          />
+        </div>
+      </div>
+    );
+  }
 }
 
 export default ApplicationDetails;

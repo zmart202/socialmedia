@@ -2,6 +2,7 @@ import React, { Component } from "react";
 import ResultsHeader from "../ResultsHeader";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
 import CompanyNav from "../../CompanyNav/CompanyNav";
+import "./SubmittedApplication.css";
 
 class SubmittedApplication extends Component {
   constructor(props) {
@@ -51,12 +52,6 @@ class SubmittedApplication extends Component {
     if (this.state.isLoading) {
       return <Spinner />;
     }
-
-    let style = {
-      backgroundColor: "#cfcfd1",
-      margin: "0px 300px",
-      boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)"
-    };
 
     let isOver18 = Object.hasOwnProperty(this.state.data, "over18") ?
     (this.state.data.over18 ? "Yes" : "No") : "Unknown";
@@ -121,61 +116,65 @@ class SubmittedApplication extends Component {
     return (
       <div>
         <CompanyNav />
-        <ResultsHeader ApplicantId={this.ApplicantId} />
-        <h1>Submitted Application</h1>
-        <div style={style}>
-          <h3>Personal Information</h3>
-          <p>
-            <strong>First Name:</strong> {this.state.data.firstName}
-          </p>
-          <p>
-            <strong>Last Name:</strong> {this.state.data.lastName}
-          </p>
-          <p>
-            <strong>Address:</strong> {this.state.data.address || "Unknown"}
-          </p>
-          <p>
-            <strong>City:</strong> {this.state.data.city || "Unknown"}
-          </p>
-          <p>
-            <strong>State:</strong> {this.state.data.state || "Unknown"}
-          </p>
-          <p>
-            <strong>ZIP Code:</strong> {this.state.data.zipCode || "Unknown"}
-          </p>
-          <p>
-            <strong>Primary Contact:</strong> {this.state.data.phone || "Unknown"}
-          </p>
-          <p>
-            <strong>Email:</strong> {this.state.data.email}
-          </p>
+        <div className="resultsnav">
+          <ResultsHeader ApplicantId={this.ApplicantId} />
         </div>
-        <div style={style}>
-          <h3>Education</h3>
-          {education}
-        </div>
-        <div style={style}>
-          <h3>Employment History</h3>
-          {workExperience}
-        </div>
-        <div style={style}>
-          <h3>Applicant Details</h3>
-          <p>
-            <strong>Cover Letter:</strong> {this.state.data.coverLetter || "None"}
-          </p>
-          <p>
-            <strong>Salary Requirements:</strong>{" "}
-            {this.state.data.salaryRequirements || "None"}
-          </p>
-          <p>
-            <strong>Is The Candidate Over The Age of 18:</strong> {isOver18}
-          </p>
-          <p>
-            <strong>
-              Is The Candidate Legally Allowed to Work in This State:
-            </strong>{" "}
-            {isLegal}
-          </p>
+        <div className="resultsheaderapp">
+          <h1>Submitted Application</h1>
+          <div className="submittedapplication">
+            <h3>Personal Information</h3>
+            <p>
+              <strong>First Name:</strong> {this.state.data.firstName}
+            </p>
+            <p>
+              <strong>Last Name:</strong> {this.state.data.lastName}
+            </p>
+            <p>
+              <strong>Address:</strong> {this.state.data.address || "Unknown"}
+            </p>
+            <p>
+              <strong>City:</strong> {this.state.data.city || "Unknown"}
+            </p>
+            <p>
+              <strong>State:</strong> {this.state.data.state || "Unknown"}
+            </p>
+            <p>
+              <strong>ZIP Code:</strong> {this.state.data.zipCode || "Unknown"}
+            </p>
+            <p>
+              <strong>Primary Contact:</strong> {this.state.data.phone || "Unknown"}
+            </p>
+            <p>
+              <strong>Email:</strong> {this.state.data.email}
+            </p>
+          </div>
+          <div className="submittedapplication">
+            <h3>Education</h3>
+            {education}
+          </div>
+          <div className="submittedapplication">
+            <h3>Employment History</h3>
+            {workExperience}
+          </div>
+          <div className="submittedapplication">
+            <h3>Applicant Details</h3>
+            <p>
+              <strong>Cover Letter:</strong> {this.state.data.coverLetter || "None"}
+            </p>
+            <p>
+              <strong>Salary Requirements:</strong>{" "}
+              {this.state.data.salaryRequirements || "None"}
+            </p>
+            <p>
+              <strong>Is The Candidate Over The Age of 18:</strong> {isOver18}
+            </p>
+            <p>
+              <strong>
+                Is The Candidate Legally Allowed to Work in This State:
+              </strong>{" "}
+              {isLegal}
+            </p>
+          </div>
         </div>
       </div>
     );

@@ -3,7 +3,7 @@ import "./ApplicantHeader.css";
 
 class ApplicantHeader extends Component {
   render() {
-    return <div className="header">Applicant Listings</div>;
+    return <div className="header">Applicants Listing</div>;
   }
 }
 

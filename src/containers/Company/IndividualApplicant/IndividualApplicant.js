@@ -82,7 +82,7 @@ class IndividualApplicant extends Component {
               }}
               to={`/company/results/${this.props.applicant.id}`}
             >
-              <div style={{ paddingBottom: "5px" }}>VIEW</div>
+              <div style={{ paddingBottom: "25px" }}>VIEW</div>
             </Link>
           </strong>
         ) : null}
@@ -129,7 +129,10 @@ class IndividualApplicant extends Component {
               ref="editFName"
             />
           ) : (
-            " " + this.props.applicant.firstName
+            <div style={{ paddingBottom: "12px" }}>
+              {" "}
+              {this.props.applicant.firstName}
+            </div>
           )}
         </div>
         <div className="align">

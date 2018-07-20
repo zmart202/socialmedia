@@ -3,6 +3,7 @@ import Aux from "../../../hoc/Aux/Aux";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import ResultsHeader from "./ResultsHeader";
 import CompanyNav from "../CompanyNav/CompanyNav";
+import "./FinalResults.css";
 
 class FinalResults extends React.Component {
   constructor(props) {
@@ -70,17 +71,6 @@ class FinalResults extends React.Component {
     let ORQuestionsArray = [];
     let multipleChoiceQuestions = null;
     let style;
-    let MCButtonStyle = {
-      cursor: "pointer",
-      color: "blue",
-      textDecoration: "underline"
-    };
-    let questionStyle = {
-      backgroundColor: "#cfcfd1",
-      margin: "10px 300px",
-      boxShadow: "2px 2px 1px 0px rgba(0,0,0,0.75)",
-      padding: "5px"
-    };
 
     if (!answerData) {
       return null;
@@ -108,8 +98,10 @@ class FinalResults extends React.Component {
 
     let openResponseQuestions = ORQuestionsArray.map(question => {
       return (
-        <div key={question.body} style={questionStyle}>
-          <h3>{question.body}</h3>
+        <div key={question.body} className="ORquestionstyle">
+          <strong>
+            <em>{question.body}</em>
+          </strong>
           <p>{question.answer}</p>
         </div>
       );
@@ -118,8 +110,10 @@ class FinalResults extends React.Component {
     if (this.state.showMultipleChoice) {
       multipleChoiceQuestions = allMCResponses.map(question => {
         return (
-          <div key={question.body}>
-            <h3>{question.body}</h3>
+          <div key={question.body} className="MCquestionStyle">
+            <strong>
+              <em>{question.body}</em>
+            </strong>
             {question.options.map(option => {
               if (question.answer === option.answer && option.correct) {
                 style = {
@@ -144,13 +138,17 @@ class FinalResults extends React.Component {
     }
 
     let multipleChoiceButton = this.state.showMultipleChoice ? (
-      <a onClick={this.showMultipleChoiceHandler} style={MCButtonStyle}>
-        Hide Multiple Choice Questions
-      </a>
+      <div className="MCButtonStyle">
+        <a onClick={this.showMultipleChoiceHandler}>
+          Hide Multiple Choice Questions
+        </a>
+      </div>
     ) : (
-      <a onClick={this.showMultipleChoiceHandler} style={MCButtonStyle}>
-        Show Multiple Choice Questions
-      </a>
+      <div className="MCButtonStyle">
+        <a onClick={this.showMultipleChoiceHandler}>
+          Show Multiple Choice Questions
+        </a>
+      </div>
     );
 
     let MCScore = `(${correctMCResponses.length}/${
@@ -164,23 +162,34 @@ class FinalResults extends React.Component {
     return (
       <Aux>
         <CompanyNav />
-        <ResultsHeader ApplicantId={this.ApplicantId} />
-        <h3 style={{ color: "purple" }}>
-          Results for {this.state.data.firstName} {this.state.data.lastName}
-        </h3>
-        <h4 style={{ color: "purple" }}>
-          Total amount of time taken is{" "}
-          <span style={{ color: "red", textDecoration: "underline" }}>
-            {this.formattedSeconds(this.state.data.secondsElapsed)}
-          </span>
-        </h4>
-        <div style={questionStyle}>
+        <div className="resultsheader">
+          <div className="resultsnav">
+            <ResultsHeader ApplicantId={this.ApplicantId} />
+          </div>
+          <h3 style={{ color: "purple" }} className="namedisplay">
+            <strong>
+              Test Results for {this.state.data.firstName}{" "}
+              {this.state.data.lastName}
+            </strong>
+          </h3>
+          <h4 style={{ color: "purple" }} className="timerdisplay">
+            Total amount of time taken is{" "}
+            <span style={{ color: "red", textDecoration: "underline" }}>
+              {this.formattedSeconds(this.state.data.secondsElapsed)}
+            </span>
+          </h4>
+        </div>
+        <div className="MCquestionlayout">
+          <h4 className="questionheader">Multiple Choice</h4>
           {MCScore}
           <br />
-          {multipleChoiceQuestions}
           {multipleChoiceButton}
+          {multipleChoiceQuestions}
         </div>
-        {openResponseQuestions}
+        <div className="questionStyle">
+          <h4 className="questionheader">Open Response</h4>
+          {openResponseQuestions}
+        </div>
       </Aux>
     );
   }

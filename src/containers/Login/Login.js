@@ -104,6 +104,15 @@ class Login extends Component {
   }
 
   render() {
+    let errorStyle = null;
+    if (this.state.isError || this.state.denied) {
+      errorStyle = {
+        marginLeft: "10px",
+        backgroundColor: "#d6d6d6",
+        padding: "20px 190px 20px 20px",
+        borderRadius: "5px;"
+      };
+    }
     if (this.state.isLoading) {
       return <Spinner />;
     }
@@ -144,11 +153,13 @@ class Login extends Component {
               />
             </div>
             <div>
-              <div className="button">
-                <a onClick={this.handleSubmit}>Login</a>
+              <a onClick={this.handleSubmit}>
+                <div className="button">Login</div>
+              </a>
+              <div style={errorStyle}>
+                {deniedMsg}
+                {errorMsg}
               </div>
-              {deniedMsg}
-              {errorMsg}
             </div>
           </form>
         </div>
