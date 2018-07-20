@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import classnames from "classnames";
 
 class PostItem extends Component {
   onLikeClick(id) {

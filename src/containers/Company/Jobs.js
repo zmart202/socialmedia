@@ -254,7 +254,6 @@ class Jobs extends Component {
       );
     }
 
-    let editJobBtn = "";
     let editJob = "";
     if (this.state.editJobMounted) {
       editJob = (
@@ -265,14 +264,6 @@ class Jobs extends Component {
           id={this.state.viewingJobId}
           token={this.token}
         />
-      );
-    } else if (this.state.viewingJobId) {
-      editJobBtn = (
-        <div>
-          <button type="button" onClick={this.toggleEditJob}>
-            Edit Job
-          </button>
-        </div>
       );
     }
 
