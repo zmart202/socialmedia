@@ -21,7 +21,7 @@ router.post("/create-company", (req, res) => {
     name,
     id: hat()
   }).then(success => {
-    if (!success) {
+    if (result.insertedCount === 0) {
       throw new Error("Could not insert company")
     }
 
@@ -63,8 +63,8 @@ router.post("/signup", (req, res) => {
       companyName,
       password: hash
     })
-  ).then(success => {
-    if (!success) {
+  ).then(result => {
+    if (result.insertedCount === 0) {
       throw new Error("Server error: could not insert user");
     }
 
@@ -154,19 +154,16 @@ router.get("/applicants", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  let companyName;
+  let companyName, companyId;
   jwt.verify(token, secret)
   .then(authData => {
     companyName = authData.companyName;
+    companyId = authData.companyId;
 
     return Applicants.find({
       companyId: authData.companyId
     }).toArray();
   }).then(applicants => {
-    if (!applicants) {
-      throw new Error(`Could not find any applicants for companyId ${authData.companyId}`);
-    }
-
     res.json({
       applicants,
       companyName,
@@ -177,6 +174,7 @@ router.get("/applicants", (req, res) => {
       success: false,
       msg: err.message
     });
+    console.error(err);
   });
 });
 
@@ -212,8 +210,8 @@ router.post("/create-applicant", (req, res) => {
       secondsElapsed: 0,
       answers: null
     });
-  }).then(success => {
-    if (!success) {
+  }).then(result => {
+    if (result.insertedCount === 0) {
       throw new Error("Could not create applicant");
     }
 
@@ -246,8 +244,8 @@ router.post("/edit-applicant", (req, res) => {
         }
       }
     )
-  ).then(success => {
-    if (!success) {
+  ).then(result => {
+    if (result.matchedCount === 0 || result.modifiedCount === 0) {
       throw new Error("Could not update applicant");
     }
 
@@ -270,9 +268,9 @@ router.post("/remove-applicant", (req, res) => {
 
   jwt.verify(token, secret)
   .then(authData =>
-    Applicants.removeOne({ email, id })
-  ).then(success => {
-    if (!success) {
+    Applicants.findOneAndDelete({ email, id })
+  ).then(result => {
+    if (result.ok !== 1) {
       throw new Error("Could not remove applicant");
     }
 

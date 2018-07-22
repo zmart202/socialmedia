@@ -28,8 +28,7 @@ class Application extends Component {
       over18: false,
       legal: false,
       educationFormMounted: false,
-      educationKey: 1,
-      addEducation: false
+      educationKey: 1
     };
 
     this.companyId = props.match.params.companyId;
@@ -41,7 +40,6 @@ class Application extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log(this.state);
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -82,11 +80,25 @@ class Application extends Component {
     this.setState({ legal: !this.state.legal });
   };
 
-  toggleEducationForm() {
-    this.setState({
-      educationFormMounted: !this.state.educationFormMounted
-    });
-  }
+  addEducation = educationObj =>
+    this.setState(prevState => ({
+      education: prevState.education.concat(educationObj)
+    }));
+
+  removeEducation = id =>
+    this.setState(prevState => ({
+      education: prevState.education.filter(x => x.id !== id)
+    }));
+
+  addExperience = experienceObj =>
+    this.setState(prevState => ({
+      workExperience: prevState.workExperience.concat(experienceObj)
+    }));
+
+  removeExperience = id =>
+    this.setState(prevState => ({
+      workExperience: prevState.workExperience.filter(x => x.id !== id)
+    }));
 
   render() {
     return (
@@ -94,8 +106,18 @@ class Application extends Component {
         <h3 className="applicationheader">Application Form</h3>
         <form>
           <PersonalInformation handleChange={this.handleChange} />
-          <EducationProfile handleChange={this.handleChange} />
-          <ExperienceProfile handleChange={this.handleChange} />
+          <EducationProfile
+            addEducation={this.addEducation}
+            removeEducation={this.removeEducation}
+            handleChange={this.handleChange}
+            education={this.state.education}
+          />
+          <ExperienceProfile
+            handleChange={this.handleChange}
+            workExperience={this.state.workExperience}
+            addExperience={this.addExperience}
+            removeExperience={this.removeExperience}
+          />
           <ApplicationDetails handleChange={this.handleChange} />
           <div className="personalinfo">
             <div className="bottomform">

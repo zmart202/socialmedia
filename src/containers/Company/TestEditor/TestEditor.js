@@ -63,7 +63,13 @@ class TestEditor extends Component {
     let createQuestion = "";
     if (!this.state.createQuestionMounted) {
       createQuestionBtn = (
-        <button type="button" onClick={this.toggleCreateQuestion}>
+        <button
+          style={{ color: "purple" }}
+          className="btn btn-light"
+          type="button"
+          onClick={this.toggleCreateQuestion}
+        >
+          <i className="fas fa-plus text-success mr-1" />
           Add New Question
         </button>
       );

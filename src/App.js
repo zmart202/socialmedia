@@ -29,6 +29,7 @@ class App extends Component {
         <Route path="/company/results/:ApplicantId" component={FinalResults} />
         <Route
           path="/company/application/:ApplicantId"
+          exact
           component={SubmittedApplication}
         />
         <Route path="/test-finished" component={TestFinished} />

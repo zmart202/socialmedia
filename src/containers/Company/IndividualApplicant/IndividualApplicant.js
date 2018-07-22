@@ -9,6 +9,7 @@ class IndividualApplicant extends Component {
     super(props);
 
     this.state = {
+      isError: false,
       isEditing: false
     };
   }
@@ -47,6 +48,13 @@ class IndividualApplicant extends Component {
         res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
       )
       .then(data => {
+        console.log(data);
+        if (!data.success) {
+          return this.setState({
+            isError: true
+          });
+        }
+        
         this.props.refreshApplicantList();
         this.setState({ isEditing: false });
       })
@@ -92,6 +100,10 @@ class IndividualApplicant extends Component {
   };
 
   render() {
+    if (this.state.isError) {
+      return <p>Error editing applicant</p>
+    }
+
     return (
       <div className="Applicant">
         <div className="padding" style={{ color: "green" }}>

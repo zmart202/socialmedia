@@ -108,7 +108,6 @@ class FinalResults extends React.Component {
     });
 
     if (this.state.showMultipleChoice) {
-      console.log("ALL MC RESPONSES", allMCResponses);
       multipleChoiceQuestions = allMCResponses.map(question => {
         return (
           <div key={question.body} className="MCquestionStyle">
