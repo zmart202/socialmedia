@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import CompanyNav from "../CompanyNav/CompanyNav";
 import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
 import PostFeed from "./PostFeed";
 
@@ -71,7 +70,6 @@ class Messaging extends Component {
     let postContent = <PostFeed posts={this.state.posts} />;
     return (
       <div>
-        <CompanyNav />
         <div className="post-form mb-3">
           <div className="card card-info">
             <div className="card-header bg-muted text-black">Questions</div>

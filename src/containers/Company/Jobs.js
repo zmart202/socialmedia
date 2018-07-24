@@ -7,7 +7,6 @@ import EditJob from "./EditJob";
 import DeleteJob from "./DeleteJob";
 import TestEditor from "./TestEditor/TestEditor";
 import Spinner from "../../components/UI/Spinner/Spinner";
-import CompanyNav from "./CompanyNav/CompanyNav";
 import "./Jobs.css";
 
 class Jobs extends Component {
@@ -41,7 +40,7 @@ class Jobs extends Component {
 
   componentDidMount() {
     if (this.token === null) {
-      return this.props.history.push("/");
+      return;
     }
 
     const options = {
@@ -322,7 +321,6 @@ class Jobs extends Component {
 
     return (
       <div>
-        <CompanyNav />
         <div className="row">
           <div className="column1">
             <h3>List of Jobs</h3>

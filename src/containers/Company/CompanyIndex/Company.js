@@ -1,12 +1,9 @@
 import React, { Component } from "react";
-import hat from "hat";
 
-import Aux from "../../../hoc/Aux/Aux";
 import NewApplicant from "../NewApplicant/NewApplicant";
 import ApplicantList from "../ApplicantList";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import "./Company.css";
-import CompanyNav from "../CompanyNav/CompanyNav";
 import ApplicantHeader from "../ApplicantHeader/ApplicantHeader";
 
 class Company extends Component {
@@ -24,22 +21,9 @@ class Company extends Component {
     };
 
     this.token = localStorage.getItem("token");
-
-    this.createApplicant = this.createApplicant.bind(this);
-    this.toggleCreateApplicant = this.toggleCreateApplicant.bind(this);
-    this.putJobsInState = this.putJobsInState.bind(this);
   }
 
   componentDidMount() {
-    this.refreshApplicantList();
-  }
-
-  refreshApplicantList = () => {
-    if (this.token === null) {
-      this.props.history.push("/");
-      return;
-    }
-
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -72,60 +56,7 @@ class Company extends Component {
         });
         console.error(err);
       });
-  };
-
-  putJobsInState(jobs) {
-    this.setState({ jobs });
   }
-
-  deleteApplicantsHandler = applicant => {
-    const token = localStorage.getItem("token");
-    if (token === null) {
-      this.props.history.push("/company-login");
-      return;
-    }
-
-    const options = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify({
-        email: applicant.email,
-        id: applicant.id
-      })
-    };
-
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/remove-applicant", options)
-      .then(
-        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
-      )
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
-
-        this.refreshApplicantList();
-      })
-      .catch(err => {
-        this.setState({
-          isLoading: false,
-          isError: true,
-          errorMsg: err.message
-        });
-        console.error(err)
-      });
-    });
-  };
 
   generateTokenHandler = () => {
     var length = 8,
@@ -138,75 +69,41 @@ class Company extends Component {
     return retVal;
   };
 
-  createApplicant(firstName, lastName, email, jobId) {
-    const token = localStorage.getItem("token");
-    if (token === null) {
-      return;
-    }
+  putJobsInState = jobs =>
+    this.setState({ jobs });
 
-    const id = hat();
+  deleteApplicant = applicant =>
+    this.setState(prevState => ({
+      isLoading: false,
+      applicants: prevState.applicants.filter(x => x.id !== applicant.id)
+    }));
 
-    const options = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        "Content-Type": "application/json"
-      },
-      method: "POST",
-      body: JSON.stringify({
-        id,
-        email,
-        firstName,
-        lastName,
-        jobId
-      })
-    };
+  createApplicant = applicant =>
+    this.setState(prevState => ({
+      isLoading: false,
+      applicants: [applicant].concat(prevState.applicants),
+      createApplicantMounted: false
+    }));
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/create-applicant", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+  editApplicant = applicant => 
+    this.setState(prevState => ({
+      applicants: prevState.applicants.map(x =>
+        x.id === applicant.id ?
+          {
+            ...x,
+            firstName: applicant.firstName,
+            lastName: applicant.lastName
+          } : x
+      )
+    }));
 
-        this.refreshApplicantList();
-      })
-      .catch(err => {
-        console.error(err);
-        this.setState({
-          isError: true,
-          isLoading: false,
-          errorMsg: err.message
-        });
-      });
-    });
-  }
-
-  toggleCreateApplicant() {
+  toggleCreateApplicant = () =>
     this.setState(prevState => ({
       createApplicantMounted: !prevState.createApplicantMounted
     }));
-  }
 
-  logOut = () => {
-    localStorage.removeItem("token");
-    this.props.history.push("/");
-  };
-
-  viewCancelHandler = () => {
-    this.setState({ viewing: false });
-  };
-
-  updateSearch = event => {
+  updateSearch = event =>
     this.setState({ search: event.target.value.substr(0, 20) });
-  };
 
   render() {
     if (this.state.isLoading) {
@@ -246,10 +143,8 @@ class Company extends Component {
       applicantList = (
         <ApplicantList
           applicants={this.state.applicants}
-          deleteApplicantsHandler={this.deleteApplicantsHandler.bind(
-            this
-          )}
-          refreshApplicantList={this.refreshApplicantList.bind(this)}
+          deleteApplicant={this.deleteApplicant}
+          editApplicant={this.editApplicant}
           searchedApplicant={this.state.search}
         />
       );
@@ -261,30 +156,27 @@ class Company extends Component {
 
     return (
       <div className="Company">
-        <Aux>
-          <div>
-            <CompanyNav />
-            <div className="CompanyName">
-              <h1>{this.state.companyName}</h1>
-            </div>
-            {createApplicant}
-            {createApplicantBtn}
-            <div className="applicantList">
-              <strong>Search Applicant by Last Name</strong>
-              <br />
-              <input
-                type="text"
-                value={this.state.search}
-                onChange={this.updateSearch.bind(this)}
-                placeholder="Type last name here.."
-              />
-            </div>
-            <ApplicantHeader />
-            <div className="CompanyApplicantList">
-              {applicantList}
-            </div>
+        <div>
+          <div className="CompanyName">
+            <h1>{this.state.companyName}</h1>
           </div>
-        </Aux>
+          {createApplicant}
+          {createApplicantBtn}
+          <div className="applicantList">
+            <strong>Search Applicant by Last Name</strong>
+            <br />
+            <input
+              type="text"
+              value={this.state.search}
+              onChange={this.updateSearch}
+              placeholder="Type last name here.."
+            />
+          </div>
+          <ApplicantHeader />
+          <div className="CompanyApplicantList">
+            {applicantList}
+          </div>
+        </div>
       </div>
     );
   }

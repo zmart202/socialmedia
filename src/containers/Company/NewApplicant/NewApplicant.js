@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import hat from "hat";
 
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import "./NewApplicant.css";
@@ -16,8 +17,7 @@ class NewApplicant extends Component {
       selectedJobId: ""
     };
 
-    this.createHandler = this.createHandler.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.token = localStorage.getItem("token");
   }
 
   componentDidMount() {
@@ -62,27 +62,65 @@ class NewApplicant extends Component {
     );
   }
 
-  createHandler(e) {
+  createHandler = e => {
     if (this.state.selectedJobId.length === 0) {
       return this.setState({
         errorMsg: "Please select a job"
       });
     }
 
-    this.props.createApplicant(
-      this.state.firstName,
-      this.state.lastName,
-      this.state.email,
-      this.state.selectedJobId
-    );
-    this.props.toggleCreateApplicant();
-  }
+    const id = hat();
 
-  handleChange(e) {
+    const applicant = {
+      id,
+      firstName: this.state.firstName,
+      lastName: this.state.lastName,
+      email: this.state.email,
+      jobId: this.state.selectedJobId
+    };
+
+    const options = {
+      headers: {
+        Authorization: `Bearer ${this.token}`,
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(applicant)
+    };
+
+    this.setState({
+      isLoading: true
+    }, () => {
+      fetch("http://localhost:4567/api/company/create-applicant", options)
+      .then(res => res.json())
+      .then(data => {
+        console.log(data);
+        if (!data.success) {
+          return this.setState({
+            isLoading: false,
+            isError: true,
+            errorMsg: data.msg
+          });
+        }
+
+        this.props.createApplicant(applicant);
+        this.props.toggleCreateApplicant();
+      })
+      .catch(err => {
+        console.error(err);
+        this.setState({
+          isError: true,
+          isLoading: false,
+          errorMsg: err.message
+        });
+      });
+    });
+  };
+
+  handleChange = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
 
   render() {
     if (this.state.isLoading) {

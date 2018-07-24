@@ -268,10 +268,10 @@ router.post("/remove-applicant", (req, res) => {
 
   jwt.verify(token, secret)
   .then(authData =>
-    Applicants.findOneAndDelete({ email, id })
+    Applicants.deleteOne({ email, id })
   ).then(result => {
-    if (result.ok !== 1) {
-      throw new Error("Could not remove applicant");
+    if (result.deletedCount === 0) {
+      throw new Error(`Could not remove applicant with id ${id}`);
     }
 
     res.json({ success: true });

@@ -20,9 +20,8 @@ class ApplicantList extends Component {
     return sorted.map(applicant => (
       <IndividualApplicant
         applicant={applicant}
-        delete={() => props.deleteApplicantsHandler(applicant)}
-        //results={() => props.viewable(applicant)}
-        refreshApplicantList={props.refreshApplicantList}
+        deleteApplicant={props.deleteApplicant}
+        editApplicant={props.editApplicant}
         key={applicant.id}
         {...props}
       />
