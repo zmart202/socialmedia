@@ -114,6 +114,8 @@ class Application extends Component {
           <EducationProfile
             education={this.state.education}
             handleChange={this.handleChange} 
+            addEducation={this.addEducation}
+            removeEducation={this.removeEducation}
           />
           <ExperienceProfile handleChange={this.handleChange} />
           <ApplicationDetails handleChange={this.handleChange} />

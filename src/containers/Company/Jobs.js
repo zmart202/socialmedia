@@ -24,25 +24,9 @@ class Jobs extends Component {
     };
 
     this.token = localStorage.getItem("token");
-
-    this.setViewingJobId = this.setViewingJobId.bind(this);
-    this.createJobInState = this.createJobInState.bind(this);
-    this.editJobInState = this.editJobInState.bind(this);
-    this.deleteJobInState = this.deleteJobInState.bind(this);
-    this.createQuestionInState = this.createQuestionInState.bind(this);
-    this.editQuestionInState = this.editQuestionInState.bind(this);
-    this.deleteQuestionInState = this.deleteQuestionInState.bind(this);
-    this.toggleCreateJob = this.toggleCreateJob.bind(this);
-    this.toggleEditJob = this.toggleEditJob.bind(this);
-    this.toggleDeleteJob = this.toggleDeleteJob.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
-    if (this.token === null) {
-      return;
-    }
-
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -78,20 +62,15 @@ class Jobs extends Component {
       });
   }
 
-  setViewingJobId(id) {
-    this.setState({
-      viewingJobId: id
-    });
-  }
+  setViewingJobId = id => this.setState({ viewingJobId: id });
 
-  createJobInState(job) {
+  createJobInState = job =>
     this.setState(prevState => ({
       jobs: prevState.jobs.concat(job),
       viewingJobId: job.id
     }));
-  }
 
-  editJobInState(job) {
+  editJobInState = job =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -104,9 +83,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  deleteJobInState(id) {
+  deleteJobInState = id =>
     this.setState(prevState => {
       let newJobs = prevState.jobs.filter(x => x.id !== id);
       return {
@@ -114,9 +92,8 @@ class Jobs extends Component {
         viewingJobId: newJobs.length > 0 ? _.sample(newJobs).id : null
       };
     });
-  }
 
-  createQuestionInState(q) {
+  createQuestionInState = q =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -128,9 +105,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  editQuestionInState(q) {
+  editQuestionInState = q =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -142,9 +118,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  deleteQuestionInState(id) {
+  deleteQuestionInState = id =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -156,31 +131,26 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  toggleCreateJob() {
+  toggleCreateJob = () =>
     this.setState(prevState => ({
       createJobMounted: !prevState.createJobMounted
     }));
-  }
 
-  toggleEditJob() {
+  toggleEditJob = () =>
     this.setState(prevState => ({
       editJobMounted: !prevState.editJobMounted
     }));
-  }
 
-  toggleDeleteJob() {
+  toggleDeleteJob = () =>
     this.setState(prevState => ({
       deleteJobMounted: !prevState.deleteJobMounted
     }));
-  }
 
-  handleChange(e) {
+  handleChange = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
 
   render() {
     if (this.state.isLoading) {

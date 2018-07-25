@@ -1,5 +1,4 @@
 import React from "react";
-import _ from "lodash";
 import "./Test.css";
 
 import Question from "../../../components/Question";
@@ -27,35 +26,34 @@ class Test extends React.Component {
     );
   }
 
-  handleChange = e => {
+  handleChange = e =>
     this.setState({
       answers: {
         ...this.state.answers,
         [e.target.name]: e.target.value
       }
     });
-  };
 
   handleSubmit = () => {
     clearInterval(this.incrementer);
 
-    const answerData = [];
-    for (let k in this.state.answers) {
-      let question = this.props.test.find(x => x.id === k);
-      if (question.type === "MULTIPLE_CHOICE") {
-        question.correct = false;
-        for (let x of question.options) {
-          if ((x.correct && x.answer) === this.state.answers[k]) {
-            question.correct = true;
-            break;
+    const answerData = this.props.test.map(q =>
+      this.state.answers[q.id] ?
+        (q.type === "MULTIPLE_CHOICE" ?
+          {
+            ...q,
+            correct: q.options.find(x =>
+              x.correct && (x.answer === this.state.answers[q.id])
+            ) ? true : false,
+            answer: this.state.answers[q.id]
+          } : {
+            ...q,
+            answer: this.state.answers[q.id]
+          }) : {
+            ...q,
+            answer: null
           }
-        }
-      }
-      answerData.push({
-        ..._.omit(question, "id"),
-        answer: this.state.answers[k]
-      });
-    }
+    );
 
     const options = {
       headers: {
