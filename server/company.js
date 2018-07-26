@@ -208,7 +208,7 @@ router.post("/create-applicant", (req, res) => {
       timestamp: new Date(),
       testTimestamp: null,
       secondsElapsed: 0,
-      answers: null
+      answerData: null
     });
   }).then(result => {
     if (result.insertedCount === 0) {

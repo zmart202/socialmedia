@@ -11,8 +11,6 @@ class Test extends React.Component {
       secondsElapsed: props.secondsElapsed
     };
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.incrementer = null;
   }
 
@@ -71,10 +69,9 @@ class Test extends React.Component {
       `http://localhost:4567/api/applicant/test-results/${this.props.id}`,
       options
     )
-      .then(
-        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
-      )
+      .then(res => res.json())
       .then(data => {
+        console.log(data);
         if (!data.success) {
           return this.props.propagateError();
         }
@@ -84,9 +81,7 @@ class Test extends React.Component {
       .catch(err => console.error(err));
   };
 
-  formattedSeconds = sec => {
-    return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
-  };
+  formattedSeconds = sec => Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
 
   render() {
     const test = this.props.test.map((x, i) => (

@@ -1,71 +1,62 @@
 import React, { Component } from "react";
+import { omit } from "ramda";
+import shortid from "shortid";
 import Toggle from "react-toggle";
 import "./Profile.css";
 
 // import EducationInput from './EducationInput/EducationInput';
 
+const initialState = {
+  school: "",
+  study: "",
+  degree: "",
+  startTime: "",
+  endTime: "",
+  finishedSchool: false,
+  educationFormMounted: false
+};
+
 class EducationProfile extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      educationKey: 1,
-      addEducation: false,
-      finishedSchool: false
-    };
+    this.state = initialState;
   }
-  keyValueHandler = () => {
-    let num = this.state.educationKey;
-    num += 1;
-    this.setState({ educationKey: num });
-    return this.state.educationKey;
+
+  saveEducationHandler = () => {
+    this.props.addEducation({
+      id: shortid.generate(),
+      ...omit(["educationFormMounted"], this.state)
+    });
+    this.setState(initialState);
   };
 
-  submitEducationHandler = event => {
-    event.preventDefault();
-    let school = this.refs.school.value;
-    let study = this.refs.study.value;
-    let degree = this.refs.degree.value;
-    let startTime = this.refs.startTime.value;
-    let endTime = this.refs.endTime.value;
-    let finishedSchool = this.state.finishedSchool;
-    let educationObj = {
-      key: this.keyValueHandler(),
-      school,
-      study,
-      degree,
-      startTime,
-      endTime,
-      finishedSchool
-    };
-    this.props.addEducation(educationObj);
-    this.setState({ addEducation: false, finishedSchool: false });
-  };
+  finishedSchoolHandler = () =>
+    this.setState(prevState => ({
+      finishedSchool: !prevState.finishedSchool
+    }));
 
-  finishedSchoolHandler = () => {
-    this.setState({ finishedSchool: !this.state.finishedSchool });
-  };
+  toggleEducationForm = () =>
+    this.setState(prevState => ({
+      educationFormMounted: !prevState.educationFormMounted 
+    }));
 
-  cancelEducationHandler = () => {
-    this.setState({ addEducation: false });
-  };
-
-  addEducationHandler = event => {
-    event.preventDefault();
-    this.setState({ addEducation: true });
-  };
+  handleChange = e =>
+    this.setState({
+      [e.target.name]: e.target.value
+    });
 
   render() {
     let educationForm = null;
-    if (this.state.addEducation) {
+    if (this.state.educationFormMounted) {
       educationForm = (
         <div className="profileinput">
           <div className="form-group" style={{ paddingTop: "10px" }}>
             <input
-              ref="school"
+              name="school"
               className="form-control form-control-lg"
               type="text"
               placeholder="School (required)"
-              onChange={this.props.handleChange}
+              onChange={this.handleChange}
             />
             <small className="form-text text-muted">
               Please provide the school's name that you attended
@@ -73,11 +64,11 @@ class EducationProfile extends Component {
           </div>
           <div className="form-group">
             <input
-              ref="study"
+              name="study"
               className="form-control form-control-lg"
               type="text"
               placeholder="Field of study"
-              onChange={this.props.handleChange}
+              onChange={this.handleChange}
             />
             <small className="form-text text-muted">
               Please provide the field of study
@@ -86,11 +77,11 @@ class EducationProfile extends Component {
           <br />
           <div className="form-group">
             <input
-              ref="degree"
+              name="degree"
               className="form-control form-control-lg"
               type="text"
               placeholder="Degree"
-              onChange={this.props.handleChange}
+              onChange={this.handleChange}
             />
             <small className="form-text text-muted">
               What kind of degree was obtained
@@ -102,9 +93,9 @@ class EducationProfile extends Component {
                 <input
                   type="date"
                   className="form-control form-control-lg"
-                  onChange={this.props.handleChange}
+                  onChange={this.handleChange}
                   defaultValue="yyyy-MM-dd"
-                  ref="startTime"
+                  name="startTime"
                   min="1955-01-01"
                   max="2090-12-31"
                 />
@@ -116,9 +107,9 @@ class EducationProfile extends Component {
                 <input
                   type="date"
                   className="form-control form-control-lg"
-                  onChange={this.props.handleChange}
+                  onChange={this.handleChange}
                   defaultValue="yyyy-MM-dd"
-                  ref="endTime"
+                  name="endTime"
                   min="1955-01-01"
                   max="2090-12-31"
                 />
@@ -138,8 +129,8 @@ class EducationProfile extends Component {
             <br />
           </div>
           <span>
-            <button onClick={this.cancelEducationHandler}>Cancel</button>
-            <button onClick={this.submitEducationHandler}>Complete</button>
+            <button type="button" onClick={this.toggleEducationForm}>Cancel</button>
+            <button type="button" onClick={this.saveEducationHandler}>Complete</button>
           </span>
         </div>
       );
@@ -150,7 +141,7 @@ class EducationProfile extends Component {
           <label>Education</label>
         </div>
         {this.props.education.map(edu => (
-          <div className="completed" key={edu.key}>
+          <div className="completed" key={edu.id}>
             <p>
               <strong>School: </strong>
               {edu.school}
@@ -170,17 +161,17 @@ class EducationProfile extends Component {
             </p>
             <p>
               <strong>Education Completed: </strong>
-              {this.state.finishedSchool ? "Yes" : "No"}
+              {edu.finishedSchool ? "Yes" : "No"}
             </p>
-            <button onClick={this.props.removeEducation(edu)}>
+            <button onClick={() => this.props.removeEducation(edu.id)}>
               Delete
             </button>
           </div>
         ))}
         {educationForm}
         <div style={{ padding: "15px" }}>
-          {this.state.addEducation ? null : (
-            <button onClick={this.addEducationHandler.bind(this)}>
+          {this.state.educationFormMounted ? null : (
+            <button type="button" onClick={this.toggleEducationForm}>
               Add education
             </button>
           )}

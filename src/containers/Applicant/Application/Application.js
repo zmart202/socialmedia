@@ -1,11 +1,13 @@
 import React, { Component } from "react";
 import _ from "lodash";
+import Toggle from "react-toggle";
 
 import ApplicationDetails from "./Input/ApplicationDetails";
 import EducationProfile from "./Input/Profile/EducationProfile";
 import PersonalInformation from "./Input/PersonalInformation";
 import ExperienceProfile from "./Input/Profile/ExperienceProfile";
-import Toggle from "react-toggle";
+import Spinner from "../../../components/UI/Spinner/Spinner";
+
 import "./Application.css";
 import "./Input/PersonalInformation.css";
 
@@ -13,6 +15,9 @@ class Application extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoading: false,
+      isError: false,
+      errorMsg: "",
       firstName: "",
       lastName: "",
       address: "",
@@ -34,11 +39,6 @@ class Application extends Component {
 
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
-    this.addEducation = this.addEducation.bind(this);
-    this.removeEducation = this.removeEducation.bind(this);
   }
 
   handleSubmit = event => {
@@ -55,7 +55,10 @@ class Application extends Component {
         ..._.omit(this.state, [
           "addEducation",
           "educationKey",
-          "educationFormMounted"
+          "educationFormMounted",
+          "isLoading",
+          "isError",
+          "errorMsg"
         ])
       })
     };
@@ -63,49 +66,55 @@ class Application extends Component {
       .then(res => res.json())
       .then(data => {
         console.log(data);
+        if (!data.success) {
+          return this.setState({
+            isError: true,
+            errorMsg: data.msg
+          });
+        }
+
         this.props.history.push(`/applicant/${data.applicantId}`);
       })
       .catch(err => console.log(err));
   };
 
-  handleChange(event) {
-    const value = event.target.value;
-    const name = event.target.name;
+  handleChange = e =>
     this.setState({
-      [name]: value
+      [e.target.name]: e.target.value
     });
-  }
 
-  over18Handler = () => {
+  over18Handler = () =>
     this.setState({ over18: !this.state.over18 });
-  };
 
-  legalHandler = () => {
+  legalHandler = () =>
     this.setState({ legal: !this.state.legal });
-  };
 
-  toggleEducationForm() {
+  toggleEducationForm = () =>
     this.setState({
       educationFormMounted: !this.state.educationFormMounted
     });
-  }
 
-  addEducation(educationObj) {
+  addEducation = educationObj =>
     this.setState(prevState => ({
       education: prevState.education.concat(educationObj)
     }));
-  }
 
-  removeEducation(educationObj) {
-    const index = this.state.education.indexOf(educationObj);
+  removeEducation = id =>
     this.setState(prevState => ({
-      education: prevState.education.filter((x, i) =>
-        i !== index
+      education: prevState.education.filter(x =>
+        x.id !== id
       )
     }));
-  }
 
   render() {
+    if (this.state.isError) {
+      return <p style={{ color: 'red' }}>{this.state.errorMsg}</p>;
+    }
+
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
+
     return (
       <div className="Form">
         <h3 className="applicationheader">Application Form</h3>
