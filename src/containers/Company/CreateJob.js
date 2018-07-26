@@ -2,6 +2,8 @@ import React, { Component } from "react";
 import hat from "hat";
 
 import Spinner from "../../components/UI/Spinner/Spinner";
+import TextAreaFieldGroup from "../../components/UI/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../components/UI/Form/TextFieldGroup";
 
 class CreateJob extends Component {
   constructor(props) {
@@ -10,7 +12,8 @@ class CreateJob extends Component {
       isLoading: false,
       isError: false,
       title: "",
-      description: ""
+      description: "",
+      content: "Type description here..."
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -80,6 +83,14 @@ class CreateJob extends Component {
     );
   }
 
+  onBlur(evt) {
+    console.log("onBlur event called with event info: ", evt);
+  }
+
+  afterPaste(evt) {
+    console.log("afterPaste event called with event info: ", evt);
+  }
+
   render() {
     if (this.state.isLoading) {
       return (
@@ -100,15 +111,35 @@ class CreateJob extends Component {
     return (
       <div>
         <div>
-          <label htmlFor="title">Title:</label>
-          <input type="text" name="title" onChange={this.handleChange} />
+          <TextFieldGroup
+            type="text"
+            name="title"
+            onChange={this.handleChange}
+            info="What is the title of the position?"
+          />
         </div>
         <div>
-          <label htmlFor="description">Description:</label>
-          <textarea name="description" onChange={this.handleChange} />
+          <TextAreaFieldGroup
+            name="description"
+            onChange={this.handleChange}
+            info="What are the specifics of the job (ex. Description, Requirements, Benefits, etc)"
+          />
         </div>
-        <button onClick={this.handleSubmit}>Save</button>
-        <button type="button" onClick={this.props.toggleCreateJob}>
+        <button
+          style={{ color: "purple" }}
+          className="btn btn-light"
+          onClick={this.handleSubmit}
+        >
+          <i className="fas fa-check text-success mr-1" />
+          Save
+        </button>
+        <button
+          style={{ color: "purple" }}
+          className="btn btn-light"
+          type="button"
+          onClick={this.props.toggleCreateJob}
+        >
+          <i className="fas fa-ban text-success mr-1" />
           Cancel
         </button>
       </div>

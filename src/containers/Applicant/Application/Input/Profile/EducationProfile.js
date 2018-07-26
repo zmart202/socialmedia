@@ -3,6 +3,8 @@ import { omit } from "ramda";
 import shortid from "shortid";
 import Toggle from "react-toggle";
 import "./Profile.css";
+import TextAreaFieldGroup from "../../../../../components/UI/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../../../../components/UI/Form/TextFieldGroup";
 
 // import EducationInput from './EducationInput/EducationInput';
 
@@ -12,7 +14,10 @@ const initialState = {
   degree: "",
   startTime: "",
   endTime: "",
+  current: false,
   finishedSchool: false,
+  disabled: false,
+  description: "",
   educationFormMounted: false
 };
 
@@ -45,93 +50,112 @@ class EducationProfile extends Component {
       [e.target.name]: e.target.value
     });
 
+  onCheck = () =>
+    this.setState(prevState => ({
+      disabled: !prevState.disabled,
+      current: !prevState.current
+    }));
+
   render() {
-    let educationForm = null;
+    let educationForm = "";
+    let addEducationBtn = "";
     if (this.state.educationFormMounted) {
       educationForm = (
         <div className="profileinput">
           <div className="form-group" style={{ paddingTop: "10px" }}>
-            <input
+            <TextFieldGroup
               name="school"
-              className="form-control form-control-lg"
               type="text"
               placeholder="School (required)"
               onChange={this.handleChange}
+              info="Please provide the school's name that you attended"
             />
-            <small className="form-text text-muted">
-              Please provide the school's name that you attended
-            </small>
           </div>
           <div className="form-group">
-            <input
+            <TextFieldGroup
               name="study"
-              className="form-control form-control-lg"
               type="text"
-              placeholder="Field of study"
+              placeholder="Field Of Study"
               onChange={this.handleChange}
+              info="Please provide your field of study while attending this school"
             />
-            <small className="form-text text-muted">
-              Please provide the field of study
-            </small>
           </div>
           <br />
           <div className="form-group">
-            <input
+            <TextFieldGroup
               name="degree"
-              className="form-control form-control-lg"
               type="text"
-              placeholder="Degree"
+              placeholder="Degree or Certificate"
               onChange={this.handleChange}
+              info="What kind of degree was obtained"
             />
-            <small className="form-text text-muted">
-              What kind of degree was obtained
-            </small>
           </div>
           <div className="form-group">
-            <span>
-              <div>
+            <div>
+              <TextFieldGroup
+                name="startTime"
+                type="date"
+                value={this.state.startTime}
+                onChange={this.handleChange}
+                info="What was the date that you began your education at this institution"
+              />
+            </div>
+            <br />
+            <div className="form-group">
+              <TextFieldGroup
+                name="endTime"
+                type="date"
+                value={this.state.endTime}
+                onChange={this.handleChange}
+                info="What was the date on which your education from this instituttion ended"
+                disabled={this.state.disabled ? "disabled" : ""}
+              />
+              <div className="form-check md-4">
                 <input
-                  type="date"
-                  className="form-control form-control-lg"
-                  onChange={this.handleChange}
-                  defaultValue="yyyy-MM-dd"
-                  name="startTime"
-                  min="1955-01-01"
-                  max="2090-12-31"
+                  type="checkbox"
+                  className="form-check-input"
+                  name="current"
+                  value={this.state.current}
+                  checked={this.state.current}
+                  onChange={this.onCheck}
+                  id="current"
                 />
-                <small className="form-text text-muted">Start Date</small>
+                <label htmlFor="current" className="form-check-label">
+                  Current School
+                </label>
+                <TextAreaFieldGroup
+                  placeholder="Program Description"
+                  name="description"
+                  value={this.state.description}
+                  onChange={this.handleChange}
+                  info="Tell us about the program you were in"
+                />
               </div>
               <br />
-
-              <div className="form-group">
-                <input
-                  type="date"
-                  className="form-control form-control-lg"
-                  onChange={this.handleChange}
-                  defaultValue="yyyy-MM-dd"
-                  name="endTime"
-                  min="1955-01-01"
-                  max="2090-12-31"
-                />
-                <small className="form-text text-muted">End Date</small>
-              </div>
-            </span>
-            <br />
-            <label className="react-toggle" style={{ padding: "20px 0px" }}>
-              <span style={{ padding: "10px" }}>
-                Did you complete your education?
-              </span>
-              <Toggle
-                defaultChecked={this.state.finishedSchool}
-                onChange={this.finishedSchoolHandler}
-              />
-            </label>
-            <br />
+              {!this.state.current ? (
+                <label className="react-toggle" style={{ padding: "20px 0px" }}>
+                  <span style={{ padding: "10px" }}>
+                    Did you complete your education?
+                  </span>
+                  <Toggle
+                    defaultChecked={this.state.finishedSchool}
+                    onChange={this.finishedSchoolHandler}
+                  />
+                </label>
+              ) : null}
+              <br />
+            </div>
           </div>
           <span>
             <button type="button" onClick={this.toggleEducationForm}>Cancel</button>
             <button type="button" onClick={this.saveEducationHandler}>Complete</button>
           </span>
+        </div>
+      );
+    } else {
+      addEducationBtn = (
+        <div style={{ padding: "15px" }}>
+          <button onClick={this.toggleEducationForm}>Add Education</button>
         </div>
       );
     }
@@ -157,25 +181,25 @@ class EducationProfile extends Component {
             <p>
               <strong>From: </strong>
               {edu.startTime} <strong>To: </strong>
-              {edu.endTime}
+              {edu.current ? " Now" : edu.endTime}
             </p>
             <p>
-              <strong>Education Completed: </strong>
-              {edu.finishedSchool ? "Yes" : "No"}
+              <strong>Description: </strong>
+              {edu.description}
             </p>
+            {!edu.current ? (
+              <p>
+                <strong>Education Completed: </strong>
+                {edu.finishedSchool ? "Yes" : "No"}
+              </p>
+            ) : null}
             <button onClick={() => this.props.removeEducation(edu.id)}>
               Delete
             </button>
           </div>
         ))}
         {educationForm}
-        <div style={{ padding: "15px" }}>
-          {this.state.educationFormMounted ? null : (
-            <button type="button" onClick={this.toggleEducationForm}>
-              Add education
-            </button>
-          )}
-        </div>
+        {addEducationBtn}
       </div>
     );
   }

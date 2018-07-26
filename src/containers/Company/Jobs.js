@@ -7,6 +7,7 @@ import EditJob from "./EditJob";
 import DeleteJob from "./DeleteJob";
 import TestEditor from "./TestEditor/TestEditor";
 import Spinner from "../../components/UI/Spinner/Spinner";
+import Modal from "../../components/UI/Modal/Modal";
 import "./Jobs.css";
 
 class Jobs extends Component {
@@ -20,7 +21,10 @@ class Jobs extends Component {
       jobs: [],
       viewingJobId: null,
       createJobMounted: false,
-      editJobMounted: false
+      editJobMounted: false,
+      createJobModal: false,
+      editJobModal: false,
+      deleteJobModal: false
     };
 
     this.token = localStorage.getItem("token");
@@ -134,17 +138,20 @@ class Jobs extends Component {
 
   toggleCreateJob = () =>
     this.setState(prevState => ({
-      createJobMounted: !prevState.createJobMounted
+      createJobMounted: !prevState.createJobMounted,
+      createJobModal: !prevState.createJobModal
     }));
 
   toggleEditJob = () =>
     this.setState(prevState => ({
-      editJobMounted: !prevState.editJobMounted
+      editJobMounted: !prevState.editJobMounted,
+      editJobModal: !prevState.editJobModal
     }));
 
   toggleDeleteJob = () =>
     this.setState(prevState => ({
-      deleteJobMounted: !prevState.deleteJobMounted
+      deleteJobMounted: !prevState.deleteJobMounted,
+      deleteJobModal: !this.state.deleteJobModal
     }));
 
   handleChange = e =>
@@ -189,10 +196,16 @@ class Jobs extends Component {
           >
             {x.title}
             <button
-              style={{ float: "right" }}
+              style={{
+                float: "right",
+                color: "purple",
+                borderRadius: "10px",
+                cursor: "pointer"
+              }}
               type="button"
               onClick={this.toggleEditJob}
             >
+              <i className="far fa-edit text-success mr-1" />
               Edit
             </button>
           </div>
@@ -216,13 +229,21 @@ class Jobs extends Component {
     } else {
       createJobBtn = (
         <div>
-          <button type="button" onClick={this.toggleCreateJob}>
-            Add New Job
-          </button>
+          <center>
+            <button
+              style={{ color: "purple" }}
+              className="btn btn-light"
+              type="button"
+              onClick={this.toggleCreateJob}
+            >
+              <i className="fas fa-plus text-success mr-1" />
+              Add New Job
+            </button>
+          </center>
         </div>
       );
     }
-    
+
     let editJob = "";
     if (this.state.editJobMounted) {
       editJob = (
@@ -263,7 +284,13 @@ class Jobs extends Component {
       );
     } else {
       deleteJobBtn = (
-        <button type="button" onClick={this.toggleDeleteJob}>
+        <button
+          style={{ color: "purple" }}
+          className="btn btn-light"
+          type="button"
+          onClick={this.toggleDeleteJob}
+        >
+          <i className="fas fa-trash-alt text-success mr-1" />
           Delete Job
         </button>
       );
@@ -277,20 +304,64 @@ class Jobs extends Component {
       !this.state.createJobMounted &&
       !this.state.testEditorMounted
     ) {
-      description = this.state.jobs.find(x => x.id === this.state.viewingJobId).description;
+      description = this.state.jobs.find(x => x.id === this.state.viewingJobId)
+        .description;
 
       let url = `http://localhost:3000/job-description/${
         this.state.companyId
       }/${this.state.viewingJobId}`;
       copyLinkBtn = (
         <CopyToClipboard text={url}>
-          <button type="button">Copy Link to Application</button>
+          <button
+            style={{ color: "purple" }}
+            className="btn btn-light"
+            type="button"
+          >
+            <i className="fas fa-link text-success mr-1" />
+            Copy Link to Application
+          </button>
         </CopyToClipboard>
       );
     }
 
+    let editJobModal = null;
+
+    if (this.state.editJobModal) {
+      editJobModal = (
+        <Modal show={this.state.editJobModal} modalClosed={this.toggleEditJob}>
+          {editJob}
+        </Modal>
+      );
+    }
+
+    let createJobModal = null;
+    if (this.state.createJobModal) {
+      createJobModal = (
+        <Modal
+          show={this.state.createJobModal}
+          modalClosed={this.toggleCreateJob}
+        >
+          {createJob}
+        </Modal>
+      );
+    }
+
+    let deleteJobModal = null;
+    if (this.state.deleteJobModal) {
+      deleteJobModal = (
+        <Modal
+          show={this.state.deleteJobModal}
+          modalClosed={this.toggleDeleteJob}
+        >
+          {deleteJob}
+        </Modal>
+      );
+    }
+
     return (
-      <div>
+      <div className="jobeditor">
+        {editJobModal}
+        {createJobModal}
         <div className="row">
           <div className="column1">
             <h3>List of Jobs</h3>
@@ -299,18 +370,16 @@ class Jobs extends Component {
           </div>
           <div className="column2">
             <div className="joblink">
-              {copyLinkBtn} | {deleteJobBtn}
+              {copyLinkBtn}
+              {deleteJobBtn}
             </div>
             <div className="jobdescription">
-              {createJob}
               <h5 style={{ textDecoration: "underline" }}>Job Description</h5>
               <p>
                 <em>{description}</em>
               </p>
             </div>
-            {editJob}
-            <div />
-            {deleteJob}
+            {deleteJobModal}
             {testEditor}
           </div>
         </div>

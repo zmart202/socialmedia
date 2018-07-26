@@ -82,35 +82,33 @@ class SubmittedApplication extends Component {
           </div>
         )) : "None") : "Unknown";
 
-    let workExperience = Object.hasOwnProperty(this.state.data, "workExperience") ?
-    (this.state.data.workExperience.length > 0 ?
-    this.state.data.workExperience.map(exp => {
-      return (
-        <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
-          <p>
-            <strong>Company Name:</strong> {exp.company}
-          </p>
-          <p>
-            <strong>Company Industry:</strong> {exp.industry}
-          </p>
-          <p>
-            <strong>Position Title:</strong> {exp.title}
-          </p>
-          <p>
-            <strong>Position Summary:</strong> {exp.summary}
-          </p>
-          <p>
-            <strong>Reason For Leaving:</strong> {exp.leaving}
-          </p>
-          <p>
-            <strong>Start Date:</strong> {exp.startTime}
-          </p>
-          <p>
-            <strong>End Date:</strong> {exp.endTime}
-          </p>
-        </div>
-      );
-    }) : "None") : "Unknown";
+    let workExperience = data.hasOwnProperty("workExperience") ?
+      (data.workExperience.length > 0 ?
+        data.workExperience.map(exp => (
+          <div key={exp.id} style={{ borderTop: "solid gray 2px" }}>
+            <p>
+              <strong>Company Name:</strong> {exp.company}
+            </p>
+            <p>
+              <strong>Company Industry:</strong> {exp.industry}
+            </p>
+            <p>
+              <strong>Position Title:</strong> {exp.title}
+            </p>
+            <p>
+              <strong>Position Summary:</strong> {exp.summary}
+            </p>
+            <p>
+              <strong>Reason For Leaving:</strong> {exp.leaving}
+            </p>
+            <p>
+              <strong>Start Date:</strong> {exp.startTime}
+            </p>
+            <p>
+              <strong>End Date:</strong> {exp.endTime}
+            </p>
+          </div>
+        )) : "None") : "Unknown";
     
     return (
       <div>

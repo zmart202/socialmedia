@@ -11,7 +11,7 @@ class Messaging extends Component {
         {
           id: 0,
           text: "how does this work",
-          reply: [
+          replies: [
             {
               id: 0,
               text: "this is how it works"
@@ -25,7 +25,7 @@ class Messaging extends Component {
         {
           id: 1,
           text: "can this software do this??",
-          reply: [
+          replies: [
             {
               id: 0,
               text: "not yet but we can start working on that now"
@@ -55,15 +55,12 @@ class Messaging extends Component {
     const newPost = {
       id: this.keyIdHandler(),
       text: this.state.text,
-      reply: []
+      replies: []
     };
 
-    this.setState(
-      prevState => ({
-        posts: [newPost].concat(prevState.posts)
-      }),
-      () => console.log(JSON.stringify(this.state.posts, null, 2))
-    );
+    this.setState(prevState => ({
+      posts: [newPost].concat(prevState.posts)
+    }));
   };
 
   render() {
@@ -83,7 +80,12 @@ class Messaging extends Component {
                     onChange={this.onChange}
                   />
                 </div>
-                <button type="submit" className="btn btn-success">
+                <button
+                  className="btn btn-light"
+                  style={{ color: "purple" }}
+                  type="submit"
+                >
+                  <i className="far fa-envelope text-success mr-1" />
                   Submit
                 </button>
               </form>

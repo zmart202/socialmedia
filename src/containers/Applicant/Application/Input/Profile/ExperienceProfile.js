@@ -1,51 +1,59 @@
 import React, { Component } from "react";
+import shortid from "shortid";
+import _ from "lodash";
 import "./Profile.css";
+import TextFieldGroup from "../../../../../components/UI/Form/TextFieldGroup";
+import TextAreaFieldGroup from "../../../../../components/UI/Form/TextAreaFieldGroup";
 // import EducationInput from './EducationInput/EducationInput';
+
+const initialState = {
+  experienceFormMounted: false,
+  company: "",
+  industry: "",
+  title: "",
+  startTime: "",
+  endTime: "",
+  current: false,
+  description: "",
+  leaving: "",
+  disabled: false
+};
 
 class ExperienceProfile extends Component {
   constructor(props) {
     super(props);
-    this.state = {
-      experienceKey: 1,
-      workExperience: [],
-      addExperience: false
-    };
+    this.state = initialState;
+
+    this.handleChange = this.handleChange.bind(this);
+    this.onCheck = this.onCheck.bind(this);
   }
-  keyValueHandler = () => {
-    let num = this.state.experienceKey;
-    num += 1;
-    this.setState({ educationKey: num });
-    return this.state.experienceKey;
+
+  handleChange = event => {
+    this.setState({ [event.target.name]: event.target.value });
+  };
+
+  onCheck = event => {
+    this.setState({
+      disabled: !this.state.disabled,
+      current: !this.state.current
+    });
   };
 
   submitExperienceHandler = event => {
     event.preventDefault();
-    let company = this.refs.company.value;
-    let industry = this.refs.industry.value;
-    let title = this.refs.title.value;
-    let summary = this.refs.summary.value;
-    let leaving = this.refs.leaving.value;
     let experienceObj = {
-      key: this.keyValueHandler(),
-      company,
-      industry,
-      title,
-      summary,
-      leaving
+      id: shortid.generate(),
+      ..._.omit(this.state, ["experienceFormMounted", "disabled"])
     };
-    this.setState({
-      workExperience: this.state.workExperience.concat(experienceObj)
-    });
-    this.setState({ addExperience: false });
+
+    this.props.addExperience(experienceObj);
+    this.setState(initialState);
   };
 
-  addExperienceHandler = event => {
-    event.preventDefault();
-    this.setState({ addExperience: true });
-  };
-
-  cancelExperienceHandler = () => {
-    this.setState({ addExperience: false });
+  toggleExperienceForm = () => {
+    this.setState(prevState => ({
+      experienceFormMounted: !prevState.experienceFormMounted
+    }));
   };
 
   deleteExperienceHandler = (exp, event) => {
@@ -57,112 +65,100 @@ class ExperienceProfile extends Component {
       workExperience
     });
   };
+
   render() {
     let experienceForm = null;
-    if (this.state.addExperience) {
+    if (this.state.experienceFormMounted) {
       experienceForm = (
         <div className="profileinput">
           <div className="form-group">
             <div style={{ paddingTop: "10px" }}>
-              <input
-                ref="company"
-                className="form-control form-control-lg"
+              <TextFieldGroup
+                name="company"
                 type="text"
                 placeholder="Company (required)"
-                onChange={this.props.handleChange}
+                onChange={this.handleChange}
+                info="Please provide the companies name that you worked for"
               />
-              <small className="form-text text-muted">
-                Please provide the companies name that you worked for
-              </small>
             </div>
           </div>
           <div className="form-group">
-            <input
-              ref="industry"
-              className="form-control form-control-lg"
+            <TextFieldGroup
+              name="industry"
               type="text"
               placeholder="Type of industry"
-              onChange={this.props.handleChange}
+              onChange={this.handleChange}
+              info="What category of industry does this company fall under"
             />
-            <small className="form-text text-muted">
-              What category of industry does this company fall under
-            </small>
           </div>
           <div className="form-group">
-            <input
-              ref="title"
-              className="form-control form-control-lg"
+            <TextFieldGroup
+              name="title"
               type="text"
               placeholder="Your title"
-              onChange={this.props.handleChange}
+              onChange={this.handleChange}
+              info="What was your job title"
             />
-            <small className="form-text text-muted">
-              What was your job title
-            </small>
-          </div>
-          <div className="form-group">
-            <textarea
-              ref="summary"
-              className="form-control form-control-lg"
-              type="text"
-              placeholder="Summary of what you did"
-              onChange={this.props.handleChange}
-            />
-            <small className="form-text text-muted">
-              Please provide a summary of what you did in a few sentences
-            </small>
-          </div>
-          <div className="form-group">
-            <textarea
-              ref="leaving"
-              className="form-control form-control-lg"
-              type="text"
-              placeholder="What were the reasons for leaving the job.."
-              onChange={this.props.handleChange}
-            />
-            <small className="form-text text-muted">
-              What was your reason for leaving
-            </small>
           </div>
           <span>
+            <h6>Start Date</h6>
             <div className="form-group">
-              <input
+              <TextFieldGroup
                 type="date"
-                id="start"
-                name="trip"
-                className="form-control form-control-lg"
-                ref="startTime"
-                defaultValue="YYYY-MM-DD"
-                onChange={this.props.handleChange}
-                min="1955-01-01"
-                max="2090-12-31"
+                name="startTime"
+                placeholder="Start Date"
+                value={this.state.startTime}
+                onChange={this.handleChange}
+                info="When did you start working for this company"
               />
-              <small className="form-text text-muted">
-                When did you start working for this company
-              </small>
             </div>
-
             <div className="form-group">
-              <input
+              <TextFieldGroup
                 type="date"
-                id="end"
-                name="trip"
-                className="form-control form-control-lg"
-                ref="endTime"
-                defaultValue="YYYY-MM-DD"
-                onChange={this.props.handleChange}
-                min="1955-01-01"
-                max="2090-12-31"
+                name="endTime"
+                placeholder="End Date"
+                value={this.state.endTime}
+                onChange={this.handleChange}
+                info="When did you stop working for this company"
+                disabled={this.state.current ? "disabled" : ""}
               />
-              <small className="form-text text-muted">
-                When did you stop working for this company
-              </small>
+            </div>
+            <div className="form-check md-4">
+              <input
+                type="checkbox"
+                className="form-check-input"
+                value={this.state.current}
+                checked={this.state.current}
+                onChange={this.onCheck}
+                id="current"
+              />
+              <label htmlFor="current" className="form-check-label">
+                Current job
+              </label>
+            </div>
+            <div className="form-group">
+              <TextAreaFieldGroup
+                name="description"
+                type="text"
+                placeholder="Description of what you did"
+                onChange={this.handleChange}
+                info="Please provide a description of what you did in a few sentences"
+              />
+            </div>
+            <div className="form-group">
+              <TextAreaFieldGroup
+                name="leaving"
+                type="text"
+                placeholder="What was the reaspon for leaving"
+                onChange={this.handleChange}
+                info="What was your reason for leaving"
+              />
             </div>
             <br />
           </span>
           <span>
-            <button onClick={this.cancelExperienceHandler}>Cancel</button>
-            <button onClick={this.submitExperienceHandler}>Complete</button>
+            <button type="button" onClick={this.toggleExperienceForm}>Cancel</button>
+            <button type="button" onClick={this.submitExperienceHandler}>Complete</button>
           </span>
         </div>
       );
@@ -172,8 +168,8 @@ class ExperienceProfile extends Component {
         <div className="subheader">
           <label>Employment History</label>
         </div>
-        {this.state.workExperience.map(exp => (
-          <div className="completed" key={exp.key}>
+        {this.props.workExperience.map(exp => (
+          <div className="completed" key={exp.id}>
             <p>
               <strong>Company: </strong>
               {exp.company}
@@ -190,17 +186,15 @@ class ExperienceProfile extends Component {
               <strong>Summary: </strong>
               {exp.summary}
             </p>
-            <button onClick={this.deleteExperienceHandler.bind(this, exp)}>
+            <button type="button" onClick={() => this.props.removeExperience(exp.id)}>
               Delete
             </button>
           </div>
         ))}
         {experienceForm}
         <div style={{ padding: "15px" }}>
-          {this.state.addExperience ? null : (
-            <button onClick={this.addExperienceHandler.bind(this)}>
-              Add experience
-            </button>
+          {this.state.experienceFormMounted ? null : (
+            <button type="button" onClick={this.toggleExperienceForm}>Add experience</button>
           )}
         </div>
       </div>

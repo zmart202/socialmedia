@@ -33,3 +33,7 @@
   color: purple;
   text-align: center;
 }
+
+.jobeditor {
+  z-index: 0;
+}

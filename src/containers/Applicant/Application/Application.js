@@ -31,10 +31,7 @@ class Application extends Component {
       coverLetter: "",
       salaryRequirements: "",
       over18: false,
-      legal: false,
-      educationFormMounted: false,
-      educationKey: 1,
-      addEducation: false
+      legal: false
     };
 
     this.companyId = props.match.params.companyId;
@@ -43,7 +40,6 @@ class Application extends Component {
 
   handleSubmit = event => {
     event.preventDefault();
-    console.log(this.state);
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -53,9 +49,6 @@ class Application extends Component {
         companyId: this.companyId,
         jobId: this.jobId,
         ..._.omit(this.state, [
-          "addEducation",
-          "educationKey",
-          "educationFormMounted",
           "isLoading",
           "isError",
           "errorMsg"
@@ -89,11 +82,6 @@ class Application extends Component {
   legalHandler = () =>
     this.setState({ legal: !this.state.legal });
 
-  toggleEducationForm = () =>
-    this.setState({
-      educationFormMounted: !this.state.educationFormMounted
-    });
-
   addEducation = educationObj =>
     this.setState(prevState => ({
       education: prevState.education.concat(educationObj)
@@ -101,9 +89,17 @@ class Application extends Component {
 
   removeEducation = id =>
     this.setState(prevState => ({
-      education: prevState.education.filter(x =>
-        x.id !== id
-      )
+      education: prevState.education.filter(x => x.id !== id)
+    }));
+
+  addExperience = experienceObj =>
+    this.setState(prevState => ({
+      workExperience: prevState.workExperience.concat(experienceObj)
+    }));
+
+  removeExperience = id =>
+    this.setState(prevState => ({
+      workExperience: prevState.workExperience.filter(x => x.id !== id)
     }));
 
   render() {
@@ -121,12 +117,16 @@ class Application extends Component {
         <form>
           <PersonalInformation handleChange={this.handleChange} />
           <EducationProfile
-            education={this.state.education}
-            handleChange={this.handleChange} 
             addEducation={this.addEducation}
             removeEducation={this.removeEducation}
+            education={this.state.education}
           />
-          <ExperienceProfile handleChange={this.handleChange} />
+          <ExperienceProfile
+            handleChange={this.handleChange}
+            workExperience={this.state.workExperience}
+            addExperience={this.addExperience}
+            removeExperience={this.removeExperience}
+          />
           <ApplicationDetails handleChange={this.handleChange} />
           <div className="personalinfo">
             <div className="bottomform">
