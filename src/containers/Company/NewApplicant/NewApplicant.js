@@ -69,6 +69,22 @@ class NewApplicant extends Component {
       });
     }
 
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "email"
+    ];
+
+    const isValid = requiredFields.reduce((acc, x) =>
+      (this.state[x].length > 0) && acc
+    , true);
+
+    if (!isValid) {
+      return this.setState({
+        errorMsg: "Please fill out all fields"
+      });
+    }
+
     const id = hat();
 
     const applicant = {

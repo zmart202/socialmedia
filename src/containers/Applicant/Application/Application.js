@@ -16,7 +16,6 @@ class Application extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      isError: false,
       errorMsg: "",
       firstName: "",
       lastName: "",
@@ -38,8 +37,28 @@ class Application extends Component {
     this.jobId = props.match.params.jobId;
   }
 
-  handleSubmit = event => {
-    event.preventDefault();
+  handleSubmit = () => {
+    const requiredFields = [
+      "firstName",
+      "lastName",
+      "address",
+      "city",
+      "state",
+      "zipCode",
+      "phone",
+      "email"
+    ];
+
+    const isValid = requiredFields.reduce((acc, x) =>
+      this.state[x].length > 0 && acc
+    , true);
+
+    if (!isValid) {
+      return this.setState({
+        errorMsg: "Please fill out all the required fields"
+      }, () => window.scrollTo(0, 0));
+    }
+
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -50,25 +69,29 @@ class Application extends Component {
         jobId: this.jobId,
         ..._.omit(this.state, [
           "isLoading",
-          "isError",
           "errorMsg"
         ])
       })
     };
-    fetch("http://localhost:4567/api/applicant/application", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
 
-        this.props.history.push(`/applicant/${data.applicantId}`);
-      })
-      .catch(err => console.log(err));
+    this.setState({
+      isLoading: true
+    }, () => {
+      fetch("http://localhost:4567/api/applicant/application", options)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (!data.success) {
+            return this.setState({
+              errorMsg: data.msg,
+              isLoading: false
+            }, () => window.scrollTo(0, 0));
+          }
+
+          this.props.history.push(`/applicant/${data.applicantId}`);
+        })
+        .catch(err => console.log(err))
+    });
   };
 
   handleChange = e =>
@@ -77,10 +100,14 @@ class Application extends Component {
     });
 
   over18Handler = () =>
-    this.setState({ over18: !this.state.over18 });
+    this.setState(prevState => ({
+      over18: !prevState.over18
+    }));
 
   legalHandler = () =>
-    this.setState({ legal: !this.state.legal });
+    this.setState(prevState => ({
+      legal: !prevState.legal
+    }));
 
   addEducation = educationObj =>
     this.setState(prevState => ({
@@ -103,10 +130,6 @@ class Application extends Component {
     }));
 
   render() {
-    if (this.state.isError) {
-      return <p style={{ color: 'red' }}>{this.state.errorMsg}</p>;
-    }
-
     if (this.state.isLoading) {
       return <Spinner />;
     }
@@ -115,6 +138,14 @@ class Application extends Component {
       <div className="Form">
         <h3 className="applicationheader">Application Form</h3>
         <form>
+          {
+            this.state.errorMsg.length > 0 ?
+              (
+                <div style={{ textAlign: 'center' }}>
+                  <p style={{ color: 'red' }}>{this.state.errorMsg}</p>
+                </div>
+              ) : ""
+          }
           <PersonalInformation handleChange={this.handleChange} />
           <EducationProfile
             addEducation={this.addEducation}
@@ -165,7 +196,7 @@ class Application extends Component {
               </div>
             </div>
             <div className="bottomform">
-              <button
+              <button type="button"
                 style={{ padding: "10px 30px", color: "purple" }}
                 onClick={this.handleSubmit}
               >

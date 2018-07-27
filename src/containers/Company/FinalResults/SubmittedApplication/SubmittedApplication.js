@@ -57,8 +57,8 @@ class SubmittedApplication extends Component {
     let isOver18 = data.hasOwnProperty("over18") ?
       (data.over18 ? "Yes" : "No") : "Unknown";
 
-    let isLegal = data.hasOwnProperty("isLegal") ?
-      (data.isLegal ? "Yes" : "No") : "Unknown";
+    let isLegal = data.hasOwnProperty("legal") ?
+      (data.legal ? "Yes" : "No") : "Unknown";
 
     let education = data.hasOwnProperty("education") ?
       (data.education.length > 0 ?

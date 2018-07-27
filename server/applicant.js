@@ -91,7 +91,10 @@ router.get("/auth/:id", (req, res) => {
       }
 
       if (applicant.completed) {
-        return res.json({ completed: true });
+        return res.json({
+          success: true,
+          completed: true
+        });
       }
 
       res.json({
