@@ -56,7 +56,22 @@ router.get("/job/:companyId/:id", (req, res) => {
       success: true,
       job: _.omit(job, "_id")
     });
-  }).catch(err => {
+
+    return Jobs.updateOne(
+      { id },
+      {
+        $inc: {
+          visitors: 1
+        }
+      }
+    );
+  })
+  .then(result => {
+    if (result.matchedCount === 0 || result.modifiedCount === 0) {
+      console.error(err);
+    }
+  })
+  .catch(err => {
     res.json({
       success: false,
       msg: err.message
@@ -81,7 +96,8 @@ router.post("/create-job", (req, res) => {
       description,
       companyId: authData.companyId,
       companyName: authData.companyName,
-      test: []
+      test: [],
+      visitors: 0
     })
   ).then(result => {
     if (result.insertedCount === 0) {

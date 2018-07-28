@@ -13,7 +13,7 @@ class Company extends Component {
       isLoading: true,
       isError: false,
       errorMsg: null,
-      applicants: [],
+      applicants: props.applicants,
       jobs: [],
       companyName: "",
       search: "",

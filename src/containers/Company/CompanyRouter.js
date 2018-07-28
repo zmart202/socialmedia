@@ -53,7 +53,8 @@ class CompanyRouter extends Component {
 		});
 	}
 
-	login = () => this.setState({ isLoggedIn: true });
+	login = () =>
+		this.setState({ isLoggedIn: true });
 
 	logout = () => {
 		localStorage.removeItem("token");
@@ -79,7 +80,7 @@ class CompanyRouter extends Component {
 								<Route exact path="/company" component={ Company } />
 								<Route path="/company/jobs" component={ Jobs } />
 								<Route path="/company/messaging" component={ Messaging } />
-								<Route path="/company/results/:ApplicantId" component={FinalResults} />
+								<Route path="/company/results/:ApplicantId" component={ FinalResults } />
 								<Route
 				          path="/company/application/:ApplicantId"
 				          component={SubmittedApplication}

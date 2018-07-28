@@ -14,19 +14,14 @@ class CompanyLogin extends Component {
       password: "",
       denied: false
     };
-
-    this.handleInput = this.handleInput.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleInput(e) {
+  handleInput = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
 
-  handleSubmit(e) {
-    e.preventDefault();
+  handleSubmit = () => {
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -78,6 +73,7 @@ class CompanyLogin extends Component {
         borderRadius: "5px"
       };
     }
+    
     if (this.state.isLoading) {
       return <Spinner />;
     }

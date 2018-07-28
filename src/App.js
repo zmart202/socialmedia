@@ -6,11 +6,13 @@ import Applicant from "./containers/Applicant/Applicant";
 import TestFinished from "./containers/Applicant/TestFinished/TestFinished";
 import JobDescript from "./containers/Applicant/JobDescript/JobDescript";
 import Application from "./containers/Applicant/Application/Application";
+import Home from "./containers/Home/Home";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
+        <Route exact path="/" component={Home} />
         <Route path="/applicant/:id" component={Applicant} />
         <Route path="/company" component={CompanyRouter} />
         <Route path="/test-finished" component={TestFinished} />

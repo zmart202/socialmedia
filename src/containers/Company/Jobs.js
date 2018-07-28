@@ -172,6 +172,11 @@ class Jobs extends Component {
       return <p>Error loading Jobs</p>;
     }
 
+    let {
+      jobs,
+      viewingJobId
+    } = this.state;
+
     let navbar = "";
     if (this.state.jobs.length > 0) {
       navbar = this.state.jobs.map(x => {
@@ -258,15 +263,17 @@ class Jobs extends Component {
     }
 
     let testEditor = "";
-    testEditor = (
-      <TestEditor
-        token={this.token}
-        job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
-        createQuestionInState={this.createQuestionInState}
-        editQuestionInState={this.editQuestionInState}
-        deleteQuestionInState={this.deleteQuestionInState}
-      />
-    );
+    if (this.state.jobs.length > 0) {
+      testEditor = (
+        <TestEditor
+          token={this.token}
+          job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
+          createQuestionInState={this.createQuestionInState}
+          editQuestionInState={this.editQuestionInState}
+          deleteQuestionInState={this.deleteQuestionInState}
+        />
+      );
+    }
 
     let deleteJob = "";
     let deleteJobBtn = "";
@@ -282,7 +289,7 @@ class Jobs extends Component {
           deleteJobInState={this.deleteJobInState}
         />
       );
-    } else {
+    } else if (this.state.jobs.length > 0) {
       deleteJobBtn = (
         <button
           style={{ color: "purple" }}
@@ -321,6 +328,17 @@ class Jobs extends Component {
             Copy Link to Application
           </button>
         </CopyToClipboard>
+      );
+    }
+
+    let visits = "";
+    if (this.state.viewingJobId) {
+      let numVisitors = jobs.find(x =>
+        x.id === viewingJobId
+      ).visitors;
+
+      visits = (
+        <p>This job has had {numVisitors} visitors so far</p>
       );
     }
 
@@ -370,6 +388,7 @@ class Jobs extends Component {
           </div>
           <div className="column2">
             <div className="joblink">
+              {visits}
               {copyLinkBtn}
               {deleteJobBtn}
             </div>
