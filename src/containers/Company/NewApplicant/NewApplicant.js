@@ -63,6 +63,8 @@ class NewApplicant extends Component {
   }
 
   createHandler = e => {
+    e.preventDefault();
+
     if (this.state.selectedJobId.length === 0) {
       return this.setState({
         errorMsg: "Please select a job"
@@ -120,7 +122,6 @@ class NewApplicant extends Component {
         }
 
         this.props.createApplicant(applicant);
-        this.props.toggleCreateApplicant();
       })
       .catch(err => {
         console.error(err);
