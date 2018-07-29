@@ -11,68 +11,34 @@ import SubmittedApplication from "./FinalResults/SubmittedApplication/SubmittedA
 import FinalResults from "./FinalResults/FinalResults";
 
 import Navbar from "../.././components/UI/layout/Navbar";
-import Spinner from "../../components/UI/Spinner/Spinner";
 
 class CompanyRouter extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isLoading: true,
-			isLoggedIn: false
+			isLoggedIn: localStorage.getItem("isLoggedIn")
 		};
-
-		this.token = localStorage.getItem("token");
 	}
 
-	componentDidMount() {
-		if (this.token === null) {
-			return this.setState({
-				isLoading: false
-			});
-		}
-
-		const options = {
-			headers: {
-				"Authorization": `Bearer ${this.token}`
-			}
-		};
-
-		fetch("http://localhost:4567/api/company/auth", options)
-		.then(res => res.json())
-		.then(data => {
-			console.log(data);
-			this.setState({
-				isLoading: false,
-				isLoggedIn: true
-			});
-		}).catch(err => {
-			console.error(err);
-			this.setState({
-				isLoading: false
-			});
-		});
-	}
-
-	login = () =>
-		this.setState({ isLoggedIn: true });
+	login = () => {
+		this.setState({ isLoggedIn: "true" });
+		localStorage.setItem("isLoggedIn", "true");
+	};
 
 	logout = () => {
+		this.setState({ isLoggedIn: "false" });
 		localStorage.removeItem("token");
-		this.setState({ isLoggedIn: false });
+		localStorage.setItem("isLoggedIn", "false");
 	};
 
 	render() {
-		const { isLoading, isLoggedIn } = this.state;
 		const { history } = this.props;
-
-		if (isLoading) {
-			return <Spinner />;
-		}
+		const { isLoggedIn } = this.state;
 
 		return (
 			<Router history={ history }>
 				{
-					isLoggedIn ?
+					isLoggedIn === "true" ?
 						(
 							<div>
 								<Navbar history={ history } logout={ this.logout } />
