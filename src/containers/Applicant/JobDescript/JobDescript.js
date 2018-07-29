@@ -72,11 +72,13 @@ class JobDescript extends Component {
 
     return (
       <div className="jobdescript">
-        <h1>{this.state.companyName}</h1>
-        <p>
-          Position being applied for - <strong>{this.state.title}</strong>
-        </p>
-        <h3>DESCRIPTION</h3>
+        <div className="descriptionTop">
+          <h3>{this.state.companyName}</h3>
+          <p>
+            Position being applied for - <strong>{this.state.title}</strong>
+          </p>
+        </div>
+        <h5>DESCRIPTION</h5>
         <p>{this.state.description}</p>
         <div style={{ padding: "10px" }}>
           <button

@@ -19,26 +19,29 @@ router.get("/jobs", (req, res) => {
   const token = bearer.split(" ")[1];
 
   let companyId, companyName;
-  jwt.verify(token, secret)
-  .then(authData => {
-    companyId = authData.companyId;
-    companyName = authData.companyName;
+  jwt
+    .verify(token, secret)
+    .then(authData => {
+      companyId = authData.companyId;
+      companyName = authData.companyName;
 
-    return Jobs.find({ companyId }).toArray();
-  }).then(jobs => {
-    res.json({
-      companyId,
-      companyName,
-      success: true,
-      jobs: jobs.map(x => _.omit(x, "_id"))
+      return Jobs.find({ companyId }).toArray();
+    })
+    .then(jobs => {
+      res.json({
+        companyId,
+        companyName,
+        success: true,
+        jobs: jobs.map(x => _.omit(x, "_id"))
+      });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
-    });
-    console.error(err);
-  });
 });
 
 router.get("/job/:companyId/:id", (req, res) => {
@@ -99,13 +102,15 @@ router.post("/create-job", (req, res) => {
       test: [],
       visitors: 0
     })
-  ).then(result => {
+  )
+  .then(result => {
     if (result.insertedCount === 0) {
       throw new Error("Could not insert Job");
     }
 
     res.json({ success: true });
-  }).catch(err => {
+  })
+  .catch(err => {
     res.json({
       success: false,
       msg: err.message
@@ -121,29 +126,32 @@ router.post("/edit-job", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret)
-  .then(authData => 
-    Jobs.updateOne(
-      { id },
-      {
-        $set: {
-          title,
-          description
+  jwt
+    .verify(token, secret)
+    .then(authData =>
+      Jobs.updateOne(
+        { id },
+        {
+          $set: {
+            title,
+            description
+          }
         }
-      }
+      )
     )
-  ).then(result => {
-    if (result.matchedCount === 0 || result.modifiedCount === 0) {
-      throw new Error(`Could not update job title with id ${id}`);
-    }
+    .then(result => {
+      if (result.matchedCount === 0 || result.modifiedCount === 0) {
+        throw new Error(`Could not update job title with id ${id}`);
+      }
 
-    res.json({ success: true });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
     });
-  });
 });
 
 router.post("/delete-job", (req, res) => {
@@ -154,22 +162,23 @@ router.post("/delete-job", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret)
-  .then(authData =>
-    Jobs.findOneAndDelete({ id })
-  ).then(result => {
-    if (result.ok !== 1) {
-      throw new Error(`Could not delete job with id ${id}`);
-    }
+  jwt
+    .verify(token, secret)
+    .then(authData => Jobs.findOneAndDelete({ id }))
+    .then(result => {
+      if (result.ok !== 1) {
+        throw new Error(`Could not delete job with id ${id}`);
+      }
 
-    res.json({ success: true });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
-    console.error(err);
-  });
 });
 
 router.post("/edit-test", (req, res) => {
@@ -180,29 +189,32 @@ router.post("/edit-test", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret)
-  .then(authData =>
-    Jobs.updateOne(
-      { id },
-      {
-        $set: {
-          test
+  jwt
+    .verify(token, secret)
+    .then(authData =>
+      Jobs.updateOne(
+        { id },
+        {
+          $set: {
+            test
+          }
         }
-      }
+      )
     )
-  ).then(result => {
-    if (result.matchedCount === 0 || result.modifiedCount === 0) {
-      throw new Error(`Could not edit test with id ${id}`);
-    }
+    .then(result => {
+      if (result.matchedCount === 0 || result.modifiedCount === 0) {
+        throw new Error(`Could not edit test with id ${id}`);
+      }
 
-    res.json({ success: true });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
-    console.error(err);
-  });
 });
 
 module.exports = router;

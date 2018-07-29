@@ -149,9 +149,7 @@ class Company extends Component {
         />
       );
     } else {
-      applicantList = (
-        <p>No applicants for this company yet.</p>
-      );
+      applicantList = <p>No applicants for this company yet.</p>;
     }
 
     return (

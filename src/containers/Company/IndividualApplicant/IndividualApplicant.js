@@ -31,6 +31,15 @@ class IndividualApplicant extends Component {
       lastName: this.refs.editLName.value
     };
 
+    if (
+      this.refs.editFName.value === this.props.applicant.firstName &&
+      this.refs.editLName.value === this.props.applicant.lastName
+    ) {
+      return this.setState({
+        isEditing: false
+      });
+    }
+
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`,
