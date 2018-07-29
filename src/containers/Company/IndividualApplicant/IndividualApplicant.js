@@ -30,6 +30,15 @@ class IndividualApplicant extends Component {
       return;
     }
 
+    if (
+      this.refs.editFName.value === this.props.applicant.firstName &&
+      this.refs.editLName.value === this.props.applicant.lastName
+    ) {
+      return this.setState({
+        isEditing: false
+      });
+    }
+
     const options = {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -54,11 +63,16 @@ class IndividualApplicant extends Component {
             isError: true
           });
         }
-        
+
         this.props.refreshApplicantList();
         this.setState({ isEditing: false });
       })
-      .catch(err => console.error(err));
+      .catch(err => {
+        console.error(err);
+        this.setState({
+          isError: true
+        });
+      });
   }
 
   completionHandler = () => {
@@ -101,7 +115,7 @@ class IndividualApplicant extends Component {
 
   render() {
     if (this.state.isError) {
-      return <p>Error editing applicant</p>
+      return <p>Error editing applicant</p>;
     }
 
     return (

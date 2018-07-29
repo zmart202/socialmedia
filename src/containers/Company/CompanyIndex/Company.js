@@ -97,34 +97,38 @@ class Company extends Component {
       })
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/remove-applicant", options)
-      .then(
-        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
-      )
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/company/remove-applicant", options)
+          .then(
+            res =>
+              res.status === 403 ? Promise.reject("Auth denied") : res.json()
+          )
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                isError: true,
+                errorMsg: data.msg
+              });
+            }
 
-        this.refreshApplicantList();
-      })
-      .catch(err => {
-        this.setState({
-          isLoading: false,
-          isError: true,
-          errorMsg: err.message
-        });
-        console.error(err)
-      });
-    });
+            this.refreshApplicantList();
+          })
+          .catch(err => {
+            this.setState({
+              isLoading: false,
+              isError: true,
+              errorMsg: err.message
+            });
+            console.error(err);
+          });
+      }
+    );
   };
 
   generateTokenHandler = () => {
@@ -161,32 +165,35 @@ class Company extends Component {
       })
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/create-applicant", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/company/create-applicant", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                isError: true,
+                errorMsg: data.msg
+              });
+            }
 
-        this.refreshApplicantList();
-      })
-      .catch(err => {
-        console.error(err);
-        this.setState({
-          isError: true,
-          isLoading: false,
-          errorMsg: err.message
-        });
-      });
-    });
+            this.refreshApplicantList();
+          })
+          .catch(err => {
+            console.error(err);
+            this.setState({
+              isError: true,
+              isLoading: false,
+              errorMsg: err.message
+            });
+          });
+      }
+    );
   }
 
   toggleCreateApplicant() {
@@ -246,17 +253,13 @@ class Company extends Component {
       applicantList = (
         <ApplicantList
           applicants={this.state.applicants}
-          deleteApplicantsHandler={this.deleteApplicantsHandler.bind(
-            this
-          )}
+          deleteApplicantsHandler={this.deleteApplicantsHandler.bind(this)}
           refreshApplicantList={this.refreshApplicantList.bind(this)}
           searchedApplicant={this.state.search}
         />
       );
     } else {
-      applicantList = (
-        <p>No applicants for this company yet.</p>
-      );
+      applicantList = <p>No applicants for this company yet.</p>;
     }
 
     return (
@@ -280,9 +283,7 @@ class Company extends Component {
               />
             </div>
             <ApplicantHeader />
-            <div className="CompanyApplicantList">
-              {applicantList}
-            </div>
+            <div className="CompanyApplicantList">{applicantList}</div>
           </div>
         </Aux>
       </div>

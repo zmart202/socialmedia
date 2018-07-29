@@ -212,7 +212,7 @@ class Jobs extends Component {
                 cursor: "pointer",
                 color: "green",
                 backgroundColor: "#def9c0",
-                paddingLeft: "10px"
+                paddingLeft: "5px"
               }
             : {
                 cursor: "pointer"
@@ -262,8 +262,7 @@ class Jobs extends Component {
         <div>
           <center>
             <button
-              style={{ color: "purple" }}
-              className="btn btn-light"
+              style={{ color: "purple", borderRadius: "5px" }}
               type="button"
               onClick={this.toggleCreateJob}
             >

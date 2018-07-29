@@ -139,6 +139,7 @@ class CreateQuestion extends Component {
               type="text"
               style={{ padding: "5px 10px" }}
               name={k}
+              placeholder="Place option here"
               onChange={this.handleOptionChange}
               defaultValue={this.state.options[k]}
             />
