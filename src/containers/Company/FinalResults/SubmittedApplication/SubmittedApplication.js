@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ResultsHeader from "../ResultsHeader";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
-import CompanyNav from "../../CompanyNav/CompanyNav";
 import "./SubmittedApplication.css";
 
 class SubmittedApplication extends Component {
@@ -53,69 +52,66 @@ class SubmittedApplication extends Component {
       return <Spinner />;
     }
 
-    let isOver18 = Object.hasOwnProperty(this.state.data, "over18") ?
-    (this.state.data.over18 ? "Yes" : "No") : "Unknown";
+    let { data } = this.state;
 
-    let isLegal = Object.hasOwnProperty(this.state.data, "isLegal") ?
-    (this.state.data.isLegal ? "Yes" : "No") : "Unknown";
+    let isOver18 = data.hasOwnProperty("over18") ?
+      (data.over18 ? "Yes" : "No") : "Unknown";
 
-    let education = Object.hasOwnProperty(this.state.data, "education") ?
-    (this.state.data.education.length > 0 ?
-    this.state.data.education.map(edu => {
-      return (
-        <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
-          <p>
-            <strong>School:</strong> {edu.school}
-          </p>
-          <p>
-            <strong>Study:</strong> {edu.study}
-          </p>
-          <p>
-            <strong>Degree:</strong> {edu.degree}
-          </p>
-          <p>
-            <strong>Start Date:</strong> {edu.startTime}
-          </p>
-          <p>
-            <strong>End Date:</strong> {edu.endTime}
-          </p>
-        </div>
-      );
-    }) : "None") : "Unknown";
+    let isLegal = data.hasOwnProperty("legal") ?
+      (data.legal ? "Yes" : "No") : "Unknown";
 
-    let workExperience = Object.hasOwnProperty(this.state.data, "workExperience") ?
-    (this.state.data.workExperience.length > 0 ?
-    this.state.data.workExperience.map(exp => {
-      return (
-        <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
-          <p>
-            <strong>Company Name:</strong> {exp.company}
-          </p>
-          <p>
-            <strong>Company Industry:</strong> {exp.industry}
-          </p>
-          <p>
-            <strong>Position Title:</strong> {exp.title}
-          </p>
-          <p>
-            <strong>Position Summary:</strong> {exp.summary}
-          </p>
-          <p>
-            <strong>Reason For Leaving:</strong> {exp.leaving}
-          </p>
-          <p>
-            <strong>Start Date:</strong> {exp.startTime}
-          </p>
-          <p>
-            <strong>End Date:</strong> {exp.endTime}
-          </p>
-        </div>
-      );
-    }) : "None") : "Unknown";
+    let education = data.hasOwnProperty("education") ?
+      (data.education.length > 0 ?
+        this.state.data.education.map(edu => (
+          <div key={edu.id} style={{ borderTop: "solid gray 2px" }}>
+            <p>
+              <strong>School:</strong> {edu.school}
+            </p>
+            <p>
+              <strong>Study:</strong> {edu.study}
+            </p>
+            <p>
+              <strong>Degree:</strong> {edu.degree}
+            </p>
+            <p>
+              <strong>Start Date:</strong> {edu.startTime}
+            </p>
+            <p>
+              <strong>End Date:</strong> {edu.endTime}
+            </p>
+          </div>
+        )) : "None") : "Unknown";
+
+    let workExperience = data.hasOwnProperty("workExperience") ?
+      (data.workExperience.length > 0 ?
+        data.workExperience.map(exp => (
+          <div key={exp.id} style={{ borderTop: "solid gray 2px" }}>
+            <p>
+              <strong>Company Name:</strong> {exp.company}
+            </p>
+            <p>
+              <strong>Company Industry:</strong> {exp.industry}
+            </p>
+            <p>
+              <strong>Position Title:</strong> {exp.title}
+            </p>
+            <p>
+              <strong>Position Summary:</strong> {exp.summary}
+            </p>
+            <p>
+              <strong>Reason For Leaving:</strong> {exp.leaving}
+            </p>
+            <p>
+              <strong>Start Date:</strong> {exp.startTime}
+            </p>
+            <p>
+              <strong>End Date:</strong> {exp.endTime}
+            </p>
+          </div>
+        )) : "None") : "Unknown";
     
     return (
       <div>
-        <CompanyNav />
         <div className="resultsnav">
           <ResultsHeader ApplicantId={this.ApplicantId} />
         </div>

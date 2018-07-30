@@ -14,7 +14,7 @@ const mongoUrl = process.env.MONGO_URL;
 
 const app = express();
 
-MongoClient.connect(mongoUrl)
+MongoClient.connect(mongoUrl, { useNewUrlParser: true })
 .then(db => {
   app.locals.db = db.db("test");
 }).catch(err => console.error(err));
@@ -28,6 +28,7 @@ app.use((req, res, next) => {
 });
 
 app.use(jsonParser);
+
 app.use("/api/company", company);
 app.use("/api/job", job);
 app.use("/api/applicant", applicant);

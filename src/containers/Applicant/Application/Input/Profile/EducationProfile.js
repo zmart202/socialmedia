@@ -1,6 +1,6 @@
 import React, { Component } from "react";
+import { omit } from "ramda";
 import shortid from "shortid";
-import _ from "lodash";
 import Toggle from "react-toggle";
 import "./Profile.css";
 import TextAreaFieldGroup from "../../../../../components/UI/Form/TextAreaFieldGroup";
@@ -25,43 +25,36 @@ class EducationProfile extends Component {
   constructor(props) {
     super(props);
     this.state = initialState;
-
-    this.handleChange = this.handleChange.bind(this);
-    this.submitEducationHandler = this.submitEducationHandler.bind(this);
   }
 
-  toggleEducationForm = () => {
-    this.setState(prevState => ({
-      educationFormMounted: !prevState.educationFormMounted
-    }));
+  saveEducationHandler = () => {
+    this.props.addEducation({
+      id: shortid.generate(),
+      ...omit(["educationFormMounted"], this.state)
+    });
+    this.setState(initialState);
   };
+
+  finishedSchoolHandler = () =>
+    this.setState(prevState => ({
+      finishedSchool: !prevState.finishedSchool
+    }));
+
+  toggleEducationForm = () =>
+    this.setState(prevState => ({
+      educationFormMounted: !prevState.educationFormMounted 
+    }));
 
   handleChange = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
 
-  submitEducationHandler = event => {
-    event.preventDefault();
-    let educationObj = {
-      id: shortid.generate(),
-      ..._.omit(this.state, ["educationFormMounted", "disabled"])
-    };
-
-    this.props.addEducation(educationObj);
-    this.setState(initialState);
-  };
-
-  onCheck = event => {
-    this.setState({
-      disabled: !this.state.disabled,
-      current: !this.state.current
-    });
-  };
-
-  finishedSchoolHandler = () => {
-    this.setState({ finishedSchool: !this.state.finishedSchool });
-  };
+  onCheck = () =>
+    this.setState(prevState => ({
+      disabled: !prevState.disabled,
+      current: !prevState.current
+    }));
 
   render() {
     let educationForm = "";
@@ -154,10 +147,8 @@ class EducationProfile extends Component {
             </div>
           </div>
           <span>
-            <button type="button" onClick={this.toggleEducationForm}>
-              Cancel
-            </button>
-            <button onClick={this.submitEducationHandler}>Complete</button>
+            <button type="button" onClick={this.toggleEducationForm}>Cancel</button>
+            <button type="button" onClick={this.saveEducationHandler}>Complete</button>
           </span>
         </div>
       );

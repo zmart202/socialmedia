@@ -2,11 +2,6 @@ import React from "react";
 import "./Navbar.css";
 
 const Navbar = props => {
-  const logOut = () => {
-    localStorage.removeItem("token");
-    props.history.push("/");
-  };
-
   const goHome = () => {
     props.history.push("/company");
   }
@@ -17,7 +12,7 @@ const Navbar = props => {
         <h3>DecisionTyme</h3>
       </a>
       <div className="right-nav">
-        <a onClick={logOut}>Logout</a>
+        <a onClick={props.logout}>Logout</a>
       </div>
     </div>
   );

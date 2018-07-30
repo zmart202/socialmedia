@@ -157,8 +157,8 @@ class ExperienceProfile extends Component {
             <br />
           </span>
           <span>
-            <button onClick={this.toggleExperienceForm}>Cancel</button>
-            <button onClick={this.submitExperienceHandler}>Complete</button>
+            <button type="button" onClick={this.toggleExperienceForm}>Cancel</button>
+            <button type="button" onClick={this.submitExperienceHandler}>Complete</button>
           </span>
         </div>
       );
@@ -186,7 +186,7 @@ class ExperienceProfile extends Component {
               <strong>Summary: </strong>
               {exp.summary}
             </p>
-            <button onClick={() => this.props.removeExperience(exp.id)}>
+            <button type="button" onClick={() => this.props.removeExperience(exp.id)}>
               Delete
             </button>
           </div>
@@ -194,7 +194,7 @@ class ExperienceProfile extends Component {
         {experienceForm}
         <div style={{ padding: "15px" }}>
           {this.state.experienceFormMounted ? null : (
-            <button onClick={this.toggleExperienceForm}>Add experience</button>
+            <button type="button" onClick={this.toggleExperienceForm}>Add experience</button>
           )}
         </div>
       </div>

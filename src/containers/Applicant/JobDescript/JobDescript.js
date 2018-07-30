@@ -56,7 +56,7 @@ class JobDescript extends Component {
   }
 
   routeToApplication() {
-    this.props.history.push(`/application/${this.companyId}/${this.jobId}`);
+    this.props.history.push(`/application/${this.state.companyName}/${this.companyId}/${this.jobId}`);
   }
 
   render() {

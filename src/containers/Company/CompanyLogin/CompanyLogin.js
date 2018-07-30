@@ -1,10 +1,10 @@
 import React, { Component } from "react";
 
-import Spinner from "../../components/UI/Spinner/Spinner";
+import Spinner from "../../../components/UI/Spinner/Spinner";
 
-import "./Login.css";
+import "./CompanyLogin.css";
 
-class Login extends Component {
+class CompanyLogin extends Component {
   constructor() {
     super();
     this.state = {
@@ -14,55 +14,14 @@ class Login extends Component {
       password: "",
       denied: false
     };
-
-    this.handleInput = this.handleInput.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  componentDidMount() {
-    const token = localStorage.getItem("token");
-    if (token === null) {
-      return;
-    }
-
-    const options = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-
-    this.setState(
-      {
-        isLoading: true
-      },
-      () => {
-        fetch("http://localhost:4567/api/company/auth", options)
-          .then(res => {
-            if (res.status === 403) {
-              return Promise.reject(new Error("Auth denied"));
-            } else {
-              return res.json();
-            }
-          })
-          .then(_ => {
-            this.props.history.push("/company");
-          })
-          .catch(err => {
-            console.error(err);
-            this.setState({ isLoading: false });
-          });
-      }
-    );
-  }
-
-  handleInput(e) {
+  handleInput = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
 
-  handleSubmit(e) {
-    e.preventDefault();
+  handleSubmit = () => {
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -79,7 +38,7 @@ class Login extends Component {
         isLoading: true
       },
       () => {
-        fetch(`http://localhost:4567/api/company/login`, options)
+        fetch("http://localhost:4567/api/company/login", options)
           .then(res => {
             if (res.status === 403) {
               this.setState({ denied: true });
@@ -89,8 +48,9 @@ class Login extends Component {
             }
           })
           .then(data => {
+            console.log(data);
             localStorage.setItem("token", data.token);
-            this.props.history.push("/company");
+            this.props.login();
           })
           .catch(err => {
             console.error(err);
@@ -110,9 +70,10 @@ class Login extends Component {
         marginLeft: "10px",
         backgroundColor: "#d6d6d6",
         padding: "20px 190px 20px 20px",
-        borderRadius: "5px;"
+        borderRadius: "5px"
       };
     }
+    
     if (this.state.isLoading) {
       return <Spinner />;
     }
@@ -168,4 +129,4 @@ class Login extends Component {
   }
 }
 
-export default Login;
+export default CompanyLogin;

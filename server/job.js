@@ -50,25 +50,37 @@ router.get("/job/:companyId/:id", (req, res) => {
   const { companyId, id } = req.params;
 
   Jobs.findOne({ companyId, id })
-    .then(job => {
-      if (!job) {
-        throw new Error(
-          `Could not find job with id ${id} under companyId ${companyId}`
-        );
-      }
+  .then(job => {
+    if (!job) {
+      throw new Error(`Could not find job with id ${id} under companyId ${companyId}`);
+    }
 
-      res.json({
-        success: true,
-        job: _.omit(job, "_id")
-      });
-    })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
-      console.error(err);
+    res.json({
+      success: true,
+      job: _.omit(job, "_id")
     });
+
+    return Jobs.updateOne(
+      { id },
+      {
+        $inc: {
+          visitors: 1
+        }
+      }
+    );
+  })
+  .then(result => {
+    if (result.matchedCount === 0 || result.modifiedCount === 0) {
+      console.error(err);
+    }
+  })
+  .catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
+  });
 });
 
 router.post("/create-job", (req, res) => {
@@ -79,31 +91,31 @@ router.post("/create-job", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt
-    .verify(token, secret)
-    .then(authData =>
-      Jobs.insertOne({
-        id,
-        title,
-        description,
-        companyId: authData.companyId,
-        companyName: authData.companyName,
-        test: []
-      })
-    )
-    .then(result => {
-      if (result.insertedCount === 0) {
-        throw new Error("Could not insert Job");
-      }
-
-      res.json({ success: true });
+  jwt.verify(token, secret)
+  .then(authData => 
+    Jobs.insertOne({
+      id,
+      title,
+      description,
+      companyId: authData.companyId,
+      companyName: authData.companyName,
+      test: [],
+      visitors: 0
     })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
+  )
+  .then(result => {
+    if (result.insertedCount === 0) {
+      throw new Error("Could not insert Job");
+    }
+
+    res.json({ success: true });
+  })
+  .catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
     });
+  });
 });
 
 router.post("/edit-job", (req, res) => {

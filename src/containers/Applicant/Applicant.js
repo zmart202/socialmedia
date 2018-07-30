@@ -18,9 +18,6 @@ class Applicant extends Component {
       buttonClicked: false
     };
 
-    this.startTest = this.startTest.bind(this);
-    this.propagateError = this.propagateError.bind(this);
-    this.redirectToFinished = this.redirectToFinished.bind(this);
     this.id = this.props.match.params.id;
   }
 
@@ -35,6 +32,13 @@ class Applicant extends Component {
         return res.status === 403 ? Promise.reject("Auth denied") : res.json();
       })
       .then(data => {
+        console.log(data);
+        if (!data.success) {
+          return this.setState({
+            isError: true,
+          });
+        }
+
         if (data.completed) {
           this.setState({
             isLoading: false,
@@ -107,6 +111,10 @@ class Applicant extends Component {
   };
 
   render() {
+    if (this.state.isError) {
+      return <p>There was an error.</p>;
+    }
+
     if (this.state.isLoading) {
       return <Spinner />;
     }
@@ -117,10 +125,6 @@ class Applicant extends Component {
 
     if (this.state.isCompleted) {
       return <p>You have already completed the test!</p>;
-    }
-
-    if (this.state.isError) {
-      return <p>There was an error.</p>;
     }
 
     let pageChoice = !this.state.buttonClicked ? (

@@ -1,44 +1,26 @@
 import React, { Component } from "react";
 import { Route } from "react-router-dom";
-import Login from "./containers/Login/Login";
 import "./App.css";
-import Company from "./containers/Company/CompanyIndex/Company";
+import CompanyRouter from "./containers/Company/CompanyRouter";
 import Applicant from "./containers/Applicant/Applicant";
 import TestFinished from "./containers/Applicant/TestFinished/TestFinished";
-import FinalResults from "./containers/Company/FinalResults/FinalResults";
-import Jobs from "./containers/Company/Jobs";
-import TestEditor from "./containers/Company/TestEditor/TestEditor";
 import JobDescript from "./containers/Applicant/JobDescript/JobDescript";
 import Application from "./containers/Applicant/Application/Application";
-import SubmittedApplication from "./containers/Company/FinalResults/SubmittedApplication/SubmittedApplication";
-import Navbar from "./components/UI/layout/Navbar";
-import Messaging from "./containers/Company/Messaging/Messaging";
-// import Footer from "./components/UI/layout/Footer";
+import Home from "./containers/Home/Home";
 
 class App extends Component {
   render() {
     return (
       <div className="App">
-        <Navbar history={this.props.history} />
-        <Route path="/" exact component={Login} />
+        <Route exact path="/" component={Home} />
         <Route path="/applicant/:id" component={Applicant} />
-        <Route path="/company" exact component={Company} />
-        <Route path="/company/jobs" exact component={Jobs} />
-        <Route path="/company/test-editor" exact component={TestEditor} />
-        <Route path="/company/messaging" exact component={Messaging} />
-        <Route path="/company/results/:ApplicantId" component={FinalResults} />
-        <Route
-          path="/company/application/:ApplicantId"
-          exact
-          component={SubmittedApplication}
-        />
+        <Route path="/company" component={CompanyRouter} />
         <Route path="/test-finished" component={TestFinished} />
         <Route
           path="/job-description/:companyId/:jobId"
           component={JobDescript}
         />
-        <Route path="/application/:companyId/:jobId" component={Application} />
-        {/* <Footer /> */}
+        <Route path="/application/:companyName/:companyId/:jobId" component={Application} />
       </div>
     );
   }

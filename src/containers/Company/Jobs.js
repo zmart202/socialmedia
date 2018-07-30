@@ -7,7 +7,6 @@ import EditJob from "./EditJob";
 import DeleteJob from "./DeleteJob";
 import TestEditor from "./TestEditor/TestEditor";
 import Spinner from "../../components/UI/Spinner/Spinner";
-import CompanyNav from "./CompanyNav/CompanyNav";
 import Modal from "../../components/UI/Modal/Modal";
 import "./Jobs.css";
 
@@ -29,25 +28,9 @@ class Jobs extends Component {
     };
 
     this.token = localStorage.getItem("token");
-
-    this.setViewingJobId = this.setViewingJobId.bind(this);
-    this.createJobInState = this.createJobInState.bind(this);
-    this.editJobInState = this.editJobInState.bind(this);
-    this.deleteJobInState = this.deleteJobInState.bind(this);
-    this.createQuestionInState = this.createQuestionInState.bind(this);
-    this.editQuestionInState = this.editQuestionInState.bind(this);
-    this.deleteQuestionInState = this.deleteQuestionInState.bind(this);
-    this.toggleCreateJob = this.toggleCreateJob.bind(this);
-    this.toggleEditJob = this.toggleEditJob.bind(this);
-    this.toggleDeleteJob = this.toggleDeleteJob.bind(this);
-    this.handleChange = this.handleChange.bind(this);
   }
 
   componentDidMount() {
-    if (this.token === null) {
-      return this.props.history.push("/");
-    }
-
     const options = {
       headers: {
         Authorization: `Bearer ${this.token}`
@@ -83,20 +66,15 @@ class Jobs extends Component {
       });
   }
 
-  setViewingJobId(id) {
-    this.setState({
-      viewingJobId: id
-    });
-  }
+  setViewingJobId = id => this.setState({ viewingJobId: id });
 
-  createJobInState(job) {
+  createJobInState = job =>
     this.setState(prevState => ({
       jobs: prevState.jobs.concat(job),
       viewingJobId: job.id
     }));
-  }
 
-  editJobInState(job) {
+  editJobInState = job =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -109,9 +87,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  deleteJobInState(id) {
+  deleteJobInState = id =>
     this.setState(prevState => {
       let newJobs = prevState.jobs.filter(x => x.id !== id);
       return {
@@ -119,9 +96,8 @@ class Jobs extends Component {
         viewingJobId: newJobs.length > 0 ? _.sample(newJobs).id : null
       };
     });
-  }
 
-  createQuestionInState(q) {
+  createQuestionInState = q =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -133,9 +109,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  editQuestionInState(q) {
+  editQuestionInState = q =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -147,9 +122,8 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  deleteQuestionInState(id) {
+  deleteQuestionInState = id =>
     this.setState(prevState => ({
       jobs: prevState.jobs.map(
         x =>
@@ -161,34 +135,29 @@ class Jobs extends Component {
             : x
       )
     }));
-  }
 
-  toggleCreateJob() {
+  toggleCreateJob = () =>
     this.setState(prevState => ({
       createJobMounted: !prevState.createJobMounted,
       createJobModal: !prevState.createJobModal
     }));
-  }
 
-  toggleEditJob() {
+  toggleEditJob = () =>
     this.setState(prevState => ({
       editJobMounted: !prevState.editJobMounted,
       editJobModal: !prevState.editJobModal
     }));
-  }
 
-  toggleDeleteJob() {
+  toggleDeleteJob = () =>
     this.setState(prevState => ({
       deleteJobMounted: !prevState.deleteJobMounted,
       deleteJobModal: !this.state.deleteJobModal
     }));
-  }
 
-  handleChange(e) {
+  handleChange = e =>
     this.setState({
       [e.target.name]: e.target.value
     });
-  }
 
   render() {
     if (this.state.isLoading) {
@@ -202,6 +171,11 @@ class Jobs extends Component {
     if (this.state.isError) {
       return <p>Error loading Jobs</p>;
     }
+
+    let {
+      jobs,
+      viewingJobId
+    } = this.state;
 
     let navbar = "";
     if (this.state.jobs.length > 0) {
@@ -288,15 +262,17 @@ class Jobs extends Component {
     }
 
     let testEditor = "";
-    testEditor = (
-      <TestEditor
-        token={this.token}
-        job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
-        createQuestionInState={this.createQuestionInState}
-        editQuestionInState={this.editQuestionInState}
-        deleteQuestionInState={this.deleteQuestionInState}
-      />
-    );
+    if (this.state.jobs.length > 0) {
+      testEditor = (
+        <TestEditor
+          token={this.token}
+          job={this.state.jobs.find(x => x.id === this.state.viewingJobId)}
+          createQuestionInState={this.createQuestionInState}
+          editQuestionInState={this.editQuestionInState}
+          deleteQuestionInState={this.deleteQuestionInState}
+        />
+      );
+    }
 
     let deleteJob = "";
     let deleteJobBtn = "";
@@ -312,7 +288,7 @@ class Jobs extends Component {
           deleteJobInState={this.deleteJobInState}
         />
       );
-    } else {
+    } else if (this.state.jobs.length > 0) {
       deleteJobBtn = (
         <button
           style={{ color: "purple" }}
@@ -354,6 +330,17 @@ class Jobs extends Component {
       );
     }
 
+    let visits = "";
+    if (this.state.viewingJobId) {
+      let numVisitors = jobs.find(x =>
+        x.id === viewingJobId
+      ).visitors;
+
+      visits = (
+        <p>This job has had {numVisitors} visitors so far</p>
+      );
+    }
+
     let editJobModal = null;
 
     if (this.state.editJobModal) {
@@ -390,7 +377,6 @@ class Jobs extends Component {
 
     return (
       <div className="jobeditor">
-        <CompanyNav />
         {editJobModal}
         {createJobModal}
         <div className="row">
@@ -401,6 +387,7 @@ class Jobs extends Component {
           </div>
           <div className="column2">
             <div className="joblink">
+              {visits}
               {copyLinkBtn}
               {deleteJobBtn}
             </div>

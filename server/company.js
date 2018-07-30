@@ -209,51 +209,51 @@ router.post("/create-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  let companyId;
-  jwt
-    .verify(token, secret)
-    .then(authData => {
-      companyId = authData.companyId;
+  let companyId, companyName;
+  jwt.verify(token, secret)
+  .then(authData => {
+    companyId = authData.companyId;
+    companyName = authData.companyName;
 
-      return Jobs.findOne({
-        companyId,
-        id: req.body.jobId
-      });
-    })
-    .then(job => {
-      if (!job) {
-        throw new Error(
-          `Could not find job with id ${
-            req.body.jobId
-          } and companyId ${companyId}`
-        );
-      }
-
-      return Applicants.insertOne({
-        ...req.body,
-        companyId,
-        test: job.test,
-        completed: false,
-        timestamp: new Date(),
-        testTimestamp: null,
-        secondsElapsed: 0,
-        answers: null
-      });
-    })
-    .then(result => {
-      if (result.insertedCount === 0) {
-        throw new Error("Could not create applicant");
-      }
-
-      res.json({ success: true });
-    })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
-      console.error(err);
+    return Jobs.findOne({
+      companyId,
+      id: req.body.jobId
     });
+  })
+  .then(job => {
+    if (!job) {
+      throw new Error(
+        `Could not find job with id ${
+          req.body.jobId
+        } and companyId ${companyId}`
+      );
+    }
+    return Applicants.insertOne({
+      ...req.body,
+      companyId,
+      companyName,
+      test: job.test,
+      completed: false,
+      timestamp: new Date(),
+      testTimestamp: null,
+      secondsElapsed: 0,
+      answers: null
+    });
+  })
+  .then(result => {
+    if (result.insertedCount === 0) {
+      throw new Error("Could not create applicant");
+    }
+
+    res.json({ success: true });
+  })
+  .catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
+  });
 });
 
 router.post("/edit-applicant", (req, res) => {
@@ -299,23 +299,22 @@ router.post("/remove-applicant", (req, res) => {
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
+  
+  jwt.verify(token, secret)
+  .then(authData =>
+    Applicants.deleteOne({ email, id })
+  ).then(result => {
+    if (result.deletedCount === 0) {
+      throw new Error(`Could not remove applicant with id ${id}`);
+    }
 
-  jwt
-    .verify(token, secret)
-    .then(authData => Applicants.findOneAndDelete({ email, id }))
-    .then(result => {
-      if (result.ok !== 1) {
-        throw new Error("Could not remove applicant");
-      }
-
-      res.json({ success: true });
-    })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
+    res.json({ success: true });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
     });
+  });
 });
 
 router.get("/test-results/:applicantId", (req, res) => {
