@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import _ from "lodash";
+import { omit } from "ramda";
 import Toggle from "react-toggle";
 
 import ApplicationDetails from "./Input/ApplicationDetails";
@@ -17,6 +17,7 @@ class Application extends Component {
     this.state = {
       isLoading: false,
       errorMsg: "",
+      invalidFields: [],
       firstName: "",
       lastName: "",
       address: "",
@@ -39,7 +40,7 @@ class Application extends Component {
   }
 
   handleSubmit = () => {
-    const requiredFields = [
+    const invalidFields = [
       "firstName",
       "lastName",
       "address",
@@ -48,16 +49,13 @@ class Application extends Component {
       "zipCode",
       "phone",
       "email"
-    ];
+    ].filter(x => this.state[x].length === 0);
 
-    const isValid = requiredFields.reduce((acc, x) =>
-      this.state[x].length > 0 && acc
-    , true);
-
-    if (!isValid) {
+    if (invalidFields.length > 0) {
       return this.setState({
+        invalidFields,
         errorMsg: "Please fill out all the required fields"
-      }, () => window.scrollTo(0, 0));
+      }, window.scrollTo(0, 0));
     }
 
     const options = {
@@ -69,10 +67,11 @@ class Application extends Component {
         companyId: this.companyId,
         companyName: this.companyName,
         jobId: this.jobId,
-        ..._.omit(this.state, [
+        ...omit([
           "isLoading",
-          "errorMsg"
-        ])
+          "errorMsg",
+          "invalidFields"
+        ], this.state)
       })
     };
 
@@ -148,7 +147,7 @@ class Application extends Component {
                 </div>
               ) : ""
           }
-          <PersonalInformation handleChange={this.handleChange} />
+          <PersonalInformation invalidFields={this.state.invalidFields} handleChange={this.handleChange} />
           <EducationProfile
             addEducation={this.addEducation}
             removeEducation={this.removeEducation}

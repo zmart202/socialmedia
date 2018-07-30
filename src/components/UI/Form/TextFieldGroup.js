@@ -10,13 +10,20 @@ const TextFieldGroup = ({
   type,
   onChange,
   disabled,
-  defaultValue
+  defaultValue,
+  invalidField
 }) => {
   return (
     <div className="form-group">
       <input
         type={type}
         className="form-control form-control-lg"
+        style={
+          invalidField ?
+            {
+              border: '2px solid red'
+            } : {}
+        }
         placeholder={placeholder}
         name={name}
         value={value}
