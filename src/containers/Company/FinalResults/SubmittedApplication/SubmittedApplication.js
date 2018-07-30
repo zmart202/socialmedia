@@ -10,7 +10,7 @@ class SubmittedApplication extends Component {
     this.state = {
       isLoading: true,
       isError: false,
-      data: {},
+      data: {}
     };
     this.ApplicantId = this.props.match.params.ApplicantId;
   }
@@ -53,66 +53,81 @@ class SubmittedApplication extends Component {
       return <Spinner />;
     }
 
-    let isOver18 = Object.hasOwnProperty(this.state.data, "over18") ?
-    (this.state.data.over18 ? "Yes" : "No") : "Unknown";
+    let applicant = this.state.data;
 
-    let isLegal = Object.hasOwnProperty(this.state.data, "isLegal") ?
-    (this.state.data.isLegal ? "Yes" : "No") : "Unknown";
+    let isOver18 = applicant.hasOwnProperty("over18")
+      ? applicant.over18
+        ? "Yes"
+        : "No"
+      : "Unknown";
 
-    let education = Object.hasOwnProperty(this.state.data, "education") ?
-    (this.state.data.education.length > 0 ?
-    this.state.data.education.map(edu => {
-      return (
-        <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
-          <p>
-            <strong>School:</strong> {edu.school}
-          </p>
-          <p>
-            <strong>Study:</strong> {edu.study}
-          </p>
-          <p>
-            <strong>Degree:</strong> {edu.degree}
-          </p>
-          <p>
-            <strong>Start Date:</strong> {edu.startTime}
-          </p>
-          <p>
-            <strong>End Date:</strong> {edu.endTime}
-          </p>
-        </div>
-      );
-    }) : "None") : "Unknown";
+    let isLegal = applicant.hasOwnProperty("legal")
+      ? applicant.legal
+        ? "Yes"
+        : "No"
+      : "Unknown";
 
-    let workExperience = Object.hasOwnProperty(this.state.data, "workExperience") ?
-    (this.state.data.workExperience.length > 0 ?
-    this.state.data.workExperience.map(exp => {
-      return (
-        <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
-          <p>
-            <strong>Company Name:</strong> {exp.company}
-          </p>
-          <p>
-            <strong>Company Industry:</strong> {exp.industry}
-          </p>
-          <p>
-            <strong>Position Title:</strong> {exp.title}
-          </p>
-          <p>
-            <strong>Position Summary:</strong> {exp.summary}
-          </p>
-          <p>
-            <strong>Reason For Leaving:</strong> {exp.leaving}
-          </p>
-          <p>
-            <strong>Start Date:</strong> {exp.startTime}
-          </p>
-          <p>
-            <strong>End Date:</strong> {exp.endTime}
-          </p>
-        </div>
-      );
-    }) : "None") : "Unknown";
-    
+    let education = Object.hasOwnProperty(this.state.data, "education")
+      ? this.state.data.education.length > 0
+        ? this.state.data.education.map(edu => {
+            return (
+              <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
+                <p>
+                  <strong>School:</strong> {edu.school}
+                </p>
+                <p>
+                  <strong>Study:</strong> {edu.study}
+                </p>
+                <p>
+                  <strong>Degree:</strong> {edu.degree}
+                </p>
+                <p>
+                  <strong>Start Date:</strong> {edu.startTime}
+                </p>
+                <p>
+                  <strong>End Date:</strong> {edu.endTime}
+                </p>
+              </div>
+            );
+          })
+        : "None"
+      : "Unknown";
+
+    let workExperience = Object.hasOwnProperty(
+      this.state.data,
+      "workExperience"
+    )
+      ? this.state.data.workExperience.length > 0
+        ? this.state.data.workExperience.map(exp => {
+            return (
+              <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
+                <p>
+                  <strong>Company Name:</strong> {exp.company}
+                </p>
+                <p>
+                  <strong>Company Industry:</strong> {exp.industry}
+                </p>
+                <p>
+                  <strong>Position Title:</strong> {exp.title}
+                </p>
+                <p>
+                  <strong>Position Summary:</strong> {exp.summary}
+                </p>
+                <p>
+                  <strong>Reason For Leaving:</strong> {exp.leaving}
+                </p>
+                <p>
+                  <strong>Start Date:</strong> {exp.startTime}
+                </p>
+                <p>
+                  <strong>End Date:</strong> {exp.endTime}
+                </p>
+              </div>
+            );
+          })
+        : "None"
+      : "Unknown";
+
     return (
       <div>
         <CompanyNav />
@@ -142,7 +157,8 @@ class SubmittedApplication extends Component {
               <strong>ZIP Code:</strong> {this.state.data.zipCode || "Unknown"}
             </p>
             <p>
-              <strong>Primary Contact:</strong> {this.state.data.phone || "Unknown"}
+              <strong>Primary Contact:</strong>{" "}
+              {this.state.data.phone || "Unknown"}
             </p>
             <p>
               <strong>Email:</strong> {this.state.data.email}
@@ -159,7 +175,8 @@ class SubmittedApplication extends Component {
           <div className="submittedapplication">
             <h3>Applicant Details</h3>
             <p>
-              <strong>Cover Letter:</strong> {this.state.data.coverLetter || "None"}
+              <strong>Cover Letter:</strong>{" "}
+              {this.state.data.coverLetter || "None"}
             </p>
             <p>
               <strong>Salary Requirements:</strong>{" "}

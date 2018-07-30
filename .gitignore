@@ -31,4 +31,4 @@ run-collMods.js
 
 mongo-client-tests.js
 
-.vscode
+.vscodesendgrid.env
