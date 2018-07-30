@@ -18,9 +18,6 @@ class Applicant extends Component {
       buttonClicked: false
     };
 
-    this.startTest = this.startTest.bind(this);
-    this.propagateError = this.propagateError.bind(this);
-    this.redirectToFinished = this.redirectToFinished.bind(this);
     this.id = this.props.match.params.id;
   }
 

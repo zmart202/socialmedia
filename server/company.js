@@ -209,10 +209,11 @@ router.post("/create-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  let companyId;
+  let companyId, companyName;
   jwt.verify(token, secret)
   .then(authData => {
     companyId = authData.companyId;
+    companyName = authData.companyName;
 
     return Jobs.findOne({
       companyId,
@@ -230,6 +231,7 @@ router.post("/create-applicant", (req, res) => {
     return Applicants.insertOne({
       ...req.body,
       companyId,
+      companyName,
       test: job.test,
       completed: false,
       timestamp: new Date(),

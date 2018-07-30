@@ -2,6 +2,7 @@
 
 const express = require("express");
 const hat = require("hat");
+const { omit } = require("ramda");
 
 const { hashPassword, comparePasswords } = require("./promisified-utils");
 
@@ -99,14 +100,7 @@ router.get("/auth/:id", (req, res) => {
 
       res.json({
         success: true,
-        id: applicant.id,
-        firstName: applicant.firstName,
-        lastName: applicant.lastName,
-        email: applicant.email,
-        companyId: applicant.companyId,
-        test: applicant.test,
-        completed: applicant.completed,
-        testTimestamp: applicant.testTimestamp
+        ...omit(["_id"], applicant)
       });
     }).catch(err => {
       res.json({

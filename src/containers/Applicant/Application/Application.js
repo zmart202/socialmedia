@@ -33,6 +33,7 @@ class Application extends Component {
       legal: false
     };
 
+    this.companyName = decodeURIComponent(props.match.params.companyName);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
   }
@@ -66,6 +67,7 @@ class Application extends Component {
       method: "POST",
       body: JSON.stringify({
         companyId: this.companyId,
+        companyName: this.companyName,
         jobId: this.jobId,
         ..._.omit(this.state, [
           "isLoading",

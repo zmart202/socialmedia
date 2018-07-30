@@ -20,7 +20,7 @@ class App extends Component {
           path="/job-description/:companyId/:jobId"
           component={JobDescript}
         />
-        <Route path="/application/:companyId/:jobId" component={Application} />
+        <Route path="/application/:companyName/:companyId/:jobId" component={Application} />
       </div>
     );
   }
