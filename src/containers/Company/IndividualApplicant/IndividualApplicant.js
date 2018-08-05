@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "./IndividualApplicant.css";
 import { Link } from "react-router-dom";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 
@@ -132,36 +131,6 @@ class IndividualApplicant extends Component {
     }
   };
 
-  viewApplicantResults = () => {
-    return (
-      <div>
-        {this.props.applicant.completed ? (
-          <strong>
-            <Link
-              style={{
-                cursor: "pointer",
-                color: "blue",
-                textDecoration: "underline"
-              }}
-              to={`/company/results/${this.props.applicant.id}`}
-            >
-              <div style={{ paddingBottom: "25px" }}>VIEW</div>
-            </Link>
-          </strong>
-        ) : null}
-      </div>
-    );
-  };
-
-  copyURLHandler = () => {
-    let URL = `http://localhost:3000/applicant/${this.props.applicant.id}`;
-    return (
-      <CopyToClipboard text={URL}>
-        <button>Click to Copy URL</button>
-      </CopyToClipboard>
-    );
-  };
-
   render() {
     if (this.state.isLoading) {
       return <Spinner />;
@@ -207,9 +176,23 @@ class IndividualApplicant extends Component {
             <p>{this.props.applicant.email}</p>
           </div>
           <div className="padding">
-            {!this.props.applicant.completed ? this.copyURLHandler() : null}
           </div>
-          <div className="padding">{this.viewApplicantResults()}</div>
+          <div className="padding">
+            <div>
+              <strong>
+                <Link
+                  style={{
+                    cursor: "pointer",
+                    color: "blue",
+                    textDecoration: "underline"
+                  }}
+                  to={`/company/applicant/${this.props.applicant.id}`}
+                >
+                  <div style={{ paddingBottom: "25px" }}>VIEW</div>
+                </Link>
+              </strong>
+            </div>
+          </div>
           <div className="padding">
             <ActionButtons
               isEditing={this.state.isEditing}

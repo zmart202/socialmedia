@@ -73,7 +73,7 @@ class CompanyLogin extends Component {
         borderRadius: "5px"
       };
     }
-    
+
     if (this.state.isLoading) {
       return <Spinner />;
     }

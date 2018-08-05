@@ -18,7 +18,7 @@ const TestIntro = props => {
       <div style={style.inner}>
         <p>
           Hey {props.applicant.firstName}! Thanks for applying through Decision Tyme!
-          The following exam has been custom designed by {props.applicant.companyName} for the position you are applying for.
+          The following exam has been custom designed by {props.companyName} for the position titled: {props.jobTitle}.
           Once clicking "START TEST NOW" you will be on the clock to
           see how long it takes you to respond to all of the questions. Good luck!!
         </p>

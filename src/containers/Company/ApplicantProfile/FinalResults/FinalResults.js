@@ -1,7 +1,6 @@
 import React from "react";
-import Aux from "../../../hoc/Aux/Aux";
-import Spinner from "../../../components/UI/Spinner/Spinner";
-import ResultsHeader from "./ResultsHeader";
+
+import Spinner from "../../../../components/UI/Spinner/Spinner";
 import "./FinalResults.css";
 
 class FinalResults extends React.Component {
@@ -11,10 +10,10 @@ class FinalResults extends React.Component {
       isLoading: true,
       isError: false,
       data: {},
-      applicants: [],
       showMultipleChoice: false
     };
-    this.ApplicantId = this.props.match.params.ApplicantId;
+    
+    this.applicantId = props.applicantId;
   }
 
   componentDidMount() {
@@ -34,7 +33,7 @@ class FinalResults extends React.Component {
     };
 
     fetch(
-      `http://localhost:4567/api/company/test-results/${this.ApplicantId}`,
+      `http://localhost:4567/api/company/test-results/${this.applicantId}`,
       options
     )
       .then(
@@ -64,16 +63,19 @@ class FinalResults extends React.Component {
   };
 
   render() {
-    let answerData = this.state.data.answerData;
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
+
+    const { answerData, completed } = this.state.data;
+
     let allMCResponses = [];
     let correctMCResponses = [];
     let ORQuestionsArray = [];
     let multipleChoiceQuestions = null;
     let style;
 
-    if (!answerData) {
-      return null;
-    } else {
+    if (answerData) {
       answerData.map(answer => {
         if (answer.type === "MULTIPLE_CHOICE") {
           allMCResponses.push(answer);
@@ -154,41 +156,52 @@ class FinalResults extends React.Component {
       allMCResponses.length
     }) of the multiple choice questions were answered correctly!`;
 
-    if (this.state.isLoading) {
-      return <Spinner />;
-    }
-
     return (
-      <Aux>
-        <div className="resultsheader">
-          <div className="resultsnav">
-            <ResultsHeader ApplicantId={this.ApplicantId} />
-          </div>
-          <h3 style={{ color: "purple" }} className="namedisplay">
-            <strong>
-              Test Results for {this.state.data.firstName}{" "}
-              {this.state.data.lastName}
-            </strong>
-          </h3>
-          <h4 style={{ color: "purple" }} className="timerdisplay">
-            Total amount of time taken is{" "}
-            <span style={{ color: "red", textDecoration: "underline" }}>
-              {this.formattedSeconds(this.state.data.secondsElapsed)}
-            </span>
-          </h4>
-        </div>
-        <div className="MCquestionlayout">
-          <h4 className="questionheader">Multiple Choice</h4>
-          {MCScore}
-          <br />
-          {multipleChoiceButton}
-          {multipleChoiceQuestions}
-        </div>
-        <div className="questionStyle">
-          <h4 className="questionheader">Open Response</h4>
-          {openResponseQuestions}
-        </div>
-      </Aux>
+      <div>
+          {
+            completed ?
+              (
+                <div>
+                  <div className="resultsheader">
+                    <h3 style={{ color: "purple" }} className="namedisplay">
+                      <strong>
+                        Test Results for {this.state.data.firstName}{" "}
+                        {this.state.data.lastName}
+                      </strong>
+                    </h3>
+                    <h4 style={{ color: "purple" }} className="timerdisplay">
+                      Total amount of time taken is{" "}
+                      <span style={{ color: "red", textDecoration: "underline" }}>
+                        {this.formattedSeconds(this.state.data.secondsElapsed)}
+                      </span>
+                    </h4>
+                  </div>
+                  <div className="MCquestionlayout">
+                    <h4 className="questionheader">Multiple Choice</h4>
+                    {MCScore}
+                    <br />
+                    {multipleChoiceButton}
+                    {multipleChoiceQuestions}
+                  </div>
+                  <div className="questionStyle">
+                    <h4 className="questionheader">Open Response</h4>
+                    {openResponseQuestions}
+                  </div>
+                </div>
+              ) : (
+                <div>
+                  <div className="resultsheader">
+                    <h3 style={{ color: "purple" }} className="namedisplay">
+                      <strong>
+                        {this.state.data.firstName}{" "}
+                        {this.state.data.lastName} has not yet completed the test
+                      </strong>
+                    </h3>
+                  </div>
+                </div>
+              )
+          }
+      </div>
     );
   }
 }

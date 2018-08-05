@@ -38,7 +38,26 @@ router.post("/application", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
   const Jobs = db.collection("jobs");
-  const { companyId, jobId } = req.body;
+  const {
+    companyId,
+    companyName,
+    jobId,
+    firstName,
+    lastName,
+    address,
+    city,
+    state,
+    zipCode,
+    phone,
+    email,
+    workExperience,
+    education,
+    coverLetter,
+    salaryRequirements,
+    over18,
+    legal
+  } = req.body;
+
   const applicantId = hat();
 
   let test;
@@ -51,7 +70,23 @@ router.post("/application", (req, res) => {
     test = job.test;
 
     return Applicants.insertOne({
-      ...req.body,
+      companyId,
+      companyName,
+      jobId,
+      firstName,
+      lastName,
+      address,
+      city,
+      state,
+      zipCode,
+      phone,
+      email,
+      workExperience,
+      education,
+      coverLetter,
+      salaryRequirements,
+      over18,
+      legal,
       test,
       id: applicantId,
       completed: false,
@@ -66,7 +101,6 @@ router.post("/application", (req, res) => {
     }
 
     res.json({
-      ...req.body,
       applicantId,
       test,
       success: true

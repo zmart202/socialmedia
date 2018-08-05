@@ -18,7 +18,9 @@ class Applicant extends Component {
       buttonClicked: false
     };
 
-    this.id = this.props.match.params.id;
+    this.companyName = props.match.params.companyName;
+    this.jobTitle = props.match.params.jobTitle;
+    this.id = props.match.params.id;
   }
 
   componentDidMount() {
@@ -89,13 +91,11 @@ class Applicant extends Component {
     this.props.history.push("/test-finished");
   };
 
-  propagateError = () => {
+  propagateError = () =>
     this.setState({ isError: true });
-  };
 
-  changePageHandler = () => {
+  changePageHandler = () =>
     this.setState({ buttonClicked: !this.state.buttonClicked });
-  };
 
   handleChange = e => {
     this.setState({
@@ -128,7 +128,12 @@ class Applicant extends Component {
     }
 
     let pageChoice = !this.state.buttonClicked ? (
-      <TestIntro applicant={this.state.applicant} startTest={this.startTest} />
+      <TestIntro
+        applicant={this.state.applicant}
+        startTest={this.startTest}
+        companyName={this.companyName}
+        jobTitle={this.jobTitle}
+      />
     ) : (
       <Test
         id={this.id}

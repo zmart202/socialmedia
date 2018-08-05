@@ -13,7 +13,7 @@ class Company extends Component {
       isLoading: true,
       isError: false,
       errorMsg: null,
-      applicants: props.applicants,
+      applicants: [],
       jobs: [],
       companyName: "",
       search: "",
@@ -85,7 +85,7 @@ class Company extends Component {
       createApplicantMounted: false
     }));
 
-  editApplicant = applicant => 
+  editApplicant = applicant =>
     this.setState(prevState => ({
       applicants: prevState.applicants.map(x =>
         x.id === applicant.id ?

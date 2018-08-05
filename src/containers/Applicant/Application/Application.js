@@ -35,6 +35,7 @@ class Application extends Component {
     };
 
     this.companyName = decodeURIComponent(props.match.params.companyName);
+    this.jobTitle = decodeURIComponent(props.match.params.jobTitle);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
   }
@@ -89,7 +90,9 @@ class Application extends Component {
             }, () => window.scrollTo(0, 0));
           }
 
-          this.props.history.push(`/applicant/${data.applicantId}`);
+          this.props.history.push(
+            `/applicant/${this.companyName}/${this.jobTitle}/${data.applicantId}`
+          );
         })
         .catch(err => console.log(err))
     });

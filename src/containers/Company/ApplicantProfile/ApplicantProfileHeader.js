@@ -1,7 +1,6 @@
 import React from "react";
-import { Link } from "react-router-dom";
 
-const resultsHeader = props => {
+const ApplicantProfileHeader = props => {
   // let style = {
   //   border: "solid purple 3px",
   //   padding: "5px",
@@ -12,26 +11,24 @@ const resultsHeader = props => {
   // };
   return (
     <div className="btn-group mb-4" role="group">
-      <Link
+      <a
         className="btn btn-light"
         style={{ color: "purple" }}
-        from={`/company/results/${props.ApplicantId}`}
-        to={`/company/application/${props.ApplicantId}`}
+        onClick={() => props.changePage("application")}
       >
         <i className="fas fa-user-circle text-success mr-1" />
         Application
-      </Link>
-      <Link
+      </a>
+      <a
         className="btn btn-light"
         style={{ color: "purple" }}
-        from={`/company/application/${props.ApplicantId}`}
-        to={`/company/results/${props.ApplicantId}`}
+        onClick={() => props.changePage("results")}
       >
         <i className="fas fa-stopwatch text-success mr-1" />
         Test Results
-      </Link>
+      </a>
     </div>
   );
 };
 
-export default resultsHeader;
+export default ApplicantProfileHeader;

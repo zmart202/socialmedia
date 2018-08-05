@@ -2,7 +2,6 @@ import React, { Component } from "react";
 import { Link } from "react-router-dom";
 
 import Aux from "../../../../hoc/Aux/Aux";
-import ResultsHeader from "../ResultsHeader";
 
 class TestResults extends Component {
   constructor(props) {
@@ -46,7 +45,6 @@ class TestResults extends Component {
 
     return (
       <Aux>
-        <ResultsHeader />
         <h3 style={{ color: "purple" }}>
           Results for {this.props.applicant.firstName}{" "}
           {this.props.applicant.lastName}
