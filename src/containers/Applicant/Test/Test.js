@@ -1,5 +1,4 @@
 import React from "react";
-import _ from "lodash";
 import "./Test.css";
 
 import Question from "../../../components/Question";
@@ -12,8 +11,6 @@ class Test extends React.Component {
       secondsElapsed: props.secondsElapsed
     };
 
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.incrementer = null;
   }
 
@@ -27,35 +24,34 @@ class Test extends React.Component {
     );
   }
 
-  handleChange = e => {
+  handleChange = e =>
     this.setState({
       answers: {
         ...this.state.answers,
         [e.target.name]: e.target.value
       }
     });
-  };
 
   handleSubmit = () => {
     clearInterval(this.incrementer);
 
-    const answerData = [];
-    for (let k in this.state.answers) {
-      let question = this.props.test.find(x => x.id === k);
-      if (question.type === "MULTIPLE_CHOICE") {
-        question.correct = false;
-        for (let x of question.options) {
-          if ((x.correct && x.answer) === this.state.answers[k]) {
-            question.correct = true;
-            break;
+    const answerData = this.props.test.map(q =>
+      this.state.answers[q.id] ?
+        (q.type === "MULTIPLE_CHOICE" ?
+          {
+            ...q,
+            correct: q.options.find(x =>
+              x.correct && (x.answer === this.state.answers[q.id])
+            ) ? true : false,
+            answer: this.state.answers[q.id]
+          } : {
+            ...q,
+            answer: this.state.answers[q.id]
+          }) : {
+            ...q,
+            answer: null
           }
-        }
-      }
-      answerData.push({
-        ..._.omit(question, "id"),
-        answer: this.state.answers[k]
-      });
-    }
+    );
 
     const options = {
       headers: {
@@ -73,10 +69,9 @@ class Test extends React.Component {
       `http://localhost:4567/api/applicant/test-results/${this.props.id}`,
       options
     )
-      .then(
-        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
-      )
+      .then(res => res.json())
       .then(data => {
+        console.log(data);
         if (!data.success) {
           return this.props.propagateError();
         }
@@ -86,9 +81,7 @@ class Test extends React.Component {
       .catch(err => console.error(err));
   };
 
-  formattedSeconds = sec => {
-    return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
-  };
+  formattedSeconds = sec => Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
 
   render() {
     const test = this.props.test.map((x, i) => (

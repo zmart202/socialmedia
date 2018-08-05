@@ -11,9 +11,9 @@ class CreateJob extends Component {
     this.state = {
       isLoading: false,
       isError: false,
+      errorMsg: "",
       title: "",
-      description: "",
-      content: "Type description here..."
+      description: ""
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -28,6 +28,15 @@ class CreateJob extends Component {
 
   handleSubmit(e) {
     e.preventDefault();
+
+    if (
+      ["title", "description"]
+      .find(x => this.state[x].length === 0)
+    ) {
+      return this.setState({
+        errorMsg: "Please include a job title and description"
+      });
+    }
 
     const id = hat();
     const job = {
@@ -83,14 +92,6 @@ class CreateJob extends Component {
     );
   }
 
-  onBlur(evt) {
-    console.log("onBlur event called with event info: ", evt);
-  }
-
-  afterPaste(evt) {
-    console.log("afterPaste event called with event info: ", evt);
-  }
-
   render() {
     if (this.state.isLoading) {
       return (
@@ -105,6 +106,13 @@ class CreateJob extends Component {
         <div>
           <p>Error creating Job</p>
         </div>
+      );
+    }
+
+    let errorMsg = "";
+    if (this.state.errorMsg.length > 0) {
+      errorMsg = (
+        <p style={{ color: 'red' }}>{this.state.errorMsg}</p>
       );
     }
 
@@ -125,6 +133,7 @@ class CreateJob extends Component {
             info="What are the specifics of the job (ex. Description, Requirements, Benefits, etc)"
           />
         </div>
+        {errorMsg}
         <button
           style={{ color: "purple" }}
           className="btn btn-light"

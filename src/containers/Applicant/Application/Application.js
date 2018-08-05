@@ -1,18 +1,24 @@
 import React, { Component } from "react";
-import _ from "lodash";
+import { omit } from "ramda";
+import Toggle from "react-toggle";
 
 import ApplicationDetails from "./Input/ApplicationDetails";
 import EducationProfile from "./Input/Profile/EducationProfile";
 import PersonalInformation from "./Input/PersonalInformation";
 import ExperienceProfile from "./Input/Profile/ExperienceProfile";
-import Toggle from "react-toggle";
+import Spinner from "../../../components/UI/Spinner/Spinner";
+
 import "./Application.css";
 import "./Input/PersonalInformation.css";
+import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
 
 class Application extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      isLoading: false,
+      errorMsg: "",
+      invalidFields: [],
       firstName: "",
       lastName: "",
       address: "",
@@ -25,21 +31,42 @@ class Application extends Component {
       education: [],
       coverLetter: "",
       salaryRequirements: "",
+      felonyForm: "",
+      selectedFile: null,
       over18: false,
       legal: false,
-      educationFormMounted: false,
-      educationKey: 1
+      felon: false
     };
 
+    this.companyName = decodeURIComponent(props.match.params.companyName);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
-
-    this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this);
+    this.fileSelectHandler = this.fileSelectHandler.bind(this);
+    this.uploadHandler = this.uploadHandler.bind(this);
   }
 
-  handleSubmit = event => {
-    event.preventDefault();
+  handleSubmit = () => {
+    const invalidFields = [
+      "firstName",
+      "lastName",
+      "address",
+      "city",
+      "state",
+      "zipCode",
+      "phone",
+      "email"
+    ].filter(x => this.state[x].length === 0);
+
+    if (invalidFields.length > 0) {
+      return this.setState(
+        {
+          invalidFields,
+          errorMsg: "Please fill out all the required fields"
+        },
+        window.scrollTo(0, 0)
+      );
+    }
+
     const options = {
       headers: {
         "Content-Type": "application/json"
@@ -47,38 +74,57 @@ class Application extends Component {
       method: "POST",
       body: JSON.stringify({
         companyId: this.companyId,
+        companyName: this.companyName,
         jobId: this.jobId,
-        ..._.omit(this.state, [
-          "addEducation",
-          "educationKey",
-          "educationFormMounted"
-        ])
+        ...omit(["isLoading", "errorMsg", "invalidFields"], this.state)
       })
     };
-    fetch("http://localhost:4567/api/applicant/application", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        this.props.history.push(`/applicant/${data.applicantId}`);
-      })
-      .catch(err => console.log(err));
+
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/applicant/application", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState(
+                {
+                  errorMsg: data.msg,
+                  isLoading: false
+                },
+                () => window.scrollTo(0, 0)
+              );
+            }
+
+            this.props.history.push(`/applicant/${data.applicantId}`);
+          })
+          .catch(err => console.log(err));
+      }
+    );
   };
 
-  handleChange(event) {
-    const value = event.target.value;
-    const name = event.target.name;
+  handleChange = e =>
     this.setState({
-      [name]: value
+      [e.target.name]: e.target.value
     });
-  }
 
-  over18Handler = () => {
-    this.setState({ over18: !this.state.over18 });
-  };
+  over18Handler = () =>
+    this.setState(prevState => ({
+      over18: !prevState.over18
+    }));
 
-  legalHandler = () => {
-    this.setState({ legal: !this.state.legal });
-  };
+  legalHandler = () =>
+    this.setState(prevState => ({
+      legal: !prevState.legal
+    }));
+
+  isFelonHandler = () =>
+    this.setState(prevState => ({
+      felon: !prevState.felon
+    }));
 
   addEducation = educationObj =>
     this.setState(prevState => ({
@@ -100,16 +146,51 @@ class Application extends Component {
       workExperience: prevState.workExperience.filter(x => x.id !== id)
     }));
 
+  fileSelectHandler = event => {
+    this.setState({ selectedFile: event.target.files[0] });
+  };
+
+  uploadHandler = event => {
+    event.preventDefault();
+    console.log(this.state.selectedFile);
+  };
+
   render() {
+    if (this.state.isLoading) {
+      return <Spinner />;
+    }
+
+    let felonyForm = null;
+
+    if (this.state.felon) {
+      felonyForm = (
+        <TextAreaFieldGroup
+          name="felonyForm"
+          type="text"
+          onChange={this.handleChange}
+          info="If yes, explain the number of convictions as well as the nature of each one."
+        />
+      );
+    }
+
     return (
       <div className="Form">
         <h3 className="applicationheader">Application Form</h3>
         <form>
-          <PersonalInformation handleChange={this.handleChange} />
+          {this.state.errorMsg.length > 0 ? (
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: "red" }}>{this.state.errorMsg}</p>
+            </div>
+          ) : (
+            ""
+          )}
+          <PersonalInformation
+            invalidFields={this.state.invalidFields}
+            handleChange={this.handleChange}
+          />
           <EducationProfile
             addEducation={this.addEducation}
             removeEducation={this.removeEducation}
-            handleChange={this.handleChange}
             education={this.state.education}
           />
           <ExperienceProfile
@@ -118,7 +199,11 @@ class Application extends Component {
             addExperience={this.addExperience}
             removeExperience={this.removeExperience}
           />
-          <ApplicationDetails handleChange={this.handleChange} />
+          <ApplicationDetails
+            handleChange={this.handleChange}
+            fileSelectHandler={this.fileSelectHandler}
+            uploadHandler={this.uploadHandler}
+          />
           <div className="personalinfo">
             <div className="bottomform">
               <label className="react-toggle" style={{ padding: "20px 0px" }}>
@@ -144,6 +229,18 @@ class Application extends Component {
               </label>
             </div>
             <div className="bottomform">
+              <label className="react-toggle" style={{ padding: "20px 0px" }}>
+                <span style={{ padding: "10px" }}>
+                  Have you ever been convicted of a felony?
+                </span>
+                <Toggle
+                  defaultChecked={this.state.felon}
+                  onChange={this.isFelonHandler}
+                />
+              </label>
+              {felonyForm}
+            </div>
+            <div className="bottomform">
               <div style={{ color: "red" }}>
                 <label>
                   <strong>
@@ -157,6 +254,7 @@ class Application extends Component {
             </div>
             <div className="bottomform">
               <button
+                type="button"
                 style={{ padding: "10px 30px", color: "purple" }}
                 onClick={this.handleSubmit}
               >

@@ -2,7 +2,6 @@ import React from "react";
 import Aux from "../../../hoc/Aux/Aux";
 import Spinner from "../../../components/UI/Spinner/Spinner";
 import ResultsHeader from "./ResultsHeader";
-import CompanyNav from "../CompanyNav/CompanyNav";
 import "./FinalResults.css";
 
 class FinalResults extends React.Component {
@@ -161,7 +160,6 @@ class FinalResults extends React.Component {
 
     return (
       <Aux>
-        <CompanyNav />
         <div className="resultsheader">
           <div className="resultsnav">
             <ResultsHeader ApplicantId={this.ApplicantId} />

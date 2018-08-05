@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import ResultsHeader from "../ResultsHeader";
 import Spinner from "../../../../components/UI/Spinner/Spinner";
-import CompanyNav from "../../CompanyNav/CompanyNav";
 import "./SubmittedApplication.css";
 
 class SubmittedApplication extends Component {
@@ -53,126 +52,147 @@ class SubmittedApplication extends Component {
       return <Spinner />;
     }
 
-    let applicant = this.state.data;
+    let { data } = this.state;
 
-    let isOver18 = applicant.hasOwnProperty("over18")
-      ? applicant.over18
+    let isOver18 = data.hasOwnProperty("over18")
+      ? data.over18
         ? "Yes"
         : "No"
       : "Unknown";
 
-    let isLegal = applicant.hasOwnProperty("legal")
-      ? applicant.legal
+    let isLegal = data.hasOwnProperty("legal")
+      ? data.legal
         ? "Yes"
         : "No"
       : "Unknown";
 
-    let education = Object.hasOwnProperty(this.state.data, "education")
-      ? this.state.data.education.length > 0
-        ? this.state.data.education.map(edu => {
-            return (
-              <div key={edu.key} style={{ borderTop: "solid gray 2px" }}>
-                <p>
-                  <strong>School:</strong> {edu.school}
-                </p>
-                <p>
-                  <strong>Study:</strong> {edu.study}
-                </p>
-                <p>
-                  <strong>Degree:</strong> {edu.degree}
-                </p>
-                <p>
-                  <strong>Start Date:</strong> {edu.startTime}
-                </p>
-                <p>
-                  <strong>End Date:</strong> {edu.endTime}
-                </p>
-              </div>
-            );
-          })
+    let felon = data.hasOwnProperty("felon")
+      ? data.felon
+        ? "Yes"
+        : "No"
+      : "Unknown";
+
+    let felonyForm = data.hasOwnProperty("felonyForm")
+      ? data.felon
+        ? data.felonyForm
+        : null
+      : "Unknown";
+
+    let education = data.hasOwnProperty("education")
+      ? data.education.length > 0
+        ? this.state.data.education.map(edu => (
+            <div key={edu.id} style={{ borderTop: "solid gray 2px" }}>
+              <p>
+                <strong>School:</strong> {edu.school}
+              </p>
+              <p>
+                <strong>Study:</strong> {edu.study}
+              </p>
+              <p>
+                <strong>Degree:</strong> {edu.degree}
+              </p>
+              <p>
+                <strong>Program Description:</strong> {edu.description}
+              </p>
+              <p>
+                <strong>Start Date:</strong> {edu.startTime}
+              </p>
+              <p>
+                <strong>End Date:</strong>{" "}
+                {edu.current ? "Current" : edu.endTime}
+              </p>
+            </div>
+          ))
         : "None"
       : "Unknown";
 
-    let workExperience = Object.hasOwnProperty(
-      this.state.data,
-      "workExperience"
-    )
-      ? this.state.data.workExperience.length > 0
-        ? this.state.data.workExperience.map(exp => {
-            return (
-              <div key={exp.key} style={{ borderTop: "solid gray 2px" }}>
-                <p>
-                  <strong>Company Name:</strong> {exp.company}
-                </p>
-                <p>
-                  <strong>Company Industry:</strong> {exp.industry}
-                </p>
-                <p>
-                  <strong>Position Title:</strong> {exp.title}
-                </p>
-                <p>
-                  <strong>Position Summary:</strong> {exp.summary}
-                </p>
-                <p>
-                  <strong>Reason For Leaving:</strong> {exp.leaving}
-                </p>
-                <p>
-                  <strong>Start Date:</strong> {exp.startTime}
-                </p>
-                <p>
-                  <strong>End Date:</strong> {exp.endTime}
-                </p>
-              </div>
-            );
-          })
+    let workExperience = data.hasOwnProperty("workExperience")
+      ? data.workExperience.length > 0
+        ? data.workExperience.map(exp => (
+            <div key={exp.id} style={{ borderTop: "solid gray 2px" }}>
+              <p>
+                <strong>Company Name:</strong> {exp.company}
+              </p>
+              <p>
+                <strong>Company Industry:</strong> {exp.industry}
+              </p>
+              <p>
+                <strong>Position Title:</strong> {exp.title}
+              </p>
+              <p>
+                <strong>Position Description:</strong> {exp.description}
+              </p>
+              <p>
+                <strong>Reason For Leaving:</strong> {exp.leaving}
+              </p>
+              <p>
+                <strong>Start Date:</strong> {exp.startTime}
+              </p>
+              <p>
+                <strong>End Date:</strong>{" "}
+                {exp.current ? "Current" : exp.endTime}
+              </p>
+            </div>
+          ))
         : "None"
       : "Unknown";
 
     return (
       <div>
-        <CompanyNav />
         <div className="resultsnav">
           <ResultsHeader ApplicantId={this.ApplicantId} />
         </div>
         <div className="resultsheaderapp">
-          <h1>Submitted Application</h1>
-          <div className="submittedapplication">
-            <h3>Personal Information</h3>
-            <p>
-              <strong>First Name:</strong> {this.state.data.firstName}
-            </p>
-            <p>
-              <strong>Last Name:</strong> {this.state.data.lastName}
-            </p>
-            <p>
-              <strong>Address:</strong> {this.state.data.address || "Unknown"}
-            </p>
-            <p>
-              <strong>City:</strong> {this.state.data.city || "Unknown"}
-            </p>
-            <p>
-              <strong>State:</strong> {this.state.data.state || "Unknown"}
-            </p>
-            <p>
-              <strong>ZIP Code:</strong> {this.state.data.zipCode || "Unknown"}
-            </p>
-            <p>
-              <strong>Primary Contact:</strong>{" "}
-              {this.state.data.phone || "Unknown"}
-            </p>
-            <p>
-              <strong>Email:</strong> {this.state.data.email}
-            </p>
+          <h1>{this.state.data.firstName}'s Application</h1>
+          <div className="row">
+            <div className="col-md-12">
+              <div className="card card-body bg-light mb-3">
+                <h3>Personal Information</h3>
+                <p>
+                  <strong>First Name:</strong> {this.state.data.firstName}
+                </p>
+                <p>
+                  <strong>Last Name:</strong> {this.state.data.lastName}
+                </p>
+                <p>
+                  <strong>Address:</strong>{" "}
+                  {this.state.data.address || "Unknown"}
+                </p>
+                <p>
+                  <strong>City:</strong> {this.state.data.city || "Unknown"}
+                </p>
+                <p>
+                  <strong>State:</strong> {this.state.data.state || "Unknown"}
+                </p>
+                <p>
+                  <strong>ZIP Code:</strong>{" "}
+                  {this.state.data.zipCode || "Unknown"}
+                </p>
+                <p>
+                  <strong>Primary Contact:</strong>{" "}
+                  {this.state.data.phone || "Unknown"}
+                </p>
+                <p>
+                  <strong>Email:</strong> {this.state.data.email}
+                </p>
+              </div>
+            </div>
           </div>
-          <div className="submittedapplication">
-            <h3>Education</h3>
-            {education}
+          <div className="row">
+            <div className="col-md-6">
+              <div className="card card-body mb-2">
+                <h3>Education</h3>
+                {education}
+              </div>
+            </div>
+            <div className="col-md-6">
+              <div className="card card-body mb-2">
+                <h3>Employment History</h3>
+                {workExperience}
+              </div>
+            </div>
           </div>
-          <div className="submittedapplication">
-            <h3>Employment History</h3>
-            {workExperience}
-          </div>
-          <div className="submittedapplication">
+          <div className="card card-body mb-2">
             <h3>Applicant Details</h3>
             <p>
               <strong>Cover Letter:</strong>{" "}
@@ -191,6 +211,17 @@ class SubmittedApplication extends Component {
               </strong>{" "}
               {isLegal}
             </p>
+            <p>
+              <strong>Does the candidtate have any felony offenses:</strong>{" "}
+              {felon}
+            </p>
+            {data.felon ? (
+              <span>
+                <p>
+                  <strong>Description of offenses:</strong> {felonyForm}
+                </p>
+              </span>
+            ) : null}
           </div>
         </div>
       </div>

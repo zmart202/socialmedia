@@ -4,6 +4,8 @@
   "private": true,
   "dependencies": {
     "@sendgrid/mail": "^6.3.1",
+    "ajv": "^6.5.2",
+    "ajv-keywords": "^3.2.0",
     "bcrypt": "^2.0.1",
     "cors": "^2.8.4",
     "deep-extend": "^0.5.1",
@@ -13,6 +15,7 @@
     "lodash": "^4.17.10",
     "mongodb": "^3.1.0-beta4",
     "path": "^0.12.7",
+    "ramda": "^0.25.0",
     "react": "^16.3.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.3.2",

@@ -17,14 +17,10 @@ const TestIntro = props => {
     <div className="intro">
       <div style={style.inner}>
         <p>
-          Hey {props.applicant.firstName}! Thanks for showing interest in
-          becoming a(n) POSITION_NAME at COMPANY_NAME. We think you have the
-          potential to be a great fit at our company. Before we can take this
-          any further, we would like you to respond to a few questions. Once
-          clicking "START TEST NOW" a timer will go off and you will be timed to
-          see how long it takes you to respond to all of the questions. Please
-          answer all of the questions to the best of your ability before
-          submitting the test.
+          Hey {props.applicant.firstName}! Thanks for applying through Decision Tyme!
+          The following exam has been custom designed by {props.applicant.companyName} for the position you are applying for.
+          Once clicking "START TEST NOW" you will be on the clock to
+          see how long it takes you to respond to all of the questions. Good luck!!
         </p>
         <p style={{ color: "purple", textAlign: "center" }}>
           <strong>Best of luck!</strong>
