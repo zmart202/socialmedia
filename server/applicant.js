@@ -5,9 +5,6 @@ const hat = require("hat");
 const { omit } = require("ramda");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
-// const router = require('express').Router();
-
-// const applicationHelper = require("./applicationHelper.js");
 
 const { hashPassword, comparePasswords } = require("./promisified-utils");
 
@@ -40,19 +37,31 @@ router.get("/applicant/:id", (req, res) => {
     });
 });
 
-// router.use("/application", applicationHelper);
-
-// export const handleApplication = async () => router.post("/application", re);
-
 router.post("/application", (req, res) => {
-  // console.log("Here");
   const db = req.app.locals.db;
-  // console.log("Here2");
   const Applicants = db.collection("applicants");
-  // console.log("Here3");
   const Jobs = db.collection("jobs");
 
-  const { companyId, jobId } = req.body;
+  const {
+    companyId,
+    companyName,
+    jobId,
+    firstName,
+    lastName,
+    address,
+    city,
+    state,
+    zipCode,
+    phone,
+    email,
+    workExperience,
+    education,
+    coverLetter,
+    salaryRequirements,
+    over18,
+    legal
+  } = req.body;
+
   const applicantId = hat();
 
   let test;
@@ -64,38 +73,50 @@ router.post("/application", (req, res) => {
         );
       }
 
-      test = job.test;
+    test = job.test;
 
-      return Applicants.insertOne({
-        ...req.body,
-        test,
-        id: applicantId,
-        completed: false,
-        timestamp: new Date(),
-        testTimestamp: null,
-        secondsElapsed: 0,
-        answers: null
-      });
-    })
-    .then(result => {
-      if (result.insertedCount === 0) {
-        throw new Error("Could not insert applicant");
-      }
-
-      res.json({
-        ...req.body,
-        applicantId,
-        test,
-        success: true
-      });
-    })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
-      console.error(err);
+    return Applicants.insertOne({
+      companyId,
+      companyName,
+      jobId,
+      firstName,
+      lastName,
+      address,
+      city,
+      state,
+      zipCode,
+      phone,
+      email,
+      workExperience,
+      education,
+      coverLetter,
+      salaryRequirements,
+      over18,
+      legal,
+      test,
+      id: applicantId,
+      completed: false,
+      timestamp: new Date(),
+      testTimestamp: null,
+      secondsElapsed: 0,
+      answers: null
     });
+  }).then(result => {
+    if (result.insertedCount === 0) {
+      throw new Error("Could not insert applicant");
+    }
+
+    res.json({
+      applicantId,
+      test,
+      success: true
+    });
+  }).catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+  });
 });
 
 router.get("/auth/:id", (req, res) => {

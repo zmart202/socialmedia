@@ -39,6 +39,7 @@ class Application extends Component {
     };
 
     this.companyName = decodeURIComponent(props.match.params.companyName);
+    this.jobTitle = decodeURIComponent(props.match.params.jobTitle);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
   }
@@ -78,30 +79,26 @@ class Application extends Component {
       })
     };
 
-    this.setState(
-      {
-        isLoading: true
-      },
-      () => {
-        fetch("http://localhost:4567/api/applicant/application", options)
-          .then(res => res.json())
-          .then(data => {
-            console.log(data);
-            if (!data.success) {
-              return this.setState(
-                {
-                  errorMsg: data.msg,
-                  isLoading: false
-                },
-                () => window.scrollTo(0, 0)
-              );
-            }
+    this.setState({
+      isLoading: true
+    }, () => {
+      fetch("http://localhost:4567/api/applicant/application", options)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data);
+          if (!data.success) {
+            return this.setState({
+              errorMsg: data.msg,
+              isLoading: false
+            }, () => window.scrollTo(0, 0));
+          }
 
-            this.props.history.push(`/applicant/${data.applicantId}`);
-          })
-          .catch(err => console.log(err));
-      }
-    );
+          this.props.history.push(
+            `/applicant/${this.companyName}/${this.jobTitle}/${data.applicantId}`
+          );
+        })
+        .catch(err => console.log(err))
+    });
   };
 
   handleChange = e =>

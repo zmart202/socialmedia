@@ -3,7 +3,7 @@
 const express = require("express");
 const shortid = require("shortid");
 const hat = require("hat");
-const _ = require("lodash");
+const { omit } = require("ramda");
 
 const { hashPassword, comparePasswords, jwt } = require("./promisified-utils");
 const sample = require("./sample-test");
@@ -17,18 +17,20 @@ router.post("/create-company", (req, res) => {
   const Companies = db.collection("companies");
   const { name } = req.body;
 
+  const id = hat();
+
   Companies.insertOne({
     name,
-    id: hat()
+    id
   })
-    .then(success => {
+    .then(result => {
       if (result.insertedCount === 0) {
         throw new Error("Could not insert company");
       }
 
       res.json({
-        success: true,
-        id: success.id
+        id,
+        success: true
       });
     })
     .catch(err => {
@@ -201,10 +203,61 @@ router.get("/applicants", (req, res) => {
     });
 });
 
+router.get("/applicant-profile/:id", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const Jobs = db.collection("jobs");
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  const { id } = req.params;
+
+  jwt.verify(token, secret)
+  .then(_ => {
+    const p = Applicants.findOne({ id });
+    const q = p.then(applicant => {
+      if (!applicant) {
+        throw new Error(`Could not find applicant with id ${id}`);
+      }
+
+      return Jobs.findOne({ id: applicant.jobId });
+    });
+
+    return Promise.all([p, q])
+  })
+  .then(result => {
+    if (!result[1]) {
+      throw new Error(`Could not find job with id ${result[0].jobId}`);
+    }
+
+    res.json({
+      success: true,
+      applicant: omit(["_id"], result[0]),
+      job: omit(["_id"], result[1])
+    });
+  })
+  .catch(err => {
+    res.json({
+      success: false,
+      msg: err.message
+    });
+    console.error(err);
+  });
+});
+
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Jobs = db.collection("jobs");
   const Applicants = db.collection("applicants");
+
+  const {
+    firstName,
+    lastName,
+    email,
+    id,
+    jobId
+  } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
@@ -228,10 +281,15 @@ router.post("/create-applicant", (req, res) => {
         } and companyId ${companyId}`
       );
     }
+
     return Applicants.insertOne({
-      ...req.body,
+      firstName,
+      lastName,
+      email,
+      jobId,
       companyId,
       companyName,
+      id,
       test: job.test,
       completed: false,
       timestamp: new Date(),
@@ -299,7 +357,7 @@ router.post("/remove-applicant", (req, res) => {
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
-  
+
   jwt.verify(token, secret)
   .then(authData =>
     Applicants.deleteOne({ email, id })
@@ -336,6 +394,7 @@ router.get("/test-results/:applicantId", (req, res) => {
       res.json({
         success: true,
         answerData: doc.answerData,
+        completed: doc.completed,
         test: doc.test,
         secondsElapsed: doc.secondsElapsed,
         firstName: doc.firstName,
