@@ -48,36 +48,39 @@ class IndividualApplicant extends Component {
       body: JSON.stringify(applicant)
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/edit-applicant", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/company/edit-applicant", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                isError: true,
+                errorMsg: data.msg
+              });
+            }
 
-        this.props.editApplicant(applicant);
-        this.setState({
-          isEditing: false,
-          isLoading: false
-        });
-      })
-      .catch(err => {
-        console.error(err);
-        this.setState({
-          isError: true,
-          isLoading: false,
-          errorMsg: err.message
-        });
-      });
-    });
+            this.props.editApplicant(applicant);
+            this.setState({
+              isEditing: false,
+              isLoading: false
+            });
+          })
+          .catch(err => {
+            console.error(err);
+            this.setState({
+              isError: true,
+              isLoading: false,
+              errorMsg: err.message
+            });
+          });
+      }
+    );
   };
 
   onDelete = e => {
@@ -95,32 +98,35 @@ class IndividualApplicant extends Component {
       })
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("http://localhost:4567/api/company/remove-applicant", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/company/remove-applicant", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                isError: true,
+                errorMsg: data.msg
+              });
+            }
 
-        this.props.deleteApplicant(this.props.applicant);
-      })
-      .catch(err => {
-        this.setState({
-          isLoading: false,
-          isError: true,
-          errorMsg: err.message
-        });
-        console.error(err)
-      });
-    });
+            this.props.deleteApplicant(this.props.applicant);
+          })
+          .catch(err => {
+            this.setState({
+              isLoading: false,
+              isError: true,
+              errorMsg: err.message
+            });
+            console.error(err);
+          });
+      }
+    );
   };
 
   completionHandler = () => {

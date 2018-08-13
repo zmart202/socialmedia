@@ -69,8 +69,7 @@ class Company extends Component {
     return retVal;
   };
 
-  putJobsInState = jobs =>
-    this.setState({ jobs });
+  putJobsInState = jobs => this.setState({ jobs });
 
   deleteApplicant = applicant =>
     this.setState(prevState => ({
@@ -87,13 +86,15 @@ class Company extends Component {
 
   editApplicant = applicant =>
     this.setState(prevState => ({
-      applicants: prevState.applicants.map(x =>
-        x.id === applicant.id ?
-          {
-            ...x,
-            firstName: applicant.firstName,
-            lastName: applicant.lastName
-          } : x
+      applicants: prevState.applicants.map(
+        x =>
+          x.id === applicant.id
+            ? {
+                ...x,
+                firstName: applicant.firstName,
+                lastName: applicant.lastName
+              }
+            : x
       )
     }));
 
@@ -152,6 +153,8 @@ class Company extends Component {
       applicantList = <p>No applicants for this company yet.</p>;
     }
 
+    console.log(process.env.SENDGRID_API_KEY);
+
     return (
       <div className="Company">
         <div>
@@ -171,9 +174,7 @@ class Company extends Component {
             />
           </div>
           <ApplicantHeader />
-          <div className="CompanyApplicantList">
-            {applicantList}
-          </div>
+          <div className="CompanyApplicantList">{applicantList}</div>
         </div>
       </div>
     );

@@ -157,8 +157,19 @@ class ExperienceProfile extends Component {
             <br />
           </span>
           <span>
-            <button type="button" onClick={this.toggleExperienceForm}>Cancel</button>
-            <button type="button" onClick={this.submitExperienceHandler}>Complete</button>
+            <a
+              style={{
+                textDecoration: "underline",
+                color: "blue",
+                paddingRight: "20px"
+              }}
+              onClick={this.toggleExperienceForm}
+            >
+              Cancel
+            </a>
+            <button type="button" onClick={this.submitExperienceHandler}>
+              Complete
+            </button>
           </span>
         </div>
       );
@@ -179,14 +190,26 @@ class ExperienceProfile extends Component {
               {exp.industry}
             </p>
             <p>
-              <strong>title: </strong>
+              <strong>Title: </strong>
               {exp.title}
             </p>
             <p>
-              <strong>Summary: </strong>
-              {exp.summary}
+              <strong>From: </strong>
+              {exp.startTime} <strong>To: </strong>
+              {exp.current ? " Now" : exp.endTime}
             </p>
-            <button type="button" onClick={() => this.props.removeExperience(exp.id)}>
+            <p>
+              <strong>Description: </strong>
+              {exp.description}
+            </p>
+            <p>
+              <strong>Reason for leaving: </strong>
+              {exp.leaving}
+            </p>
+            <button
+              type="button"
+              onClick={() => this.props.removeExperience(exp.id)}
+            >
               Delete
             </button>
           </div>
@@ -194,7 +217,9 @@ class ExperienceProfile extends Component {
         {experienceForm}
         <div style={{ padding: "15px" }}>
           {this.state.experienceFormMounted ? null : (
-            <button type="button" onClick={this.toggleExperienceForm}>Add experience</button>
+            <button type="button" onClick={this.toggleExperienceForm}>
+              Add experience
+            </button>
           )}
         </div>
       </div>

@@ -172,10 +172,7 @@ class Jobs extends Component {
       return <p>Error loading Jobs</p>;
     }
 
-    let {
-      jobs,
-      viewingJobId
-    } = this.state;
+    let { jobs, viewingJobId } = this.state;
 
     let navbar = "";
     if (this.state.jobs.length > 0) {
@@ -332,13 +329,9 @@ class Jobs extends Component {
 
     let visits = "";
     if (this.state.viewingJobId) {
-      let numVisitors = jobs.find(x =>
-        x.id === viewingJobId
-      ).visitors;
+      let numVisitors = jobs.find(x => x.id === viewingJobId).visitors;
 
-      visits = (
-        <p>This job has had {numVisitors} visitors so far</p>
-      );
+      visits = <p>This job has had {numVisitors} visitors so far</p>;
     }
 
     let editJobModal = null;
@@ -391,12 +384,18 @@ class Jobs extends Component {
               {copyLinkBtn}
               {deleteJobBtn}
             </div>
-            <div className="jobdescription">
-              <h5 style={{ textDecoration: "underline" }}>Job Description</h5>
-              <p>
-                <em>{description}</em>
-              </p>
-            </div>
+            <center style={{ paddingTop: "100px" }}>
+              <div className="card card-body bg-light mb-3">
+                <div className="jobdescription">
+                  <h5 style={{ textDecoration: "underline" }}>
+                    Job Description
+                  </h5>
+                  <p>
+                    <em>{description}</em>
+                  </p>
+                </div>
+              </div>
+            </center>
             {deleteJobModal}
             {testEditor}
           </div>

@@ -3,15 +3,6 @@ import TextAreaFieldGroup from "../../../../components/UI/Form/TextAreaFieldGrou
 import "./Profile/Profile.css";
 
 class ApplicationDetails extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selectedFile: null
-    };
-  }
-  fileSelectHandler = event => {
-    this.setState({ selectedFile: event.target.files[0] });
-  };
   render() {
     return (
       <div className="profileinfo">
@@ -19,10 +10,6 @@ class ApplicationDetails extends Component {
           <label>Application Details</label>
         </div>
         <div className="profileinput">
-          <div style={{ padding: "20px 0px" }}>
-            <label>Upload Resume: </label>
-            <input type="file" onChange={this.fileSelectHandler} />
-          </div>
           <TextAreaFieldGroup
             name="coverLetter"
             placeholder="Cover Letter"

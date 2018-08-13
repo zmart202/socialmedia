@@ -23,12 +23,13 @@
   border-bottom: solid purple 2px;
   width: 20%;
   padding-left: 10px;
+  margin-bottom: 20px;
 }
 
 .bottomform {
   padding-left: 30px;
   padding-right: 30px;
-  padding-bottom: 10px;
+  padding-bottom: 0px;
 }
 
 @media only screen and (max-width: 780px) {

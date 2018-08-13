@@ -6,9 +6,9 @@ const CompanyNav = () => {
   return (
     <div className="topcompanynav">
       <div>
-        <div className="border1">
+        {/* <div className="border1">
           <Link to="/company/messaging">Questions?</Link>
-        </div>
+        </div> */}
         <div>
           <Link to="/company/jobs">Editor</Link>
         </div>

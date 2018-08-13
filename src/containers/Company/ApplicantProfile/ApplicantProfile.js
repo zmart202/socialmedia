@@ -104,7 +104,7 @@ class ApplicantProfile extends Component {
 		}
 
 		return (
-			<div>
+			<div style={{ textAlign: 'center' }}>
 				<div className="profilenav">
           <ApplicantProfileHeader
           	applicantId={this.applicantId}

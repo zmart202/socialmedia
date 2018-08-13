@@ -10,6 +10,7 @@ import Spinner from "../../../components/UI/Spinner/Spinner";
 
 import "./Application.css";
 import "./Input/PersonalInformation.css";
+import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
 
 class Application extends Component {
   constructor(props) {
@@ -30,8 +31,11 @@ class Application extends Component {
       education: [],
       coverLetter: "",
       salaryRequirements: "",
+      felonyForm: "",
       over18: false,
-      legal: false
+      legal: false,
+      felon: false,
+      file: {}
     };
 
     this.companyName = decodeURIComponent(props.match.params.companyName);
@@ -53,10 +57,13 @@ class Application extends Component {
     ].filter(x => this.state[x].length === 0);
 
     if (invalidFields.length > 0) {
-      return this.setState({
-        invalidFields,
-        errorMsg: "Please fill out all the required fields"
-      }, window.scrollTo(0, 0));
+      return this.setState(
+        {
+          invalidFields,
+          errorMsg: "Please fill out all the required fields"
+        },
+        window.scrollTo(0, 0)
+      );
     }
 
     const options = {
@@ -68,11 +75,7 @@ class Application extends Component {
         companyId: this.companyId,
         companyName: this.companyName,
         jobId: this.jobId,
-        ...omit([
-          "isLoading",
-          "errorMsg",
-          "invalidFields"
-        ], this.state)
+        ...omit(["isLoading", "errorMsg", "invalidFields"], this.state)
       })
     };
 
@@ -113,6 +116,11 @@ class Application extends Component {
       legal: !prevState.legal
     }));
 
+  isFelonHandler = () =>
+    this.setState(prevState => ({
+      felon: !prevState.felon
+    }));
+
   addEducation = educationObj =>
     this.setState(prevState => ({
       education: prevState.education.concat(educationObj)
@@ -138,19 +146,34 @@ class Application extends Component {
       return <Spinner />;
     }
 
+    let felonyForm = null;
+
+    if (this.state.felon) {
+      felonyForm = (
+        <TextAreaFieldGroup
+          name="felonyForm"
+          type="text"
+          onChange={this.handleChange}
+          info="If yes, explain the number of convictions as well as the nature of each one."
+        />
+      );
+    }
+
     return (
       <div className="Form">
         <h3 className="applicationheader">Application Form</h3>
         <form>
-          {
-            this.state.errorMsg.length > 0 ?
-              (
-                <div style={{ textAlign: 'center' }}>
-                  <p style={{ color: 'red' }}>{this.state.errorMsg}</p>
-                </div>
-              ) : ""
-          }
-          <PersonalInformation invalidFields={this.state.invalidFields} handleChange={this.handleChange} />
+          {this.state.errorMsg.length > 0 ? (
+            <div style={{ textAlign: "center" }}>
+              <p style={{ color: "red" }}>{this.state.errorMsg}</p>
+            </div>
+          ) : (
+            ""
+          )}
+          <PersonalInformation
+            invalidFields={this.state.invalidFields}
+            handleChange={this.handleChange}
+          />
           <EducationProfile
             addEducation={this.addEducation}
             removeEducation={this.removeEducation}
@@ -188,6 +211,18 @@ class Application extends Component {
               </label>
             </div>
             <div className="bottomform">
+              <label className="react-toggle" style={{ padding: "20px 0px" }}>
+                <span style={{ padding: "10px" }}>
+                  Have you ever been convicted of a felony?
+                </span>
+                <Toggle
+                  defaultChecked={this.state.felon}
+                  onChange={this.isFelonHandler}
+                />
+              </label>
+              {felonyForm}
+            </div>
+            <div className="bottomform">
               <div style={{ color: "red" }}>
                 <label>
                   <strong>
@@ -200,7 +235,8 @@ class Application extends Component {
               </div>
             </div>
             <div className="bottomform">
-              <button type="button"
+              <button
+                type="button"
                 style={{ padding: "10px 30px", color: "purple" }}
                 onClick={this.handleSubmit}
               >

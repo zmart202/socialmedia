@@ -11,28 +11,40 @@ import ApplicantProfile from "./ApplicantProfile/ApplicantProfile";
 
 import Navbar from "../.././components/UI/layout/Navbar";
 
+import { loadDrift } from "../../utils/drift";
+
 class CompanyRouter extends Component {
-	constructor(props) {
-		super(props);
-		this.state = {
-			isLoggedIn: localStorage.getItem("isLoggedIn")
-		};
-	}
+  constructor(props) {
+    super(props);
+    this.state = {
+      isLoggedIn: localStorage.getItem("isLoggedIn")
+    };
+  }
 
-	login = () => {
-		this.setState({ isLoggedIn: "true" });
-		localStorage.setItem("isLoggedIn", "true");
-	};
+  componentDidMount() {
+    if (
+      this.state.isLoggedIn === "true" &&
+      document.getElementById("driftScript") === null
+    ) {
+      loadDrift();
+    }
+  }
 
-	logout = () => {
-		this.setState({ isLoggedIn: "false" });
-		localStorage.removeItem("token");
-		localStorage.setItem("isLoggedIn", "false");
-	};
+  login = () => {
+    this.setState({ isLoggedIn: "true" });
+    localStorage.setItem("isLoggedIn", "true");
+    loadDrift();
+  };
 
-	render() {
-		const { history } = this.props;
-		const { isLoggedIn } = this.state;
+  logout = () => {
+    this.setState({ isLoggedIn: "false" });
+    localStorage.removeItem("token");
+    localStorage.setItem("isLoggedIn", "false");
+  };
+
+  render() {
+    const { isLoggedIn } = this.state;
+    const { history } = this.props;
 
 		return (
 			<Router history={ history }>
