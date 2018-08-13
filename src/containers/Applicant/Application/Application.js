@@ -32,17 +32,15 @@ class Application extends Component {
       coverLetter: "",
       salaryRequirements: "",
       felonyForm: "",
-      selectedFile: null,
       over18: false,
       legal: false,
-      felon: false
+      felon: false,
+      file: {}
     };
 
     this.companyName = decodeURIComponent(props.match.params.companyName);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
-    this.fileSelectHandler = this.fileSelectHandler.bind(this);
-    this.uploadHandler = this.uploadHandler.bind(this);
   }
 
   handleSubmit = () => {
@@ -146,15 +144,6 @@ class Application extends Component {
       workExperience: prevState.workExperience.filter(x => x.id !== id)
     }));
 
-  fileSelectHandler = event => {
-    this.setState({ selectedFile: event.target.files[0] });
-  };
-
-  uploadHandler = event => {
-    event.preventDefault();
-    console.log(this.state.selectedFile);
-  };
-
   render() {
     if (this.state.isLoading) {
       return <Spinner />;
@@ -199,11 +188,7 @@ class Application extends Component {
             addExperience={this.addExperience}
             removeExperience={this.removeExperience}
           />
-          <ApplicationDetails
-            handleChange={this.handleChange}
-            fileSelectHandler={this.fileSelectHandler}
-            uploadHandler={this.uploadHandler}
-          />
+          <ApplicationDetails handleChange={this.handleChange} />
           <div className="personalinfo">
             <div className="bottomform">
               <label className="react-toggle" style={{ padding: "20px 0px" }}>

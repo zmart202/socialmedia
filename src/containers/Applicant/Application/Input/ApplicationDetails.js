@@ -10,11 +10,6 @@ class ApplicationDetails extends Component {
           <label>Application Details</label>
         </div>
         <div className="profileinput">
-          <div style={{ padding: "20px 0px" }}>
-            <label>Upload Resume: </label>
-            <input type="file" onChange={this.props.fileSelectHandler} />
-            <button onClick={this.props.uploadHandler}>Upload!</button>
-          </div>
           <TextAreaFieldGroup
             name="coverLetter"
             placeholder="Cover Letter"

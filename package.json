@@ -6,7 +6,7 @@
     "@sendgrid/mail": "^6.3.1",
     "ajv": "^6.5.2",
     "ajv-keywords": "^3.2.0",
-    "bcrypt": "^2.0.1",
+    "bcrypt": "^3.0.0",
     "cors": "^2.8.4",
     "deep-extend": "^0.5.1",
     "dotenv": "^6.0.0",

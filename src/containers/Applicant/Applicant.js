@@ -35,7 +35,7 @@ class Applicant extends Component {
         console.log(data);
         if (!data.success) {
           return this.setState({
-            isError: true,
+            isError: true
           });
         }
 

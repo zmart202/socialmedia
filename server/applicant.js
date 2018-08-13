@@ -5,6 +5,9 @@ const hat = require("hat");
 const { omit } = require("ramda");
 const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
+// const router = require('express').Router();
+
+// const applicationHelper = require("./applicationHelper.js");
 
 const { hashPassword, comparePasswords } = require("./promisified-utils");
 
@@ -37,10 +40,18 @@ router.get("/applicant/:id", (req, res) => {
     });
 });
 
+// router.use("/application", applicationHelper);
+
+// export const handleApplication = async () => router.post("/application", re);
+
 router.post("/application", (req, res) => {
+  // console.log("Here");
   const db = req.app.locals.db;
+  // console.log("Here2");
   const Applicants = db.collection("applicants");
+  // console.log("Here3");
   const Jobs = db.collection("jobs");
+
   const { companyId, jobId } = req.body;
   const applicantId = hat();
 
@@ -184,8 +195,10 @@ router.post("/test-results/:id", (req, res) => {
     });
 
   let applicant;
+  let user_id;
   Applicants.findOne({ id })
     .then(result => {
+      user_id = result.id;
       if (!result) {
         throw new Error(`Could not find applicant with id ${id}`);
       }
@@ -210,8 +223,8 @@ router.post("/test-results/:id", (req, res) => {
           sgMail.send({
             to: x.email,
             from: "itsdecisiontyme@gmail.com",
-            subject: `New Applicant`,
-            html: "<h1>You have received a new applicant</h1>"
+            subject: `A New Applicant Has Applied!!`,
+            html: `<h1>You have received a new applicant</h1><div><a href='http://localhost:3000/company/results/${user_id}'>Click here</a> to check them out!</div>`
           })
         )
       );

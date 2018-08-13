@@ -157,9 +157,16 @@ class ExperienceProfile extends Component {
             <br />
           </span>
           <span>
-            <button type="button" onClick={this.toggleExperienceForm}>
+            <a
+              style={{
+                textDecoration: "underline",
+                color: "blue",
+                paddingRight: "20px"
+              }}
+              onClick={this.toggleExperienceForm}
+            >
               Cancel
-            </button>
+            </a>
             <button type="button" onClick={this.submitExperienceHandler}>
               Complete
             </button>

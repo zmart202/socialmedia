@@ -35,22 +35,27 @@ class Test extends React.Component {
   handleSubmit = () => {
     clearInterval(this.incrementer);
 
-    const answerData = this.props.test.map(q =>
-      this.state.answers[q.id] ?
-        (q.type === "MULTIPLE_CHOICE" ?
-          {
-            ...q,
-            correct: q.options.find(x =>
-              x.correct && (x.answer === this.state.answers[q.id])
-            ) ? true : false,
-            answer: this.state.answers[q.id]
-          } : {
-            ...q,
-            answer: this.state.answers[q.id]
-          }) : {
-            ...q,
-            answer: null
-          }
+    const answerData = this.props.test.map(
+      q =>
+        this.state.answers[q.id]
+          ? q.type === "MULTIPLE_CHOICE"
+            ? {
+                ...q,
+                correct: q.options.find(
+                  x => x.correct && x.answer === this.state.answers[q.id]
+                )
+                  ? true
+                  : false,
+                answer: this.state.answers[q.id]
+              }
+            : {
+                ...q,
+                answer: this.state.answers[q.id]
+              }
+          : {
+              ...q,
+              answer: null
+            }
     );
 
     const options = {
@@ -81,7 +86,8 @@ class Test extends React.Component {
       .catch(err => console.error(err));
   };
 
-  formattedSeconds = sec => Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
+  formattedSeconds = sec =>
+    Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
 
   render() {
     const test = this.props.test.map((x, i) => (

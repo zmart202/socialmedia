@@ -42,7 +42,7 @@ class EducationProfile extends Component {
 
   toggleEducationForm = () =>
     this.setState(prevState => ({
-      educationFormMounted: !prevState.educationFormMounted 
+      educationFormMounted: !prevState.educationFormMounted
     }));
 
   handleChange = e =>
@@ -146,10 +146,23 @@ class EducationProfile extends Component {
               <br />
             </div>
           </div>
-          <span>
-            <button type="button" onClick={this.toggleEducationForm}>Cancel</button>
-            <button type="button" onClick={this.saveEducationHandler}>Complete</button>
-          </span>
+          <div style={{ paddingBottom: "30px" }}>
+            <span>
+              <a
+                style={{
+                  textDecoration: "underline",
+                  color: "blue",
+                  paddingRight: "20px"
+                }}
+                onClick={this.toggleEducationForm}
+              >
+                Cancel
+              </a>
+              <button type="button" onClick={this.saveEducationHandler}>
+                Complete
+              </button>
+            </span>
+          </div>
         </div>
       );
     } else {
