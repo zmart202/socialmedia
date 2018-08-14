@@ -18,7 +18,7 @@ class Company extends Component {
       companyName: "",
       search: "",
       createApplicantMounted: false
-    };
+    }
 
     this.token = localStorage.getItem("token");
   }
@@ -31,7 +31,7 @@ class Company extends Component {
     };
 
     fetch("http://localhost:4567/api/company/applicants", options)
-      .then(res => res.json())
+      .then(res =>res.json())
       .then(data => {
         console.log(data);
         if (!data.success) {
@@ -152,8 +152,6 @@ class Company extends Component {
     } else {
       applicantList = <p>No applicants for this company yet.</p>;
     }
-
-    console.log(process.env.SENDGRID_API_KEY);
 
     return (
       <div className="Company">
