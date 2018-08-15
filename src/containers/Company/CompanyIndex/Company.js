@@ -153,8 +153,6 @@ class Company extends Component {
       applicantList = <p>No applicants for this company yet.</p>;
     }
 
-    console.log(process.env.SENDGRID_API_KEY);
-
     return (
       <div className="Company">
         <div>

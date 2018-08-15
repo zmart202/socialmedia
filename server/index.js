@@ -9,6 +9,7 @@ require("dotenv").config();
 const company = require("./company");
 const job = require("./job");
 const applicant = require("./applicant");
+
 const mongoUrl = process.env.MONGO_URL;
 
 const app = express();
