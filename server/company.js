@@ -203,7 +203,7 @@ router.get("/applicants", (req, res) => {
     });
 });
 
-router.get("/applicant-profile/:id", (req, res) => {
+router.get("/applicant/:id", (req, res) => {
   const db = req.app.locals.db;
   const Applicants = db.collection("applicants");
   const Jobs = db.collection("jobs");
@@ -214,27 +214,17 @@ router.get("/applicant-profile/:id", (req, res) => {
   const { id } = req.params;
 
   jwt.verify(token, secret)
-  .then(_ => {
-    const p = Applicants.findOne({ id });
-    const q = p.then(applicant => {
-      if (!applicant) {
-        throw new Error(`Could not find applicant with id ${id}`);
-      }
-
-      return Jobs.findOne({ id: applicant.jobId });
-    });
-
-    return Promise.all([p, q])
-  })
-  .then(result => {
-    if (!result[1]) {
-      throw new Error(`Could not find job with id ${result[0].jobId}`);
+  .then(_ =>
+    Applicants.findOne({ id })
+  )
+  .then(applicant => {
+    if (!applicant) {
+      throw new Error(`Could not find applicant with id ${id}`);
     }
 
     res.json({
-      success: true,
-      applicant: omit(["_id"], result[0]),
-      job: omit(["_id"], result[1])
+      applicant,
+      success: true
     });
   })
   .catch(err => {
@@ -256,7 +246,8 @@ router.post("/create-applicant", (req, res) => {
     lastName,
     email,
     id,
-    jobId
+    jobId,
+    jobTitle
   } = req.body;
 
   const bearer = req.headers["authorization"];
@@ -270,7 +261,7 @@ router.post("/create-applicant", (req, res) => {
 
     return Jobs.findOne({
       companyId,
-      id: req.body.jobId
+      id: jobId
     });
   })
   .then(job => {
@@ -287,6 +278,7 @@ router.post("/create-applicant", (req, res) => {
       lastName,
       email,
       jobId,
+      jobTitle,
       companyId,
       companyName,
       id,
@@ -295,7 +287,7 @@ router.post("/create-applicant", (req, res) => {
       timestamp: new Date(),
       testTimestamp: null,
       secondsElapsed: 0,
-      answers: null
+      answerData: null
     });
   })
   .then(result => {
@@ -373,41 +365,6 @@ router.post("/remove-applicant", (req, res) => {
       msg: err.message
     });
   });
-});
-
-router.get("/test-results/:applicantId", (req, res) => {
-  const db = req.app.locals.db;
-  const Applicants = db.collection("applicants");
-  const { applicantId } = req.params;
-
-  const bearer = req.headers["authorization"];
-  const token = bearer.split(" ")[1];
-
-  jwt
-    .verify(token, secret)
-    .then(authData => Applicants.findOne({ id: applicantId }))
-    .then(doc => {
-      if (!doc) {
-        throw new Error(`Could not find applicant with id ${applicantId}`);
-      }
-
-      res.json({
-        success: true,
-        answerData: doc.answerData,
-        completed: doc.completed,
-        test: doc.test,
-        secondsElapsed: doc.secondsElapsed,
-        firstName: doc.firstName,
-        lastName: doc.lastName,
-        id: doc.id
-      });
-    })
-    .catch(err => {
-      res.json({
-        success: false,
-        msg: err.message
-      });
-    });
 });
 
 module.exports = router;

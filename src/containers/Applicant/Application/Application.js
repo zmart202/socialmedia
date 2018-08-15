@@ -75,6 +75,7 @@ class Application extends Component {
         companyId: this.companyId,
         companyName: this.companyName,
         jobId: this.jobId,
+        jobTitle: this.jobTitle,
         ...omit(["isLoading", "errorMsg", "invalidFields"], this.state)
       })
     };

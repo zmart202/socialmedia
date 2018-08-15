@@ -14,7 +14,10 @@ class NewApplicant extends Component {
       firstName: "",
       lastName: "",
       email: "",
-      selectedJobId: ""
+      job: {
+        id: "",
+        title: ""
+      }
     };
 
     this.token = localStorage.getItem("token");
@@ -65,7 +68,7 @@ class NewApplicant extends Component {
   createHandler = e => {
     e.preventDefault();
 
-    if (this.state.selectedJobId.length === 0) {
+    if (this.state.job.id.length === 0) {
       return this.setState({
         errorMsg: "Please select a job"
       });
@@ -94,7 +97,8 @@ class NewApplicant extends Component {
       firstName: this.state.firstName,
       lastName: this.state.lastName,
       email: this.state.email,
-      jobId: this.state.selectedJobId
+      jobId: this.state.job.id,
+      jobTitle: this.state.job.title
     };
 
     const options = {
@@ -138,6 +142,16 @@ class NewApplicant extends Component {
     this.setState({
       [e.target.name]: e.target.value
     });
+
+  handleJobChange = e => {
+    const [title, id] = e.target.value.split(',');
+    this.setState({
+      job: {
+        title,
+        id
+      }
+    });
+  };
 
   render() {
     if (this.state.isLoading) {
@@ -194,15 +208,15 @@ class NewApplicant extends Component {
           </div>
           <div className="input">
             <select
-              name="selectedJobId"
+              name="job"
               defaultValue=""
-              onChange={this.handleChange}
+              onChange={this.handleJobChange}
             >
               <option value="" disabled hidden>
                 Assign Job
               </option>
               {this.props.jobs.map(x => (
-                <option key={x.id} value={x.id}>
+                <option key={x.id} value={[x.title, x.id].join(',')}>
                   {x.title}
                 </option>
               ))}
