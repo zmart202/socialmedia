@@ -45,6 +45,7 @@ router.post("/application", (req, res) => {
   const {
     companyId,
     companyName,
+    jobTitle,
     jobId,
     firstName,
     lastName,
@@ -78,6 +79,7 @@ router.post("/application", (req, res) => {
     return Applicants.insertOne({
       companyId,
       companyName,
+      jobTitle,
       jobId,
       firstName,
       lastName,
@@ -99,7 +101,7 @@ router.post("/application", (req, res) => {
       timestamp: new Date(),
       testTimestamp: null,
       secondsElapsed: 0,
-      answers: null
+      answerData: null
     });
   }).then(result => {
     if (result.insertedCount === 0) {

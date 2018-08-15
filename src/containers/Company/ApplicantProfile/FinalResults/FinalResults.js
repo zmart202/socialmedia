@@ -1,52 +1,13 @@
 import React from "react";
 
-import Spinner from "../../../../components/UI/Spinner/Spinner";
 import "./FinalResults.css";
 
 class FinalResults extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      isLoading: true,
-      isError: false,
-      data: {},
       showMultipleChoice: false
     };
-    
-    this.applicantId = props.applicantId;
-  }
-
-  componentDidMount() {
-    const token = localStorage.getItem("token");
-    if (token === null) {
-      this.setState({
-        isLoading: false,
-        isError: true
-      });
-      return;
-    }
-
-    const options = {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    };
-
-    fetch(
-      `http://localhost:4567/api/company/test-results/${this.applicantId}`,
-      options
-    )
-      .then(
-        res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
-      )
-      .then(data => {
-        console.log("DATA FROM FINALRESULTS", data);
-        this.setState({
-          data,
-          isLoading: false
-        });
-      })
-      .catch(err => console.error(err));
   }
 
   formattedSeconds = sec => {
@@ -63,11 +24,7 @@ class FinalResults extends React.Component {
   };
 
   render() {
-    if (this.state.isLoading) {
-      return <Spinner />;
-    }
-
-    const { answerData, completed } = this.state.data;
+    const { applicant } = this.props;
 
     let allMCResponses = [];
     let correctMCResponses = [];
@@ -75,8 +32,8 @@ class FinalResults extends React.Component {
     let multipleChoiceQuestions = null;
     let style;
 
-    if (answerData) {
-      answerData.map(answer => {
+    if (applicant.answerData) {
+      applicant.answerData.map(answer => {
         if (answer.type === "MULTIPLE_CHOICE") {
           allMCResponses.push(answer);
 
@@ -88,7 +45,7 @@ class FinalResults extends React.Component {
 
         return allMCResponses;
       });
-      answerData.map(answer => {
+      applicant.answerData.map(answer => {
         if (answer.type === "OPEN_RESPONSE") {
           ORQuestionsArray.push(answer);
         }
@@ -159,20 +116,20 @@ class FinalResults extends React.Component {
     return (
       <div>
           {
-            completed ?
+            applicant.completed ?
               (
                 <div>
                   <div className="resultsheader">
                     <h3 style={{ color: "purple" }} className="namedisplay">
                       <strong>
-                        Test Results for {this.state.data.firstName}{" "}
-                        {this.state.data.lastName}
+                        Test Results for {applicant.firstName}{" "}
+                        {applicant.lastName}
                       </strong>
                     </h3>
                     <h4 style={{ color: "purple" }} className="timerdisplay">
                       Total amount of time taken is{" "}
                       <span style={{ color: "red", textDecoration: "underline" }}>
-                        {this.formattedSeconds(this.state.data.secondsElapsed)}
+                        {this.formattedSeconds(applicant.secondsElapsed)}
                       </span>
                     </h4>
                   </div>
@@ -193,8 +150,8 @@ class FinalResults extends React.Component {
                   <div className="resultsheader">
                     <h3 style={{ color: "purple" }} className="namedisplay">
                       <strong>
-                        {this.state.data.firstName}{" "}
-                        {this.state.data.lastName} has not yet completed the test
+                        {applicant.firstName}{" "}
+                        {applicant.lastName} has not yet completed the test
                       </strong>
                     </h3>
                   </div>
