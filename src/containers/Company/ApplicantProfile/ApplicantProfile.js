@@ -17,7 +17,6 @@ class ApplicantProfile extends Component {
 			isError: false,
 			errorMsg: "",
 			applicant: {},
-			job: {},
 			pageChoice: "application"
 		};
 
@@ -33,7 +32,7 @@ class ApplicantProfile extends Component {
 		};
 
 		fetch(
-			`http://localhost:4567/api/company/applicant-profile/${this.applicantId}`,
+			`http://localhost:4567/api/company/applicant/${this.applicantId}`,
 			options
 		).then(res => res.json())
 		.then(data => {
@@ -47,8 +46,7 @@ class ApplicantProfile extends Component {
 
 			this.setState({
 				isLoading: false,
-				applicant: data.applicant,
-				job: data.job
+				applicant: data.applicant
 			});
 		}).catch(err => {
 			console.error(err);
@@ -66,17 +64,16 @@ class ApplicantProfile extends Component {
 		choice === "application" ?
 			<SubmittedApplication
 				applicant={this.state.applicant}
-				job={this.state.job}
 			/> : <FinalResults
-				applicantId={this.applicantId}
+				applicant={this.state.applicant}
 			/>;
 
 	createUrlCopier = () => {
-		let { applicant, job } = this.state;
+		let { applicant } = this.state;
     let URL =
 			"http://localhost:3000/applicant/" +
 			encodeURIComponent(applicant.companyName) + "/" +
-			encodeURIComponent(job.title) + "/" +
+			encodeURIComponent(applicant.jobTitle) + "/" +
 			applicant.id;
 
     return (
@@ -107,7 +104,6 @@ class ApplicantProfile extends Component {
 			<div style={{ textAlign: 'center' }}>
 				<div className="profilenav">
           <ApplicantProfileHeader
-          	applicantId={this.applicantId}
           	changePage={this.changePage}
           />
         </div>

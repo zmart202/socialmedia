@@ -143,6 +143,8 @@ class Applicant extends Component {
         propagateError={this.propagateError}
         handleChange={this.handleChange}
         redirectToFinished={this.redirectToFinished}
+        companyName={this.companyName}
+        jobTitle={this.jobTitle}
       />
     );
 

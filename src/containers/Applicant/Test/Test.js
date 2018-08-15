@@ -41,11 +41,9 @@ class Test extends React.Component {
           ? q.type === "MULTIPLE_CHOICE"
             ? {
                 ...q,
-                correct: q.options.find(
-                  x => x.correct && x.answer === this.state.answers[q.id]
-                )
-                  ? true
-                  : false,
+                correct: q.options.find(x =>
+                    x.answer === this.state.answers[q.id]
+                  ).correct,
                 answer: this.state.answers[q.id]
               }
             : {
