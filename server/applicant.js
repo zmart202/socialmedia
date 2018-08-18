@@ -74,51 +74,53 @@ router.post("/application", (req, res) => {
         );
       }
 
-    test = job.test;
+      test = job.test;
 
-    return Applicants.insertOne({
-      companyId,
-      companyName,
-      jobTitle,
-      jobId,
-      firstName,
-      lastName,
-      address,
-      city,
-      state,
-      zipCode,
-      phone,
-      email,
-      workExperience,
-      education,
-      coverLetter,
-      salaryRequirements,
-      over18,
-      legal,
-      test,
-      id: applicantId,
-      completed: false,
-      timestamp: new Date(),
-      testTimestamp: null,
-      secondsElapsed: 0,
-      answerData: null
-    });
-  }).then(result => {
-    if (result.insertedCount === 0) {
-      throw new Error("Could not insert applicant");
-    }
+      return Applicants.insertOne({
+        companyId,
+        companyName,
+        jobTitle,
+        jobId,
+        firstName,
+        lastName,
+        address,
+        city,
+        state,
+        zipCode,
+        phone,
+        email,
+        workExperience,
+        education,
+        coverLetter,
+        salaryRequirements,
+        over18,
+        legal,
+        test,
+        id: applicantId,
+        completed: false,
+        timestamp: new Date(),
+        testTimestamp: null,
+        secondsElapsed: 0,
+        answerData: null
+      });
+    })
+    .then(result => {
+      if (result.insertedCount === 0) {
+        throw new Error("Could not insert applicant");
+      }
 
-    res.json({
-      applicantId,
-      test,
-      success: true
+      res.json({
+        applicantId,
+        test,
+        success: true
+      });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
     });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
-    });
-  });
 });
 
 router.get("/auth/:id", (req, res) => {

@@ -4,6 +4,7 @@ const express = require("express");
 const shortid = require("shortid");
 const hat = require("hat");
 const _ = require("lodash");
+require("dotenv").config();
 
 const { jwt } = require("./promisified-utils");
 
@@ -50,37 +51,39 @@ router.get("/job/:companyId/:id", (req, res) => {
   const { companyId, id } = req.params;
 
   Jobs.findOne({ companyId, id })
-  .then(job => {
-    if (!job) {
-      throw new Error(`Could not find job with id ${id} under companyId ${companyId}`);
-    }
-
-    res.json({
-      success: true,
-      job: _.omit(job, "_id")
-    });
-
-    return Jobs.updateOne(
-      { id },
-      {
-        $inc: {
-          visitors: 1
-        }
+    .then(job => {
+      if (!job) {
+        throw new Error(
+          `Could not find job with id ${id} under companyId ${companyId}`
+        );
       }
-    );
-  })
-  .then(result => {
-    if (result.matchedCount === 0 || result.modifiedCount === 0) {
+
+      res.json({
+        success: true,
+        job: _.omit(job, "_id")
+      });
+
+      return Jobs.updateOne(
+        { id },
+        {
+          $inc: {
+            visitors: 1
+          }
+        }
+      );
+    })
+    .then(result => {
+      if (result.matchedCount === 0 || result.modifiedCount === 0) {
+        console.error(err);
+      }
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
       console.error(err);
-    }
-  })
-  .catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
     });
-    console.error(err);
-  });
 });
 
 router.post("/create-job", (req, res) => {
@@ -91,31 +94,32 @@ router.post("/create-job", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret)
-  .then(authData => 
-    Jobs.insertOne({
-      id,
-      title,
-      description,
-      companyId: authData.companyId,
-      companyName: authData.companyName,
-      test: [],
-      visitors: 0
-    })
-  )
-  .then(result => {
-    if (result.insertedCount === 0) {
-      throw new Error("Could not insert Job");
-    }
+  jwt
+    .verify(token, secret)
+    .then(authData =>
+      Jobs.insertOne({
+        id,
+        title,
+        description,
+        companyId: authData.companyId,
+        companyName: authData.companyName,
+        test: [],
+        visitors: 0
+      })
+    )
+    .then(result => {
+      if (result.insertedCount === 0) {
+        throw new Error("Could not insert Job");
+      }
 
-    res.json({ success: true });
-  })
-  .catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
     });
-  });
 });
 
 router.post("/edit-job", (req, res) => {
@@ -140,8 +144,8 @@ router.post("/edit-job", (req, res) => {
       )
     )
     .then(result => {
-      if (result.matchedCount === 0 || result.modifiedCount === 0) {
-        throw new Error(`Could not update job title with id ${id}`);
+      if (result.matchedCount === 0) {
+        throw new Error(`Could not find job with id ${id}`);
       }
 
       res.json({ success: true });
@@ -202,8 +206,8 @@ router.post("/edit-test", (req, res) => {
       )
     )
     .then(result => {
-      if (result.matchedCount === 0 || result.modifiedCount === 0) {
-        throw new Error(`Could not edit test with id ${id}`);
+      if (result.matchedCount === 0) {
+        throw new Error(`Could not find job with id ${id}`);
       }
 
       res.json({ success: true });
