@@ -249,7 +249,7 @@ router.post("/test-results/:id", (req, res) => {
             to: x.email,
             from: "itsdecisiontyme@gmail.com",
             subject: `A New Applicant Has Applied!!`,
-            html: `<h1>You have received a new applicant</h1><div><a href='http://localhost:3000/company/results/${user_id}'>Click here</a> to check them out!</div>`
+            html: `<h1>You have received a new applicant!</h1><div><a href='http://www.decisiontime.com/company/applicant/${user_id}'>Click here</a> to check them out!</div>`
           })
         )
       );
