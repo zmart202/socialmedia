@@ -102,7 +102,7 @@ class Home extends Component {
         </center>
         <div style={{ margin: "0px 60px" }}>
           <strong>
-            DecisionTyme is a software with the main focus of helping small to
+            Decision Tyme is a software with the main focus of helping small to
             medium sized business find and organize better quality applicants.
             Our system makes it easy to store all of your applicants information
             in one convenient location. We know you as a business owner already
