@@ -13,6 +13,35 @@ const secret = process.env.SECRET;
 
 const router = express.Router();
 
+router.post("/new-company-form", (req, res) => {
+  const db = req.app.locals.db;
+  const newCompany = db.collection("newCompany");
+  const { name, companyName, email, website, phone, positions } = req.body;
+
+  newCompany
+    .insertOne({
+      name,
+      companyName,
+      email,
+      phone,
+      website,
+      positions
+    })
+    .then(result => {
+      if (result.insertedCount === 0) {
+        throw new Error("Could not insert new company submission");
+      }
+
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+    });
+});
+
 router.post("/create-company", (req, res) => {
   const db = req.app.locals.db;
   const Companies = db.collection("companies");

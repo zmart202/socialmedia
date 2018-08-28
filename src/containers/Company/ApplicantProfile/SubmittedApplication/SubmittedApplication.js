@@ -85,7 +85,12 @@ const SubmittedApplication = props => {
   return (
     <div>
       <div className="resultsheaderapp">
-        <h1 style={{ color: "purple" }}>Submitted Application</h1>
+        <center>
+          <h1 style={{ color: "purple" }}>
+            {applicant.firstName}
+            's Submitted Application
+          </h1>
+        </center>
         <div className="card card-body bg-light mb-3">
           <h3 className="text-center" style={{ color: "purple" }}>
             Personal Information

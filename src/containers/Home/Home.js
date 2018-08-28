@@ -3,20 +3,167 @@ import { Link } from "react-router-dom";
 import landingtest from "../../img/landingtest.png";
 import landinglink from "../../img/landinglink.png";
 import landinggroup from "../../img/landinggroup.png";
+import Modal from "../../components/UI/Modal/Modal";
 
 import "./Home.css";
+import TextFieldGroup from "../../components/UI/Form/TextFieldGroup";
+import Spinner from "../../components/UI/Spinner/Spinner";
 
 class Home extends Component {
-  onSubmit = () => {
-    window.confirm("Thanks for your interest");
+  constructor(props) {
+    super(props);
+    this.state = {
+      newCompany: false,
+      name: "",
+      email: "",
+      companyName: "",
+      phone: "",
+      positions: "",
+      website: "",
+      isError: false,
+      isLoading: false
+    };
+    this.onChange = this.onChange.bind(this);
+    this.onSubmit = this.onSubmit.bind(this);
+  }
+
+  toggleCompanyModal = () => {
+    this.setState(prevState => ({ newCompany: !prevState.newCompany }));
   };
+
+  onSubmit = e => {
+    e.preventDefault();
+
+    const newCompanyForm = {
+      name: this.state.name,
+      companyName: this.state.companyName,
+      email: this.state.email,
+      phone: this.state.phone,
+      website: this.state.website,
+      positions: this.state.positions
+    };
+
+    const options = {
+      headers: {
+        "Content-Type": "application/json"
+      },
+      method: "POST",
+      body: JSON.stringify(newCompanyForm)
+    };
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("http://localhost:4567/api/company/new-company-form", options)
+          .then(res => res.json())
+          .then(data => {
+            if (!data.success) {
+              console.log("problem", data);
+              return this.setState({
+                isError: true,
+                isLoading: false
+              });
+            }
+            console.log("problem1", data);
+            this.setState(
+              {
+                isLoading: false
+              },
+              () => {
+                this.toggleCompanyModal();
+              }
+            );
+          })
+          .catch(err => {
+            console.log("something went wrong");
+          });
+      }
+    );
+  };
+
+  onChange = e => {
+    this.setState({ [e.target.name]: e.target.value });
+  };
+
   render() {
+    let newCompanySubmission;
+    if (this.state.newCompany) {
+      newCompanySubmission = (
+        <Modal
+          show={this.state.newCompany}
+          modalClosed={this.toggleCompanyModal}
+        >
+          <form onSubmit={this.onSubmit}>
+            <TextFieldGroup
+              type="text"
+              name="name"
+              placeholder="Full Name"
+              onChange={this.onChange}
+              info="Please write out your first and last name"
+            />
+            <TextFieldGroup
+              type="text"
+              name="companyName"
+              placeholder="Company Name"
+              onChange={this.onChange}
+              info="What is the name of your business"
+            />
+            <TextFieldGroup
+              type="text"
+              name="email"
+              placeholder="Email"
+              onChange={this.onChange}
+              info="What is the best email to contact you"
+            />
+            <TextFieldGroup
+              type="text"
+              name="phone"
+              placeholder="Phone Number"
+              onChange={this.onChange}
+              info="What is the best phone number to contact you"
+            />
+            <TextFieldGroup
+              type="text"
+              name="website"
+              placeholder="Website"
+              onChange={this.onChange}
+              info="Please tell us your website address (ex: www.example.com)"
+            />
+            <TextFieldGroup
+              type="text"
+              name="positions"
+              placeholder="List of Positions"
+              onChange={this.onChange}
+              info="What positions are you looking to fill at your company"
+            />
+            <input type="submit" value="submit" />
+          </form>
+        </Modal>
+      );
+    }
+    if (this.state.isLoading) {
+      return (
+        <div>
+          <Spinner />
+        </div>
+      );
+    }
+
+    if (this.state.isError) {
+      return (
+        <div>
+          <p>Error with submission</p>
+        </div>
+      );
+    }
     return (
       <div>
         <div>
-          <h4 className="complogo">
+          <h5 className="complogo">
             <strong>DecisionTyme</strong>
-          </h4>
+          </h5>
+          {newCompanySubmission}
           <Link to="/company">
             <strong className="complogin">Company Portal Login</strong>
           </Link>
@@ -43,7 +190,7 @@ class Home extends Component {
             </strong>
           </h3>
           <button
-            onClick={this.onSubmit}
+            onClick={this.toggleCompanyModal}
             style={{
               padding: "20px 40px",
               backgroundColor: "purple",
@@ -62,8 +209,7 @@ class Home extends Component {
           >
             <center className="landingpageblurbs">
               <strong>
-                Generate Custom Pre-Screening Tests For All Positions Needing To
-                Be Filled
+                Generate Custom Pre-Screening Tests For Any Position
               </strong>
             </center>
             <center>
