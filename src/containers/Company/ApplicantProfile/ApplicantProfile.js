@@ -21,7 +21,7 @@ class ApplicantProfile extends Component {
 		};
 
 		this.token = localStorage.getItem("token");
-		this.applicantId = props.match.params.applicantId;
+		this.applicantId = props.match.params.applicantId
 	}
 
 	componentDidMount() {

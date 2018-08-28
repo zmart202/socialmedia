@@ -19,6 +19,7 @@
     "react": "^16.3.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.3.2",
+    "react-pdf": "^3.0.5",
     "react-router-dom": "^4.2.2",
     "react-scripts": "1.1.4",
     "react-toggle": "^4.0.2",
@@ -32,5 +33,6 @@
     "eject": "react-scripts eject",
     "serve": "nodemon --ignore 'src' server/index.js"
   },
-  "devDependencies": {}
+  "devDependencies": {},
+  "proxy": "http://localhost:4567"
 }

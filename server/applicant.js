@@ -1,12 +1,12 @@
 "use strict";
 
 const express = require("express");
+const bodyParser = require("body-parser");
 const hat = require("hat");
 const { omit } = require("ramda");
 const sgMail = require("@sendgrid/mail");
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 require("dotenv").config();
-
-const { hashPassword, comparePasswords } = require("./promisified-utils");
 
 const secret = process.env.SECRET;
 
@@ -43,6 +43,7 @@ router.post("/application", (req, res) => {
   const Jobs = db.collection("jobs");
 
   const {
+    applicantId,
     companyId,
     companyName,
     jobTitle,
@@ -62,8 +63,6 @@ router.post("/application", (req, res) => {
     over18,
     legal
   } = req.body;
-
-  const applicantId = hat();
 
   let test;
   Jobs.findOne({ companyId, id: jobId })
@@ -118,6 +117,23 @@ router.post("/application", (req, res) => {
       success: false,
       msg: err.message
     });
+  });
+
+  const url = "http://localhost:3000/applicant/" +
+    encodeURIComponent(companyName) + "/" +
+    encodeURIComponent(jobTitle) + "/" +
+    applicantId
+
+  console.log("URL:", url);
+
+  sgMail.send({
+    to: email,
+    from: "itsdecisiontyme@gmail.com",
+    subject: "blehbleh",
+    html: `<div>
+        <p>You will be prompted to begin the test:</p>
+        <a href=${url}>Click here</a>
+      </div>`
   });
 });
 
@@ -240,7 +256,6 @@ router.post("/test-results/:id", (req, res) => {
         );
       }
 
-      sgMail.setApiKey(process.env.SENDGRID_API_KEY);
       return Promise.all(
         companyUsers.map(x =>
           sgMail.send({

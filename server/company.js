@@ -236,6 +236,39 @@ router.get("/applicant/:id", (req, res) => {
   });
 });
 
+router.get("/resume/:applicantId", (req, res) => {
+  const db = req.app.locals.db;
+  const Resumes = db.collection("resumes");
+  const { applicantId } = req.params;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret)
+  .then(({ companyId }) =>
+    Resumes.findOne({
+      applicantId,
+      companyId
+    })
+  )
+  .then(resume => {
+    if (!resume) {
+      throw new Error(
+        `Could not find resume with applicantId ${applicantId} and companyId ${companyId}`
+      );
+    }
+
+    console.log(resume);
+
+    res.set("Content-Type", "application/pdf");
+    res.send(new Buffer(resume.resume.buffer));
+  })
+  .catch(err => {
+    res.send(err.message);
+    console.error(err);
+  })
+})
+
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Jobs = db.collection("jobs");

@@ -6,9 +6,12 @@ const MongoClient = require("mongodb").MongoClient;
 const path = require("path");
 require("dotenv").config();
 
+const { jwt } = require("./promisified-utils");
 const company = require("./company");
 const job = require("./job");
 const applicant = require("./applicant");
+const resume = require("./resume");
+
 const mongoUrl = process.env.MONGO_URL;
 
 const app = express();
@@ -40,6 +43,7 @@ app.use(jsonParser);
 app.use("/api/company", company);
 app.use("/api/job", job);
 app.use("/api/applicant", applicant);
+app.use("/api/resume", resume);
 
 app.use(express.static(path.join(__dirname, "../build")));
 

@@ -8,6 +8,7 @@ import CompanyNav from "./CompanyNav/CompanyNav";
 import Jobs from "./Jobs";
 import Messaging from "./Messaging/Messaging";
 import ApplicantProfile from "./ApplicantProfile/ApplicantProfile";
+import Resume from "./Resume";
 
 import Navbar from "../.././components/UI/layout/Navbar";
 
@@ -58,6 +59,7 @@ class CompanyRouter extends Component {
 								<Route path="/company/jobs" component={ Jobs } />
 								<Route path="/company/messaging" component={ Messaging } />
 								<Route path="/company/applicant/:applicantId" component={ ApplicantProfile } />
+                <Route path="/company/resume/:applicantId" component={ Resume } />
 							</div>
 						) :
 						(
