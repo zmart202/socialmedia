@@ -29,7 +29,7 @@ class Applicant extends Component {
       return;
     }
 
-    fetch(`http://localhost:4567/api/applicant/auth/${this.id}`)
+    fetch(`/api/applicant/auth/${this.id}`)
       .then(res => {
         return res.status === 403 ? Promise.reject("Auth denied") : res.json();
       })
@@ -77,7 +77,7 @@ class Applicant extends Component {
       return;
     }
 
-    fetch(`http://localhost:4567/api/applicant/test-timestamp/${this.id}`)
+    fetch(`/api/applicant/test-timestamp/${this.id}`)
       .then(
         res => (res.status === 403 ? Promise.reject("Auth denied") : res.json())
       )

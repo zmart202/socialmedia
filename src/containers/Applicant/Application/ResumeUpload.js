@@ -33,7 +33,7 @@ class ResumeUpload extends Component {
     };
 
     fetch(
-      `http://localhost:4567/api/applicant/resume/${this.companyId}/${this.applicantId}`
+      `/api/applicant/resume/${this.companyId}/${this.applicantId}`
     , options)
     .then(res => res.json())
     .then(data => {

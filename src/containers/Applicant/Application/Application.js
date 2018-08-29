@@ -86,7 +86,7 @@ class Application extends Component {
     this.setState({
       isLoading: true
     }, () => {
-      fetch("http://localhost:4567/api/applicant/application", options)
+      fetch("/api/applicant/application", options)
         .then(res => res.json())
         .then(data => {
           console.log(data);

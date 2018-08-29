@@ -47,7 +47,7 @@ class IndividualQuestion extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/job/edit-test", options)
+        fetch("/api/job/edit-test", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {
@@ -97,16 +97,16 @@ class IndividualQuestion extends Component {
       switch (this.props.question.type) {
         case "OPEN_RESPONSE":
           question = (
-            <div>
+            <pre>
               <h5>
                 {this.props.index + 1}. {this.props.question.body}
               </h5>
-            </div>
+            </pre>
           );
           break;
         case "MULTIPLE_CHOICE":
           question = (
-            <div>
+            <pre>
               <h5>
                 {this.props.index + 1}. {this.props.question.body}
               </h5>
@@ -123,7 +123,7 @@ class IndividualQuestion extends Component {
                   </div>
                 );
               })}
-            </div>
+            </pre>
           );
           break;
         default:

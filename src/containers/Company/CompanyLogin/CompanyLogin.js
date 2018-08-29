@@ -38,7 +38,7 @@ class CompanyLogin extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/company/login", options)
+        fetch("/api/company/login", options)
           .then(res => {
             if (res.status === 403) {
               this.setState({ denied: true });

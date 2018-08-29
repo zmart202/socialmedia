@@ -10,10 +10,10 @@ const CompanyNav = () => {
           <Link to="/company/messaging">Questions?</Link>
         </div> */}
         <div>
-          <Link to="/company/jobs">Editor</Link>
-        </div>
-        <div className="border2">
           <Link to="/company">Applicants</Link>
+        </div>
+        <div>
+          <Link to="/company/jobs">Editor</Link>
         </div>
       </div>
     </div>

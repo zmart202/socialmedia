@@ -40,7 +40,7 @@ class DeleteJob extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/job/delete-job", options)
+        fetch("/api/job/delete-job", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {

@@ -37,7 +37,7 @@ class Jobs extends Component {
       }
     };
 
-    fetch("http://localhost:4567/api/job/jobs", options)
+    fetch("/api/job/jobs", options)
       .then(res => res.json())
       .then(data => {
         console.log("Data from jobs", data);
@@ -196,7 +196,7 @@ class Jobs extends Component {
             style={style}
             onClick={() => this.setViewingJobId(x.id)}
           >
-            {x.title}
+            {x.title.length < 17 ? x.title : x.title.substring(0, 16) + "..."}
             <button
               style={{
                 float: "right",
@@ -372,6 +372,7 @@ class Jobs extends Component {
       <div className="jobeditor">
         {editJobModal}
         {createJobModal}
+        {deleteJobModal}
         <div className="row">
           <div className="column1">
             <h3>List of Jobs</h3>
@@ -396,7 +397,6 @@ class Jobs extends Component {
                 </div>
               </div>
             </center>
-            {deleteJobModal}
             {testEditor}
           </div>
         </div>

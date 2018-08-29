@@ -1,5 +1,4 @@
 import React, { Component } from "react";
-import { CopyToClipboard } from "react-copy-to-clipboard";
 
 import FinalResults from "./FinalResults/FinalResults";
 import SubmittedApplication from "./SubmittedApplication/SubmittedApplication";
@@ -16,6 +15,9 @@ class ApplicantProfile extends Component {
 			isLoading: true,
 			isError: false,
 			errorMsg: "",
+			isEmailing: false,
+			emailSuccess: false,
+			emailError: false,
 			applicant: {},
 			pageChoice: "application"
 		};
@@ -32,7 +34,7 @@ class ApplicantProfile extends Component {
 		};
 
 		fetch(
-			`http://localhost:4567/api/company/applicant/${this.applicantId}`,
+			`/api/company/applicant/${this.applicantId}`,
 			options
 		).then(res => res.json())
 		.then(data => {
@@ -68,53 +70,93 @@ class ApplicantProfile extends Component {
 				applicant={this.state.applicant}
 			/>;
 
-	createUrlCopier = () => {
-		let { applicant } = this.state;
-    let URL =
-			"http://localhost:3000/applicant/" +
-			encodeURIComponent(applicant.companyName) + "/" +
-			encodeURIComponent(applicant.jobTitle) + "/" +
-			applicant.id;
+	sendEmailReminder = () => {
+		this.setState({
+			isEmailing: true
+		}, () => {
+			const options = {
+				headers: {
+					"Authorization": `Bearer ${this.token}`,
+					"Content-Type": "application/json"
+				},
+				method: "POST",
+				body: JSON.stringify({
+					applicantId: this.state.applicant.id
+				})
+			};
 
-    return (
-      <CopyToClipboard text={URL}>
-        <button>Click to Copy URL</button>
-      </CopyToClipboard>
-    );
-  };
+			fetch("/api/company/email-reminder", options)
+			.then(res => res.json())
+			.then(data => {
+				console.log(data);
+				if (!data.success) {
+					return this.setState({
+						emailError: true,
+						isEmailing: false
+					});
+				}
 
-	render() {
-		const {
+				this.setState({
+					emailSuccess: true,
+					isEmailing: false
+				});
+			})
+			.catch(err => {
+				console.error(err);
+				this.setState({
+					emailError: true,
+					isEmailing: false
+				});
+			});
+		});
+	};
+
+	renderEmailBtn = () =>
+		<button type="button"
+			disabled={this.state.isEmailing}
+			onClick={this.sendEmailReminder}
+		>
+			Send Email Reminder
+		</button>;
+
+  render() {
+    const {
 			isError,
 			errorMsg,
 			isLoading,
 			applicant,
-			pageChoice
+			pageChoice,
+			emailSuccess,
+			emailError
 		} = this.state;
 
-		if (isError) {
-			return <p>{errorMsg}</p>
-		}
+    if (isError) {
+      return <p>{errorMsg}</p>;
+    }
 
-		if (isLoading) {
-			return <Spinner />;
-		}
+    if (isLoading) {
+      return <Spinner />;
+    }
 
-		return (
-			<div style={{ textAlign: 'center' }}>
-				<div className="profilenav">
-          <ApplicantProfileHeader
-          	changePage={this.changePage}
-          />
+    return (
+      <div>
+        <div className="profilenav">
+          <ApplicantProfileHeader changePage={this.changePage} />
         </div>
+        {applicant.completed ? "" : this.renderEmailBtn()}
 				{
-					applicant.completed ?
-						"" : this.createUrlCopier()
+					emailSuccess ? (
+						<p style={{ color: 'green' }}>Email sent!</p>
+					) : (
+						emailError ? (
+							<p style={{ color: 'red' }}>Failure: could not send email</p>
+						) : ""
+					)
 				}
-				{this.renderPageChoice(pageChoice)}
-			</div>
-		);
-	}
+        {this.renderPageChoice(pageChoice)}
+      </div>
+    );
+  }
 }
 
 export default ApplicantProfile;

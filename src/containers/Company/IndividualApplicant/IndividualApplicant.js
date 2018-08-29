@@ -53,7 +53,7 @@ class IndividualApplicant extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/company/edit-applicant", options)
+        fetch("/api/company/edit-applicant", options)
           .then(res => res.json())
           .then(data => {
             console.log(data);
@@ -103,7 +103,7 @@ class IndividualApplicant extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/company/remove-applicant", options)
+        fetch("/api/company/remove-applicant", options)
           .then(res => res.json())
           .then(data => {
             console.log(data);

@@ -25,7 +25,7 @@ class Resume extends Component {
     };
 
     fetch(
-      `http://localhost:4567/api/company/resume/${this.applicantId}`,
+      `/api/company/resume/${this.applicantId}`,
       options
     )
     .then(res => res.arrayBuffer())

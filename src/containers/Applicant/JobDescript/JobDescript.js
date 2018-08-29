@@ -28,7 +28,7 @@ class JobDescript extends Component {
       });
     }
 
-    fetch(`http://localhost:4567/api/job/job/${this.companyId}/${this.jobId}`)
+    fetch(`/api/job/job/${this.companyId}/${this.jobId}`)
       .then(res => res.json())
       .then(data => {
         console.log(data);

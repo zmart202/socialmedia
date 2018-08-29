@@ -18,7 +18,7 @@ class Company extends Component {
       companyName: "",
       search: "",
       createApplicantMounted: false
-    }
+    };
 
     this.token = localStorage.getItem("token");
   }
@@ -30,8 +30,8 @@ class Company extends Component {
       }
     };
 
-    fetch("http://localhost:4567/api/company/applicants", options)
-      .then(res =>res.json())
+    fetch("/api/company/applicants", options)
+      .then(res => res.json())
       .then(data => {
         console.log(data);
         if (!data.success) {

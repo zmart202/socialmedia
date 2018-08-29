@@ -4,13 +4,45 @@ const express = require("express");
 const shortid = require("shortid");
 const hat = require("hat");
 const { omit } = require("ramda");
+const sgMail = require("@sendgrid/mail");
+require("dotenv").config();
 
 const { hashPassword, comparePasswords, jwt } = require("./promisified-utils");
 const sample = require("./sample-test");
 
 const secret = process.env.SECRET;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const router = express.Router();
+
+router.post("/new-company-form", (req, res) => {
+  const db = req.app.locals.db;
+  const newCompany = db.collection("newCompany");
+  const { name, companyName, email, website, phone, positions } = req.body;
+
+  newCompany
+    .insertOne({
+      name,
+      companyName,
+      email,
+      phone,
+      website,
+      positions
+    })
+    .then(result => {
+      if (result.insertedCount === 0) {
+        throw new Error("Could not insert new company submission");
+      }
+
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+    });
+});
 
 router.post("/create-company", (req, res) => {
   const db = req.app.locals.db;
@@ -213,27 +245,26 @@ router.get("/applicant/:id", (req, res) => {
 
   const { id } = req.params;
 
-  jwt.verify(token, secret)
-  .then(_ =>
-    Applicants.findOne({ id })
-  )
-  .then(applicant => {
-    if (!applicant) {
-      throw new Error(`Could not find applicant with id ${id}`);
-    }
+  jwt
+    .verify(token, secret)
+    .then(_ => Applicants.findOne({ id }))
+    .then(applicant => {
+      if (!applicant) {
+        throw new Error(`Could not find applicant with id ${id}`);
+      }
 
-    res.json({
-      applicant,
-      success: true
+      res.json({
+        applicant,
+        success: true
+      });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
-  })
-  .catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
-    });
-    console.error(err);
-  });
 });
 
 router.get("/resume/:applicantId", (req, res) => {
@@ -274,69 +305,63 @@ router.post("/create-applicant", (req, res) => {
   const Jobs = db.collection("jobs");
   const Applicants = db.collection("applicants");
 
-  const {
-    firstName,
-    lastName,
-    email,
-    id,
-    jobId,
-    jobTitle
-  } = req.body;
+  const { firstName, lastName, email, id, jobId, jobTitle } = req.body;
 
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
   let companyId, companyName;
-  jwt.verify(token, secret)
-  .then(authData => {
-    companyId = authData.companyId;
-    companyName = authData.companyName;
+  jwt
+    .verify(token, secret)
+    .then(authData => {
+      companyId = authData.companyId;
+      companyName = authData.companyName;
 
-    return Jobs.findOne({
-      companyId,
-      id: jobId
-    });
-  })
-  .then(job => {
-    if (!job) {
-      throw new Error(
-        `Could not find job with id ${
-          req.body.jobId
-        } and companyId ${companyId}`
-      );
-    }
+      return Jobs.findOne({
+        companyId,
+        id: jobId
+      });
+    })
+    .then(job => {
+      if (!job) {
+        throw new Error(
+          `Could not find job with id ${
+            req.body.jobId
+          } and companyId ${companyId}`
+        );
+      }
 
-    return Applicants.insertOne({
-      firstName,
-      lastName,
-      email,
-      jobId,
-      jobTitle,
-      companyId,
-      companyName,
-      id,
-      test: job.test,
-      completed: false,
-      timestamp: new Date(),
-      testTimestamp: null,
-      secondsElapsed: 0,
-      answerData: null
-    });
-  })
-  .then(result => {
-    if (result.insertedCount === 0) {
-      throw new Error("Could not create applicant");
-    }
+      return Applicants.insertOne({
+        firstName,
+        lastName,
+        email,
+        jobId,
+        jobTitle,
+        companyId,
+        companyName,
+        id,
+        test: job.test,
+        completed: false,
+        timestamp: new Date(),
+        testTimestamp: null,
+        secondsElapsed: 0,
+        answerData: null
+      });
+    })
+    .then(result => {
+      if (result.insertedCount === 0) {
+        throw new Error("Could not create applicant");
+      }
 
-    res.json({ success: true });
-  })
-  .catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
-    console.error(err);
-  });
 });
 
 router.post("/edit-applicant", (req, res) => {
@@ -383,21 +408,72 @@ router.post("/remove-applicant", (req, res) => {
   const bearer = req.headers["authorization"];
   const token = bearer.split(" ")[1];
 
-  jwt.verify(token, secret)
-  .then(authData =>
-    Applicants.deleteOne({ email, id })
-  ).then(result => {
-    if (result.deletedCount === 0) {
-      throw new Error(`Could not remove applicant with id ${id}`);
-    }
+  jwt
+    .verify(token, secret)
+    .then(authData => Applicants.deleteOne({ email, id }))
+    .then(result => {
+      if (result.deletedCount === 0) {
+        throw new Error(`Could not remove applicant with id ${id}`);
+      }
 
-    res.json({ success: true });
-  }).catch(err => {
-    res.json({
-      success: false,
-      msg: err.message
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
     });
-  });
+});
+
+router.post("/email-reminder", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { applicantId } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt
+    .verify(token, secret)
+    .then(({ companyId }) =>
+      Applicants.findOne({
+        companyId,
+        id: applicantId
+      })
+    )
+    .then(applicant => {
+      if (!applicant) {
+        throw new Error(
+          `Could not find applicant with id ${id} under company with id ${companyId}`
+        );
+      }
+
+      const url = "http://decisiontyme.com/applicant/" +
+        encodeURIComponent(applicant.companyName) + "/" +
+        encodeURIComponent(applicant.jobTitle) + "/" +
+        applicantId;
+
+      return sgMail.send({
+        to: applicant.email,
+        from: "itsdecisiontyme@gmail.com",
+        subject: "Reminder: your test has not been completed",
+        html: `<div>
+            <p>You will be prompted to begin the test:</p>
+            <a href=${url}>Click here</a>
+          </div>`
+      });
+    })
+    .then(() => {
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
+    });
 });
 
 module.exports = router;

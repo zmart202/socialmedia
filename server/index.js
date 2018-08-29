@@ -4,7 +4,6 @@ const express = require("express");
 const jsonParser = require("body-parser").json();
 const MongoClient = require("mongodb").MongoClient;
 const path = require("path");
-require("dotenv").config();
 
 const { jwt } = require("./promisified-utils");
 const company = require("./company");
@@ -45,7 +44,14 @@ app.use("/api/job", job);
 app.use("/api/applicant", applicant);
 app.use("/api/resume", resume);
 
-app.use(express.static(path.join(__dirname, "../build")));
+// Server static assets if in production
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "../build")));
+
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(_dirname, "../build", "index.html"));
+  });
+}
 
 app.get("/*", (req, res) => {
   res.sendFile(path.join(__dirname, "../build", "index.html"));
