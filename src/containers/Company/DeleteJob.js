@@ -8,9 +8,7 @@ class DeleteJob extends Component {
     super(props);
     this.state = {
       isLoading: false,
-      isError: false,
-      errorMsg: "",
-      titleConfirmation: ""
+      isError: false
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -18,12 +16,6 @@ class DeleteJob extends Component {
   }
 
   handleSubmit(e) {
-    if (this.state.titleConfirmation !== this.props.title) {
-      return this.setState({
-        errorMsg: "Title you entered does not match"
-      });
-    }
-
     const options = {
       headers: {
         Authorization: `Bearer ${this.props.token}`,
@@ -89,25 +81,10 @@ class DeleteJob extends Component {
 
     return (
       <div>
-        <label htmlFor="titleConfirmation">
-          Enter The Highlighted Job Title:
-        </label>
-        <TextFieldGroup
-          type="text"
-          name="titleConfirmation"
-          placeholder="Place job title you wish to delete here"
-          onChange={this.handleChange}
-          info="* There is no undoing deleting a job position"
-        />
-        <button
-          style={{ color: "purple" }}
-          className="btn btn-light"
-          type="button"
-          onClick={this.handleSubmit}
-        >
-          <i className="fas fa-trash-alt text-success mr-1" />
-          Delete
-        </button>
+        <center>
+          <label>Are you sure you want to delete?</label>
+        </center>
+        <br />
         <button
           style={{ color: "purple" }}
           className="btn btn-light"
@@ -116,6 +93,15 @@ class DeleteJob extends Component {
         >
           <i className="fas fa-ban text-success mr-1" />
           Cancel
+        </button>
+        <button
+          style={{ color: "purple" }}
+          className="btn btn-light"
+          type="button"
+          onClick={this.handleSubmit}
+        >
+          <i className="fas fa-trash-alt text-success mr-1" />
+          Delete
         </button>
         {this.state.errorMsg}
       </div>
