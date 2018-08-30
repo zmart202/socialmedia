@@ -1,6 +1,7 @@
 import React, { Component } from "react";
 import { omit } from "ramda";
 import Toggle from "react-toggle";
+import hat from "hat";
 
 import ApplicationDetails from "./Input/ApplicationDetails";
 import EducationProfile from "./Input/Profile/EducationProfile";
@@ -42,6 +43,7 @@ class Application extends Component {
     this.jobTitle = decodeURIComponent(props.match.params.jobTitle);
     this.companyId = props.match.params.companyId;
     this.jobId = props.match.params.jobId;
+    this.applicantId = hat();
   }
 
   handleSubmit = () => {
@@ -72,6 +74,7 @@ class Application extends Component {
       },
       method: "POST",
       body: JSON.stringify({
+        applicantId: this.applicantId,
         companyId: this.companyId,
         companyName: this.companyName,
         jobId: this.jobId,
@@ -83,7 +86,7 @@ class Application extends Component {
     this.setState({
       isLoading: true
     }, () => {
-      fetch("http://localhost:4567/api/applicant/application", options)
+      fetch("/api/applicant/application", options)
         .then(res => res.json())
         .then(data => {
           console.log(data);
@@ -95,7 +98,7 @@ class Application extends Component {
           }
 
           this.props.history.push(
-            `/applicant/${this.companyName}/${this.jobTitle}/${data.applicantId}`
+            `/applicant/${this.companyName}/${this.jobTitle}/${this.applicantId}`
           );
         })
         .catch(err => console.log(err))
@@ -186,7 +189,12 @@ class Application extends Component {
             addExperience={this.addExperience}
             removeExperience={this.removeExperience}
           />
-          <ApplicationDetails handleChange={this.handleChange} />
+          <ApplicationDetails
+            applicantId={this.applicantId}
+            companyId={this.companyId}
+            jobId={this.jobId}
+            handleChange={this.handleChange}
+          />
           <div className="personalinfo">
             <div className="bottomform">
               <label className="react-toggle" style={{ padding: "20px 0px" }}>

@@ -4,12 +4,14 @@ const express = require("express");
 const shortid = require("shortid");
 const hat = require("hat");
 const { omit } = require("ramda");
+const sgMail = require("@sendgrid/mail");
 require("dotenv").config();
 
 const { hashPassword, comparePasswords, jwt } = require("./promisified-utils");
 const sample = require("./sample-test");
 
 const secret = process.env.SECRET;
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const router = express.Router();
 
@@ -265,6 +267,39 @@ router.get("/applicant/:id", (req, res) => {
     });
 });
 
+router.get("/resume/:applicantId", (req, res) => {
+  const db = req.app.locals.db;
+  const Resumes = db.collection("resumes");
+  const { applicantId } = req.params;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt.verify(token, secret)
+  .then(({ companyId }) =>
+    Resumes.findOne({
+      applicantId,
+      companyId
+    })
+  )
+  .then(resume => {
+    if (!resume) {
+      throw new Error(
+        `Could not find resume with applicantId ${applicantId} and companyId ${companyId}`
+      );
+    }
+
+    console.log(resume);
+
+    res.set("Content-Type", "application/pdf");
+    res.send(new Buffer(resume.resume.buffer));
+  })
+  .catch(err => {
+    res.send(err.message);
+    console.error(err);
+  })
+})
+
 router.post("/create-applicant", (req, res) => {
   const db = req.app.locals.db;
   const Jobs = db.collection("jobs");
@@ -388,6 +423,56 @@ router.post("/remove-applicant", (req, res) => {
         success: false,
         msg: err.message
       });
+    });
+});
+
+router.post("/email-reminder", (req, res) => {
+  const db = req.app.locals.db;
+  const Applicants = db.collection("applicants");
+  const { applicantId } = req.body;
+
+  const bearer = req.headers["authorization"];
+  const token = bearer.split(" ")[1];
+
+  jwt
+    .verify(token, secret)
+    .then(({ companyId }) =>
+      Applicants.findOne({
+        companyId,
+        id: applicantId
+      })
+    )
+    .then(applicant => {
+      if (!applicant) {
+        throw new Error(
+          `Could not find applicant with id ${id} under company with id ${companyId}`
+        );
+      }
+
+      const url = "http://decisiontyme.com/applicant/" +
+        encodeURIComponent(applicant.companyName) + "/" +
+        encodeURIComponent(applicant.jobTitle) + "/" +
+        applicantId;
+
+      return sgMail.send({
+        to: applicant.email,
+        from: "itsdecisiontyme@gmail.com",
+        subject: "Reminder: your test has not been completed",
+        html: `<div>
+            <p>You will be prompted to begin the test:</p>
+            <a href=${url}>Click here</a>
+          </div>`
+      });
+    })
+    .then(() => {
+      res.json({ success: true });
+    })
+    .catch(err => {
+      res.json({
+        success: false,
+        msg: err.message
+      });
+      console.error(err);
     });
 });
 

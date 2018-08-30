@@ -39,7 +39,7 @@ class NewApplicant extends Component {
           }
         };
 
-        fetch("http://localhost:4567/api/job/jobs", options)
+        fetch("/api/job/jobs", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {
@@ -113,7 +113,7 @@ class NewApplicant extends Component {
     this.setState({
       isLoading: true
     }, () => {
-      fetch("http://localhost:4567/api/company/create-applicant", options)
+      fetch("/api/company/create-applicant", options)
       .then(res => res.json())
       .then(data => {
         console.log(data);

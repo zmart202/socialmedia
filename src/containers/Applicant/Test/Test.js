@@ -69,7 +69,7 @@ class Test extends React.Component {
     };
 
     fetch(
-      `http://localhost:4567/api/applicant/test-results/${this.props.id}`,
+      `/api/applicant/test-results/${this.props.id}`,
       options
     )
       .then(res => res.json())

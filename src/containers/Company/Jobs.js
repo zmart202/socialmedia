@@ -37,7 +37,7 @@ class Jobs extends Component {
       }
     };
 
-    fetch("http://localhost:4567/api/job/jobs", options)
+    fetch("/api/job/jobs", options)
       .then(res => res.json())
       .then(data => {
         console.log("Data from jobs", data);
@@ -310,9 +310,15 @@ class Jobs extends Component {
       description = this.state.jobs.find(x => x.id === this.state.viewingJobId)
         .description;
 
-      let url = `http://localhost:3000/job-description/${
+      let host = window.location.hostname;
+      if (host.includes("localhost")) {
+        host = "http://localhost:3000";
+      }
+
+      let url = host + `/job-description/${
         this.state.companyId
       }/${this.state.viewingJobId}`;
+
       copyLinkBtn = (
         <CopyToClipboard text={url}>
           <button

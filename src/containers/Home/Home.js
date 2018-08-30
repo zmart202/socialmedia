@@ -55,7 +55,7 @@ class Home extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/company/new-company-form", options)
+        fetch("/api/company/new-company-form", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {

@@ -6,6 +6,7 @@ import Applicant from "./containers/Applicant/Applicant";
 import TestFinished from "./containers/Applicant/TestFinished/TestFinished";
 import JobDescript from "./containers/Applicant/JobDescript/JobDescript";
 import Application from "./containers/Applicant/Application/Application";
+import ResumeUpload from "./containers/Applicant/Application/ResumeUpload";
 import Home from "./containers/Home/Home";
 
 class App extends Component {
@@ -26,6 +27,10 @@ class App extends Component {
         <Route
           path="/application/:companyName/:jobTitle/:companyId/:jobId"
           component={Application}
+        />
+        <Route
+          path="/application/resume/:companyId/:applicantId"
+          component={ResumeUpload}
         />
       </div>
     );

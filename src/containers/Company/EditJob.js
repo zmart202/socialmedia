@@ -46,7 +46,7 @@ class EditJob extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/job/edit-job", options)
+        fetch("/api/job/edit-job", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {

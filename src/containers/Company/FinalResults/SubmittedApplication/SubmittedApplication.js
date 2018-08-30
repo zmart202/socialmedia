@@ -32,7 +32,7 @@ class SubmittedApplication extends Component {
     };
 
     fetch(
-      `http://localhost:4567/api/applicant/applicant/${this.ApplicantId}`,
+      `/api/applicant/applicant/${this.ApplicantId}`,
       options
     )
       .then(

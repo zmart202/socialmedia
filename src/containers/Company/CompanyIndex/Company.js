@@ -30,7 +30,7 @@ class Company extends Component {
       }
     };
 
-    fetch("http://localhost:4567/api/company/applicants", options)
+    fetch("/api/company/applicants", options)
       .then(res => res.json())
       .then(data => {
         console.log(data);

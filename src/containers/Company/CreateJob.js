@@ -59,7 +59,7 @@ class CreateJob extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/job/create-job", options)
+        fetch("/api/job/create-job", options)
           .then(res => res.json())
           .then(data => {
             if (!data.success) {

@@ -69,7 +69,7 @@ class CreateQuestion extends Component {
         isLoading: true
       },
       () => {
-        fetch("http://localhost:4567/api/job/edit-test", options)
+        fetch("/api/job/edit-test", options)
           .then(res => res.json())
           .then(data => {
             console.log(data);
