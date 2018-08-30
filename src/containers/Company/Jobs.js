@@ -310,9 +310,15 @@ class Jobs extends Component {
       description = this.state.jobs.find(x => x.id === this.state.viewingJobId)
         .description;
 
-      let url = `http://localhost:3000/job-description/${
+      let host = window.location.hostname;
+      if (host.includes("localhost")) {
+        host = "http://localhost:3000";
+      }
+
+      let url = host + `/job-description/${
         this.state.companyId
       }/${this.state.viewingJobId}`;
+
       copyLinkBtn = (
         <CopyToClipboard text={url}>
           <button

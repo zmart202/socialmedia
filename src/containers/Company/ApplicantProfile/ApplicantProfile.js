@@ -15,9 +15,6 @@ class ApplicantProfile extends Component {
 			isLoading: true,
 			isError: false,
 			errorMsg: "",
-			isEmailing: false,
-			emailSuccess: false,
-			emailError: false,
 			applicant: {},
 			pageChoice: "application"
 		};
@@ -70,55 +67,6 @@ class ApplicantProfile extends Component {
 				applicant={this.state.applicant}
 			/>;
 
-	sendEmailReminder = () => {
-		this.setState({
-			isEmailing: true
-		}, () => {
-			const options = {
-				headers: {
-					"Authorization": `Bearer ${this.token}`,
-					"Content-Type": "application/json"
-				},
-				method: "POST",
-				body: JSON.stringify({
-					applicantId: this.state.applicant.id
-				})
-			};
-
-			fetch("/api/company/email-reminder", options)
-			.then(res => res.json())
-			.then(data => {
-				console.log(data);
-				if (!data.success) {
-					return this.setState({
-						emailError: true,
-						isEmailing: false
-					});
-				}
-
-				this.setState({
-					emailSuccess: true,
-					isEmailing: false
-				});
-			})
-			.catch(err => {
-				console.error(err);
-				this.setState({
-					emailError: true,
-					isEmailing: false
-				});
-			});
-		});
-	};
-
-	renderEmailBtn = () =>
-		<button type="button"
-			disabled={this.state.isEmailing}
-			onClick={this.sendEmailReminder}
-		>
-			Send Email Reminder
-		</button>;
-
   render() {
     const {
 			isError,
@@ -126,8 +74,6 @@ class ApplicantProfile extends Component {
 			isLoading,
 			applicant,
 			pageChoice,
-			emailSuccess,
-			emailError
 		} = this.state;
 
     if (isError) {
@@ -143,16 +89,6 @@ class ApplicantProfile extends Component {
         <div className="profilenav">
           <ApplicantProfileHeader changePage={this.changePage} />
         </div>
-        {applicant.completed ? "" : this.renderEmailBtn()}
-				{
-					emailSuccess ? (
-						<p style={{ color: 'green' }}>Email sent!</p>
-					) : (
-						emailError ? (
-							<p style={{ color: 'red' }}>Failure: could not send email</p>
-						) : ""
-					)
-				}
         {this.renderPageChoice(pageChoice)}
       </div>
     );

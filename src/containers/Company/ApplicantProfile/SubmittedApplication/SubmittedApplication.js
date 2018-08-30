@@ -4,6 +4,17 @@ import "./SubmittedApplication.css";
 const SubmittedApplication = props => {
   let { applicant } = props;
 
+  let host = window.location.hostname;
+  if (host.includes("localhost")) {
+    host = "http://localhost:4567";
+  }
+
+  const resumeUrl = host +
+    "/api/resume/" +
+    applicant.companyId + "/" +
+    applicant.jobId + "/" +
+    applicant.id;
+
   let isOver18 = applicant.hasOwnProperty("over18")
     ? applicant.over18
       ? "Yes"
@@ -87,8 +98,9 @@ const SubmittedApplication = props => {
       <div className="resultsheaderapp">
         <center>
           <h1 style={{ color: "purple" }}>
-            {applicant.firstName}
-            's Submitted Application
+            {applicant.firstName +
+              "'s Submitted Application"
+            }
           </h1>
         </center>
         <div className="card card-body bg-light mb-3">
@@ -152,6 +164,15 @@ const SubmittedApplication = props => {
           <h3 className="text-center" style={{ color: "purple" }}>
             Applicant Details
           </h3>
+          <a href={resumeUrl}
+            target="_blank"
+  					style={{
+              cursor: 'pointer',
+              paddingBottom: '20px'
+            }}
+  				>
+  					<i className="fas fa-file">View Resume</i>
+  				</a>
           <p>
             <strong>Cover Letter:</strong> {applicant.coverLetter || "None"}
           </p>

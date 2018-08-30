@@ -6,8 +6,13 @@ class FinalResults extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showMultipleChoice: false
+      showMultipleChoice: false,
+      isEmailing: false,
+      emailSuccess: false,
+      emailError: false
     };
+
+    this.token = localStorage.getItem("token");
   }
 
   formattedSeconds = sec => {
@@ -23,8 +28,70 @@ class FinalResults extends React.Component {
     this.setState({ showMultipleChoice: !this.state.showMultipleChoice });
   };
 
+  renderEmailBtn = () =>
+		<div style={{
+			paddingLeft: '50px',
+      paddingTop: '20px'
+		}}>
+			<button type="button"
+				disabled={this.state.isEmailing}
+				onClick={this.sendEmailReminder}
+        style={{
+          cursor: 'pointer'
+        }}
+			>
+				<i className="far fa-envelope">Send Email Reminder</i>
+			</button>
+		</div>;
+
+    sendEmailReminder = () => {
+  		this.setState({
+  			isEmailing: true
+  		}, () => {
+  			const options = {
+  				headers: {
+  					"Authorization": `Bearer ${this.token}`,
+  					"Content-Type": "application/json"
+  				},
+  				method: "POST",
+  				body: JSON.stringify({
+  					applicantId: this.props.applicant.id
+  				})
+  			};
+
+  			fetch("/api/company/email-reminder", options)
+  			.then(res => res.json())
+  			.then(data => {
+  				console.log(data);
+  				if (!data.success) {
+  					return this.setState({
+  						emailError: true,
+  						isEmailing: false
+  					});
+  				}
+
+  				this.setState({
+  					emailSuccess: true,
+  					isEmailing: false
+  				});
+  			})
+  			.catch(err => {
+  				console.error(err);
+  				this.setState({
+  					emailError: true,
+  					isEmailing: false
+  				});
+  			});
+  		});
+  	};
+
   render() {
     const { applicant } = this.props;
+
+    const {
+      emailSuccess,
+      emailError
+    } = this.state;
 
     let allMCResponses = [];
     let correctMCResponses = [];
@@ -155,6 +222,16 @@ class FinalResults extends React.Component {
                   {applicant.firstName} {applicant.lastName} has not yet
                   completed the test
                 </strong>
+                {this.renderEmailBtn()}
+        				{
+        					emailSuccess ? (
+        						<p style={{ color: 'green' }}>Email sent!</p>
+        					) : (
+        						emailError ? (
+        							<p style={{ color: 'red' }}>Failure: could not send email</p>
+        						) : ""
+        					)
+        				}
               </h3>
             </div>
           </div>

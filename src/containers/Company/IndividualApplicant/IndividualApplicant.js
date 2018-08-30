@@ -179,7 +179,7 @@ class IndividualApplicant extends Component {
         </div>
         <div className="align">
           <div className="email">
-            <p>{this.props.applicant.email}</p>
+            <p>{this.props.applicant.jobTitle}</p>
           </div>
           <div className="padding">
           </div>

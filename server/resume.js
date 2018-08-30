@@ -1,5 +1,6 @@
 "use strict";
 
+const path = require("path");
 const { Router } = require("express");
 const bodyParser = require("body-parser");
 
@@ -43,24 +44,20 @@ router.post("/:companyId/:applicantId/:jobId", pdfParser, (req, res) => {
   });
 });
 
-router.get("/:jobId/:applicantId/:token", (req, res) => {
+router.get("/:companyId/:jobId/:applicantId", (req, res) => {
   const db = req.app.locals.db;
   const Resumes = db.collection("resumes");
-  const { token, applicantId, jobId } = req.params;
+  const { companyId, jobId, applicantId } = req.params;
 
-  jwt.verify(token, secret)
-  .then(({ companyId }) =>
-    Resumes.findOne({
-      applicantId,
-      companyId,
-      jobId
-    })
-  )
+  Resumes.findOne({
+    applicantId,
+    companyId,
+    jobId
+  })
   .then(resume => {
     if (!resume) {
-      throw new Error(
-        "Could not find resume with applicantId " +
-        applicantId + " and companyId " + companyId
+      return res.sendFile(
+        path.join(__dirname, "../public/resume-does-not-exist.html")
       );
     }
 
