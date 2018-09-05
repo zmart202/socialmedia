@@ -97,19 +97,25 @@ class IndividualQuestion extends Component {
       switch (this.props.question.type) {
         case "OPEN_RESPONSE":
           question = (
-            <pre>
-              <h5>
+            <pre
+              style={{
+                textAlign: "left",
+                width: "95%",
+                whiteSpace: "pre-wrap"
+              }}
+            >
+              <p>
                 {this.props.index + 1}. {this.props.question.body}
-              </h5>
+              </p>
             </pre>
           );
           break;
         case "MULTIPLE_CHOICE":
           question = (
             <pre>
-              <h5>
+              <p>
                 {this.props.index + 1}. {this.props.question.body}
-              </h5>
+              </p>
               {this.props.question.options.map(x => {
                 let highlighter = {};
                 if (x.correct) {

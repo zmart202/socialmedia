@@ -98,7 +98,7 @@ class EditJob extends Component {
     return (
       <div>
         <div>
-          <label htmlFor="title">Title:</label>
+          <label htmlFor="title">Edit Job Information:</label>
           <TextFieldGroup
             type="text"
             name="title"

@@ -41,7 +41,6 @@ class Company extends Component {
             errorMsg: data.msg
           });
         }
-
         this.setState({
           isLoading: false,
           applicants: data.applicants,

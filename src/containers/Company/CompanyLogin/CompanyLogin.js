@@ -106,6 +106,7 @@ class CompanyLogin extends Component {
             </div>
             <div style={{ padding: "10px" }}>
               <input
+                autofocus
                 type="password"
                 className="LoginInput"
                 placeholder="password..."

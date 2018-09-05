@@ -61,7 +61,9 @@ router.post("/application", (req, res) => {
     coverLetter,
     salaryRequirements,
     over18,
-    legal
+    legal,
+    felon,
+    felonyForm
   } = req.body;
 
   let test;
@@ -95,6 +97,8 @@ router.post("/application", (req, res) => {
         over18,
         legal,
         test,
+        felon,
+        felonyForm,
         id: applicantId,
         completed: false,
         timestamp: new Date(),
@@ -121,9 +125,12 @@ router.post("/application", (req, res) => {
       });
     });
 
-  const url = "http://decisiontyme.com/applicant/" +
-    encodeURIComponent(companyName) + "/" +
-    encodeURIComponent(jobTitle) + "/" +
+  const url =
+    "http://decisiontyme.com/applicant/" +
+    encodeURIComponent(companyName) +
+    "/" +
+    encodeURIComponent(jobTitle) +
+    "/" +
     applicantId;
 
   sgMail.send({
