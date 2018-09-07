@@ -67,7 +67,7 @@ router.get("/job/:companyId/:id", (req, res) => {
         { id },
         {
           $inc: {
-            visitors: 1
+            visits: 1
           }
         }
       );
@@ -104,7 +104,7 @@ router.post("/create-job", (req, res) => {
         companyId: authData.companyId,
         companyName: authData.companyName,
         test: [],
-        visitors: 0
+        visits: 0
       })
     )
     .then(result => {

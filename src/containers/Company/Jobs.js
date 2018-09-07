@@ -174,9 +174,9 @@ class Jobs extends Component {
 
     let { jobs, viewingJobId } = this.state;
 
-    let navbar = "";
-    if (this.state.jobs.length > 0) {
-      navbar = this.state.jobs.map(x => {
+    let jobList = "";
+    if (jobs.length > 0) {
+      jobList = jobs.map(x => {
         const style =
           x.id === this.state.viewingJobId
             ? {
@@ -214,7 +214,7 @@ class Jobs extends Component {
         );
       });
     } else {
-      navbar = <p>No jobs yet</p>;
+      jobList = <p>No jobs yet</p>;
     }
 
     let createJobBtn = "";
@@ -383,7 +383,7 @@ class Jobs extends Component {
           <div className="column1">
             <h3>List of Jobs</h3>
             {createJobBtn}
-            <div className="jobnavbar">{navbar}</div>
+            <div className="jobnavbar">{jobList}</div>
           </div>
           <div className="column2">
             <div className="joblink">

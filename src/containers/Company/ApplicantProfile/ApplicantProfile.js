@@ -72,7 +72,6 @@ class ApplicantProfile extends Component {
 			isError,
 			errorMsg,
 			isLoading,
-			applicant,
 			pageChoice,
 		} = this.state;
 

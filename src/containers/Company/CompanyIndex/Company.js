@@ -14,7 +14,10 @@ class Company extends Component {
       isError: false,
       errorMsg: null,
       applicants: [],
+      loadingJobs: true,
+      errorLoadingJobs: false,
       jobs: [],
+      totalJobViews: 0,
       companyName: "",
       search: "",
       createApplicantMounted: false
@@ -30,32 +33,43 @@ class Company extends Component {
       }
     };
 
-    fetch("/api/company/applicants", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
-
-        this.setState({
+    Promise.all([
+      fetch("/api/company/applicants", options)
+        .then(res => res.json()),
+      fetch("/api/job/jobs", options)
+        .then(res => res.json())
+    ])
+    .then(data => {
+      console.log(data);
+      if (data.includes(responseObj =>
+        responseObj.success === false
+      )) {
+        return this.setState({
           isLoading: false,
-          applicants: data.applicants,
-          companyName: data.companyName
+          isError: true
         });
-      })
-      .catch(err => {
+      } else {
+        const companyName = data[0].companyName;
+        const [{ applicants }, { jobs }] = data;
         this.setState({
+          companyName,
+          applicants,
+          jobs,
           isLoading: false,
-          isError: true,
-          errorMsg: err.message
-        });
-        console.error(err);
+          totalJobViews: jobs.reduce((acc, x) =>
+            acc + x.visits
+          , 0)
+        })
+      }
+    })
+    .catch(err => {
+      console.error(err);
+      this.setState({
+        isLoading: false,
+        isError: true,
+        msg: err.message
       });
+    });
   }
 
   generateTokenHandler = () => {
@@ -158,6 +172,7 @@ class Company extends Component {
         <div>
           <div className="CompanyName">
             <h1>{this.state.companyName}</h1>
+            <p>Your positions have been viewed a total of {this.state.totalJobViews} times</p>
           </div>
           {createApplicant}
           {createApplicantBtn}

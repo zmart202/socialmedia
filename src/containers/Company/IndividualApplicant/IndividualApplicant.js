@@ -1,4 +1,6 @@
 import React, { Component } from "react";
+import dateFormat from "dateformat";
+
 import "./IndividualApplicant.css";
 import { Link } from "react-router-dom";
 import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
@@ -138,6 +140,8 @@ class IndividualApplicant extends Component {
   };
 
   render() {
+    const { applicant } = this.props;
+
     if (this.state.isLoading) {
       return <Spinner />;
     }
@@ -207,6 +211,13 @@ class IndividualApplicant extends Component {
               editHandler={this.editHandler}
               deleteHandler={this.onDelete}
             />
+          </div>
+          <div style={{
+            paddingTop: '15px'
+          }}>
+            <p style={{fontSize:"10px"}}>
+              Created: <strong>{dateFormat(applicant.timestamp, "mmmm dS, yyyy")}</strong>
+            </p>
           </div>
         </div>
       </div>
