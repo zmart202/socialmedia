@@ -57,7 +57,9 @@ class JobDescript extends Component {
 
   routeToApplication() {
     this.props.history.push(
-      `/application/${this.state.companyName}/${this.state.title}/${this.companyId}/${this.jobId}`
+      `/application/${this.state.companyName}/${this.state.title}/${
+        this.companyId
+      }/${this.jobId}`
     );
   }
 
@@ -81,7 +83,15 @@ class JobDescript extends Component {
           </p>
         </div>
         <h5>DESCRIPTION</h5>
-        <p>{this.state.description}</p>
+        <pre
+          style={{
+            textAlign: "left",
+            width: "100%",
+            whiteSpace: "pre-wrap"
+          }}
+        >
+          <p>{this.state.description}</p>
+        </pre>
         <div style={{ padding: "10px" }}>
           <button
             type="button"

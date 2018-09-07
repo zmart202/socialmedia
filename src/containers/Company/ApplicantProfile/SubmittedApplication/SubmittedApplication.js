@@ -9,10 +9,13 @@ const SubmittedApplication = props => {
     host = "http://localhost:4567";
   }
 
-  const resumeUrl = host +
+  const resumeUrl =
+    host +
     "/api/resume/" +
-    applicant.companyId + "/" +
-    applicant.jobId + "/" +
+    applicant.companyId +
+    "/" +
+    applicant.jobId +
+    "/" +
     applicant.id;
 
   let isOver18 = applicant.hasOwnProperty("over18")
@@ -86,7 +89,8 @@ const SubmittedApplication = props => {
               <strong>Start Date:</strong> {exp.startTime}
             </p>
             <p>
-              <strong>End Date:</strong> {exp.endTime}
+              <strong>End Date:</strong>{" "}
+              {exp.current ? <span>Now</span> : <span>{exp.endTime}</span>}
             </p>
           </div>
         ))
@@ -98,9 +102,7 @@ const SubmittedApplication = props => {
       <div className="resultsheaderapp">
         <center>
           <h1 style={{ color: "purple" }}>
-            {applicant.firstName +
-              "'s Submitted Application"
-            }
+            {applicant.firstName + "'s Submitted Application"}
           </h1>
         </center>
         <div className="card card-body bg-light mb-3">
@@ -164,15 +166,16 @@ const SubmittedApplication = props => {
           <h3 className="text-center" style={{ color: "purple" }}>
             Applicant Details
           </h3>
-          <a href={resumeUrl}
+          <a
+            href={resumeUrl}
             target="_blank"
-  					style={{
-              cursor: 'pointer',
-              paddingBottom: '20px'
+            style={{
+              cursor: "pointer",
+              paddingBottom: "20px"
             }}
-  				>
-  					<i className="fas fa-file">View Resume</i>
-  				</a>
+          >
+            <i className="fas fa-file">View Resume</i>
+          </a>
           <p>
             <strong>Cover Letter:</strong> {applicant.coverLetter || "None"}
           </p>
@@ -193,10 +196,14 @@ const SubmittedApplication = props => {
             <strong>Does the applicant have any felony charges:</strong>{" "}
             {isFelon}
           </p>
-          <p>
-            <strong>Description of felony charges:</strong>
-            {felonyForm}
-          </p>
+          {applicant.hasOwnProperty("felonyForm") ? (
+            applicant.felon ? (
+              <p>
+                <strong>Description of felony charges:</strong>
+                {felonyForm}
+              </p>
+            ) : null
+          ) : null}
         </div>
       </div>
     </div>

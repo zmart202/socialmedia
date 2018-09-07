@@ -32,8 +32,9 @@
 }
 
 .button {
+  text-align: center;
   background-color: #6e2d84;
-  padding: 10px 140px 10px 40px;
+  padding: 10px 70px 10px 70px;
   margin: 0px 0px 20px 10px;
   color: white;
   opacity: 1;

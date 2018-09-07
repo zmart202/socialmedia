@@ -83,26 +83,35 @@ class Application extends Component {
       })
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("/api/applicant/application", options)
-        .then(res => res.json())
-        .then(data => {
-          console.log(data);
-          if (!data.success) {
-            return this.setState({
-              errorMsg: data.msg,
-              isLoading: false
-            }, () => window.scrollTo(0, 0));
-          }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("/api/applicant/application", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            console.log(this.state);
+            if (!data.success) {
+              return this.setState(
+                {
+                  errorMsg: data.msg,
+                  isLoading: false
+                },
+                () => window.scrollTo(0, 0)
+              );
+            }
 
-          this.props.history.push(
-            `/applicant/${this.companyName}/${this.jobTitle}/${this.applicantId}`
-          );
-        })
-        .catch(err => console.log(err))
-    });
+            this.props.history.push(
+              `/applicant/${this.companyName}/${this.jobTitle}/${
+                this.applicantId
+              }`
+            );
+          })
+          .catch(err => console.log(err));
+      }
+    );
   };
 
   handleChange = e =>
@@ -120,10 +129,11 @@ class Application extends Component {
       legal: !prevState.legal
     }));
 
-  isFelonHandler = () =>
+  isFelonHandler = () => {
     this.setState(prevState => ({
       felon: !prevState.felon
     }));
+  };
 
   addEducation = educationObj =>
     this.setState(prevState => ({

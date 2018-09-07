@@ -24,9 +24,10 @@ class Jobs extends Component {
       editJobMounted: false,
       createJobModal: false,
       editJobModal: false,
-      deleteJobModal: false
+      deleteJobModal: false,
+      viewDescription: false
     };
-
+    this.viewDescriptionHandler = this.viewDescriptionHandler.bind(this);
     this.token = localStorage.getItem("token");
   }
 
@@ -66,7 +67,11 @@ class Jobs extends Component {
       });
   }
 
-  setViewingJobId = id => this.setState({ viewingJobId: id });
+  setViewingJobId = id =>
+    this.setState({
+      viewingJobId: id,
+      viewDescription: false
+    });
 
   createJobInState = job =>
     this.setState(prevState => ({
@@ -87,6 +92,10 @@ class Jobs extends Component {
             : x
       )
     }));
+
+  viewDescriptionHandler = () => {
+    this.setState({ viewDescription: !this.state.viewDescription });
+  };
 
   deleteJobInState = id =>
     this.setState(prevState => {
@@ -202,7 +211,8 @@ class Jobs extends Component {
                 float: "right",
                 color: "purple",
                 borderRadius: "10px",
-                cursor: "pointer"
+                cursor: "pointer",
+                fontSize: "10px"
               }}
               type="button"
               onClick={this.toggleEditJob}
@@ -315,9 +325,9 @@ class Jobs extends Component {
         host = "http://localhost:3000";
       }
 
-      let url = host + `/job-description/${
-        this.state.companyId
-      }/${this.state.viewingJobId}`;
+      let url =
+        host +
+        `/job-description/${this.state.companyId}/${this.state.viewingJobId}`;
 
       copyLinkBtn = (
         <CopyToClipboard text={url}>
@@ -327,7 +337,7 @@ class Jobs extends Component {
             type="button"
           >
             <i className="fas fa-link text-success mr-1" />
-            Copy Link to Application
+            Copy Pre-Screening Link
           </button>
         </CopyToClipboard>
       );
@@ -394,12 +404,47 @@ class Jobs extends Component {
             <center style={{ paddingTop: "100px" }}>
               <div className="card card-body bg-light mb-3">
                 <div className="jobdescription">
-                  <h5 style={{ textDecoration: "underline" }}>
-                    Job Description
-                  </h5>
-                  <p>
-                    <em>{description}</em>
-                  </p>
+                  <h5>Job Description</h5>
+                  {this.state.viewDescription ? (
+                    <a
+                      style={{
+                        color: "blue",
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        fontSize: "12px"
+                      }}
+                      onClick={this.viewDescriptionHandler}
+                    >
+                      Hide Job Description
+                    </a>
+                  ) : (
+                    <a
+                      style={{
+                        color: "blue",
+                        textDecoration: "underline",
+                        cursor: "pointer",
+                        fontSize: "12px"
+                      }}
+                      onClick={this.viewDescriptionHandler}
+                    >
+                      View Job Description
+                    </a>
+                  )}
+                  {this.state.viewDescription ? (
+                    <pre>
+                      <p>
+                        <div
+                          style={{
+                            textAlign: "left",
+                            width: "100%",
+                            whiteSpace: "pre-wrap"
+                          }}
+                        >
+                          <em>{description}</em>
+                        </div>
+                      </p>
+                    </pre>
+                  ) : null}
                 </div>
               </div>
             </center>

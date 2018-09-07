@@ -195,7 +195,8 @@ class Home extends Component {
               padding: "20px 40px",
               backgroundColor: "purple",
               color: "white",
-              fontWeight: "bold"
+              fontWeight: "bold",
+              cursor: "pointer"
             }}
           >
             CLICK HERE TO GET STARTED{" "}

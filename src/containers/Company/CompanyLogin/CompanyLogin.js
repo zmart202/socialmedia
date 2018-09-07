@@ -61,7 +61,7 @@ class CompanyLogin extends Component {
           });
       }
     );
-  }
+  };
 
   render() {
     let errorStyle = null;
@@ -91,7 +91,7 @@ class CompanyLogin extends Component {
     return (
       <div className="background">
         <div className="login">
-          <form>
+          <form onSubmit={this.handleSubmit}>
             <h2 className="company">
               <strong>Company Login</strong>
             </h2>
@@ -106,6 +106,7 @@ class CompanyLogin extends Component {
             </div>
             <div style={{ padding: "10px" }}>
               <input
+                autofocus
                 type="password"
                 className="LoginInput"
                 placeholder="password..."
@@ -114,9 +115,7 @@ class CompanyLogin extends Component {
               />
             </div>
             <div>
-              <a onClick={this.handleSubmit}>
-                <div className="button">Login</div>
-              </a>
+              <input type="submit" value="Login" className="button" />
               <div style={errorStyle}>
                 {deniedMsg}
                 {errorMsg}
