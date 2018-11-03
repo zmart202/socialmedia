@@ -3,11 +3,11 @@ import { Link } from "react-router-dom";
 import landingtest from "../../img/landingtest.png";
 import landinglink from "../../img/landinglink.png";
 import landinggroup from "../../img/landinggroup.png";
-import Modal from "../../components/UI/Modal/Modal";
+import Modal from "../../common/Modal/Modal";
 
 import "./Home.css";
-import TextFieldGroup from "../../components/UI/Form/TextFieldGroup";
-import Spinner from "../../components/UI/Spinner/Spinner";
+import TextFieldGroup from "../../common/Form/TextFieldGroup";
+import Spinner from "../../common/Spinner/Spinner";
 
 class Home extends Component {
   constructor(props) {

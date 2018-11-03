@@ -1,9 +1,9 @@
 import React, { Component } from "react";
 import hat from "hat";
 
-import Spinner from "../../components/UI/Spinner/Spinner";
-import TextAreaFieldGroup from "../../components/UI/Form/TextAreaFieldGroup";
-import TextFieldGroup from "../../components/UI/Form/TextFieldGroup";
+import Spinner from "../../common/Spinner/Spinner";
+import TextAreaFieldGroup from "../../common/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../common/Form/TextFieldGroup";
 
 class CreateJob extends Component {
   constructor(props) {
@@ -29,10 +29,7 @@ class CreateJob extends Component {
   handleSubmit(e) {
     e.preventDefault();
 
-    if (
-      ["title", "description"]
-      .find(x => this.state[x].length === 0)
-    ) {
+    if (["title", "description"].find(x => this.state[x].length === 0)) {
       return this.setState({
         errorMsg: "Please include a job title and description"
       });
@@ -111,9 +108,7 @@ class CreateJob extends Component {
 
     let errorMsg = "";
     if (this.state.errorMsg.length > 0) {
-      errorMsg = (
-        <p style={{ color: 'red' }}>{this.state.errorMsg}</p>
-      );
+      errorMsg = <p style={{ color: "red" }}>{this.state.errorMsg}</p>;
     }
 
     return (

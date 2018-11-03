@@ -7,11 +7,11 @@ import ApplicationDetails from "./Input/ApplicationDetails";
 import EducationProfile from "./Input/Profile/EducationProfile";
 import PersonalInformation from "./Input/PersonalInformation";
 import ExperienceProfile from "./Input/Profile/ExperienceProfile";
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../common/Spinner/Spinner";
 
 import "./Application.css";
 import "./Input/PersonalInformation.css";
-import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
+import TextAreaFieldGroup from "../../../common/Form/TextAreaFieldGroup";
 
 class Application extends Component {
   constructor(props) {

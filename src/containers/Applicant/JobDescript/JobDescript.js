@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../common/Spinner/Spinner";
 import "./JobDescript.css";
 
 class JobDescript extends Component {

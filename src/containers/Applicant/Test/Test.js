@@ -1,7 +1,7 @@
 import React from "react";
 import "./Test.css";
 
-import Question from "../../../components/Question";
+import Question from "../../../common/Question";
 
 class Test extends React.Component {
   constructor(props) {
@@ -41,9 +41,9 @@ class Test extends React.Component {
           ? q.type === "MULTIPLE_CHOICE"
             ? {
                 ...q,
-                correct: q.options.find(x =>
-                    x.answer === this.state.answers[q.id]
-                  ).correct,
+                correct: q.options.find(
+                  x => x.answer === this.state.answers[q.id]
+                ).correct,
                 answer: this.state.answers[q.id]
               }
             : {
@@ -68,10 +68,7 @@ class Test extends React.Component {
       })
     };
 
-    fetch(
-      `/api/applicant/test-results/${this.props.id}`,
-      options
-    )
+    fetch(`/api/applicant/test-results/${this.props.id}`, options)
       .then(res => res.json())
       .then(data => {
         console.log(data);

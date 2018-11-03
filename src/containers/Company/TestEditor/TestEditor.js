@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import QuestionList from "./QuestionList/QuestionList";
 import CreateQuestion from "./CreateQuestion";
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../common/Spinner/Spinner";
 
 class TestEditor extends Component {
   constructor(props) {

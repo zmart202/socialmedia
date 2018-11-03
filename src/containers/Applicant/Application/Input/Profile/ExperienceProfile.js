@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import shortid from "shortid";
 import _ from "lodash";
 import "./Profile.css";
-import TextFieldGroup from "../../../../../components/UI/Form/TextFieldGroup";
-import TextAreaFieldGroup from "../../../../../components/UI/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../../../../common/Form/TextFieldGroup";
+import TextAreaFieldGroup from "../../../../../common/Form/TextAreaFieldGroup";
 // import EducationInput from './EducationInput/EducationInput';
 
 const initialState = {

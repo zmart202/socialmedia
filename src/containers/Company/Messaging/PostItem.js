@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ResponseFeed from "./ResponseFeed";
-import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
+import TextAreaFieldGroup from "../../../common/Form/TextAreaFieldGroup";
 
 class PostItem extends Component {
   constructor(props) {

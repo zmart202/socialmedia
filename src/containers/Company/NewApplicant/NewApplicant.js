@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import hat from "hat";
 
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../common/Spinner/Spinner";
 import "./NewApplicant.css";
 
 class NewApplicant extends Component {
@@ -74,15 +74,12 @@ class NewApplicant extends Component {
       });
     }
 
-    const requiredFields = [
-      "firstName",
-      "lastName",
-      "email"
-    ];
+    const requiredFields = ["firstName", "lastName", "email"];
 
-    const isValid = requiredFields.reduce((acc, x) =>
-      (this.state[x].length > 0) && acc
-    , true);
+    const isValid = requiredFields.reduce(
+      (acc, x) => this.state[x].length > 0 && acc,
+      true
+    );
 
     if (!isValid) {
       return this.setState({
@@ -110,32 +107,35 @@ class NewApplicant extends Component {
       body: JSON.stringify(applicant)
     };
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      fetch("/api/company/create-applicant", options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            isError: true,
-            errorMsg: data.msg
-          });
-        }
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        fetch("/api/company/create-applicant", options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                isError: true,
+                errorMsg: data.msg
+              });
+            }
 
-        this.props.createApplicant(applicant);
-      })
-      .catch(err => {
-        console.error(err);
-        this.setState({
-          isError: true,
-          isLoading: false,
-          errorMsg: err.message
-        });
-      });
-    });
+            this.props.createApplicant(applicant);
+          })
+          .catch(err => {
+            console.error(err);
+            this.setState({
+              isError: true,
+              isLoading: false,
+              errorMsg: err.message
+            });
+          });
+      }
+    );
   };
 
   handleChange = e =>
@@ -144,7 +144,7 @@ class NewApplicant extends Component {
     });
 
   handleJobChange = e => {
-    const [title, id] = e.target.value.split(',');
+    const [title, id] = e.target.value.split(",");
     this.setState({
       job: {
         title,
@@ -207,16 +207,12 @@ class NewApplicant extends Component {
             />
           </div>
           <div className="input">
-            <select
-              name="job"
-              defaultValue=""
-              onChange={this.handleJobChange}
-            >
+            <select name="job" defaultValue="" onChange={this.handleJobChange}>
               <option value="" disabled hidden>
                 Assign Job
               </option>
               {this.props.jobs.map(x => (
-                <option key={x.id} value={[x.title, x.id].join(',')}>
+                <option key={x.id} value={[x.title, x.id].join(",")}>
                   {x.title}
                 </option>
               ))}

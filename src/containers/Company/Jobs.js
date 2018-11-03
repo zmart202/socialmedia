@@ -6,8 +6,8 @@ import CreateJob from "./CreateJob";
 import EditJob from "./EditJob";
 import DeleteJob from "./DeleteJob";
 import TestEditor from "./TestEditor/TestEditor";
-import Spinner from "../../components/UI/Spinner/Spinner";
-import Modal from "../../components/UI/Modal/Modal";
+import Spinner from "../../common/Spinner/Spinner";
+import Modal from "../../common/Modal/Modal";
 import "./Jobs.css";
 
 class Jobs extends Component {
@@ -311,6 +311,7 @@ class Jobs extends Component {
 
     let description = "";
     let copyLinkBtn = "";
+    let jobTitle = "";
     if (
       this.state.viewingJobId &&
       !this.state.editJobMounted &&
@@ -319,6 +320,8 @@ class Jobs extends Component {
     ) {
       description = this.state.jobs.find(x => x.id === this.state.viewingJobId)
         .description;
+      jobTitle = this.state.jobs.find(x => x.id === this.state.viewingJobId)
+        .title;
 
       let host = window.location.hostname;
       if (host.includes("localhost")) {
@@ -386,6 +389,7 @@ class Jobs extends Component {
 
     return (
       <div className="jobeditor">
+        {console.log(this.state.jobs)}
         {editJobModal}
         {createJobModal}
         {deleteJobModal}
@@ -404,7 +408,7 @@ class Jobs extends Component {
             <center style={{ paddingTop: "100px" }}>
               <div className="card card-body bg-light mb-3">
                 <div className="jobdescription">
-                  <h5>Job Description</h5>
+                  <h5>{jobTitle}</h5>
                   {this.state.viewDescription ? (
                     <a
                       style={{

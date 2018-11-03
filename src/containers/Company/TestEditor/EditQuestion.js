@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import shortid from "shortid";
 import _ from "lodash";
 
-import Spinner from "../../../components/UI/Spinner/Spinner";
-import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
+import Spinner from "../../../common/Spinner/Spinner";
+import ActionButtons from "../../../common/Buttons/ActionButtons";
 
 class EditQuestion extends Component {
   constructor(props) {

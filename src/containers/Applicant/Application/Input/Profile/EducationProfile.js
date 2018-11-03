@@ -3,8 +3,8 @@ import { omit } from "ramda";
 import shortid from "shortid";
 import Toggle from "react-toggle";
 import "./Profile.css";
-import TextAreaFieldGroup from "../../../../../components/UI/Form/TextAreaFieldGroup";
-import TextFieldGroup from "../../../../../components/UI/Form/TextFieldGroup";
+import TextAreaFieldGroup from "../../../../../common/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../../../../common/Form/TextFieldGroup";
 
 // import EducationInput from './EducationInput/EducationInput';
 

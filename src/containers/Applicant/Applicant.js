@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import Test from "./Test/Test";
 import TestIntro from "./TestIntro/TestIntro";
-import Spinner from "../../components/UI/Spinner/Spinner";
+import Spinner from "../../common/Spinner/Spinner";
 
 class Applicant extends Component {
   constructor(props) {
@@ -91,8 +91,7 @@ class Applicant extends Component {
     this.props.history.push("/test-finished");
   };
 
-  propagateError = () =>
-    this.setState({ isError: true });
+  propagateError = () => this.setState({ isError: true });
 
   changePageHandler = () =>
     this.setState({ buttonClicked: !this.state.buttonClicked });

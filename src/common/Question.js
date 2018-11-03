@@ -1,5 +1,5 @@
 import React from "react";
-import TextAreaFieldGroup from "./UI/Form/TextAreaFieldGroup";
+import TextAreaFieldGroup from "./Form/TextAreaFieldGroup";
 
 const Question = props => {
   let question = "";

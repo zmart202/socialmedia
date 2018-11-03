@@ -2,7 +2,7 @@ import React, { Component } from "react";
 
 import NewApplicant from "../NewApplicant/NewApplicant";
 import ApplicantList from "../ApplicantList";
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../common/Spinner/Spinner";
 import "./Company.css";
 import ApplicantHeader from "../ApplicantHeader/ApplicantHeader";
 

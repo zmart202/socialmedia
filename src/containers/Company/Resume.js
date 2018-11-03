@@ -1,11 +1,11 @@
 import React, { Component } from "react";
 import { Document } from "react-pdf/dist/entry.webpack";
 
-import Spinner from "../../components/UI/Spinner/Spinner";
+import Spinner from "../../common/Spinner/Spinner";
 
 class Resume extends Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       isLoading: true,
       isError: false,
@@ -19,29 +19,26 @@ class Resume extends Component {
   componentDidMount() {
     const options = {
       headers: {
-        "Authorization": `Bearer ${this.token}`,
+        Authorization: `Bearer ${this.token}`,
         "Content-Type": "application/pdf"
       }
     };
 
-    fetch(
-      `/api/company/resume/${this.applicantId}`,
-      options
-    )
-    .then(res => res.arrayBuffer())
-    .then(pdf => {
-      console.log(pdf);
-      this.setState({
-        resume: pdf,
-        isLoading: false
-      });
-    })
-    .catch(err => {
-      this.setState({
-        isLoading: false,
-        isError: true
+    fetch(`/api/company/resume/${this.applicantId}`, options)
+      .then(res => res.arrayBuffer())
+      .then(pdf => {
+        console.log(pdf);
+        this.setState({
+          resume: pdf,
+          isLoading: false
+        });
       })
-    })
+      .catch(err => {
+        this.setState({
+          isLoading: false,
+          isError: true
+        });
+      });
   }
 
   render() {
@@ -55,9 +52,11 @@ class Resume extends Component {
 
     return (
       <div>
-        <Document file={{
-          data: this.state.resume
-        }} />
+        <Document
+          file={{
+            data: this.state.resume
+          }}
+        />
       </div>
     );
   }

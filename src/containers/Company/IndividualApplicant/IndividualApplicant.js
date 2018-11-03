@@ -3,8 +3,8 @@ import dateFormat from "dateformat";
 
 import "./IndividualApplicant.css";
 import { Link } from "react-router-dom";
-import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
-import Spinner from "../../../components/UI/Spinner/Spinner";
+import ActionButtons from "../../../common/Buttons/ActionButtons";
+import Spinner from "../../../common/Spinner/Spinner";
 
 class IndividualApplicant extends Component {
   constructor(props) {
@@ -167,7 +167,8 @@ class IndividualApplicant extends Component {
             </div>
           ) : (
             this.props.applicant.lastName
-          )},
+          )}
+          ,
           {this.state.isEditing ? (
             <input
               type="text"
@@ -185,8 +186,7 @@ class IndividualApplicant extends Component {
           <div className="email">
             <p>{this.props.applicant.jobTitle}</p>
           </div>
-          <div className="padding">
-          </div>
+          <div className="padding" />
           <div className="padding">
             <div>
               <strong>
@@ -212,11 +212,16 @@ class IndividualApplicant extends Component {
               deleteHandler={this.onDelete}
             />
           </div>
-          <div style={{
-            paddingTop: '15px'
-          }}>
-            <p style={{fontSize:"10px"}}>
-              Created: <strong>{dateFormat(applicant.timestamp, "mmmm dS, yyyy")}</strong>
+          <div
+            style={{
+              paddingTop: "15px"
+            }}
+          >
+            <p style={{ fontSize: "10px" }}>
+              Created:{" "}
+              <strong>
+                {dateFormat(applicant.timestamp, "mmmm dS, yyyy")}
+              </strong>
             </p>
           </div>
         </div>

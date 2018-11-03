@@ -2,8 +2,8 @@ import React, { Component } from "react";
 import shortid from "shortid";
 import _ from "lodash";
 
-import ActionButtons from "../../../components/UI/Buttons/ActionButtons";
-import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
+import ActionButtons from "../../../common/Buttons/ActionButtons";
+import TextAreaFieldGroup from "../../../common/Form/TextAreaFieldGroup";
 
 class CreateQuestion extends Component {
   constructor(props) {

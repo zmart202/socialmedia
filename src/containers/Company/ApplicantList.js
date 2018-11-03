@@ -1,7 +1,7 @@
 import _ from "lodash";
 import React, { Component } from "react";
 import IndividualApplicant from "./IndividualApplicant/IndividualApplicant";
-import Pagination from "../../components/UI/Pagination/Pagination";
+import Pagination from "../../common/Pagination/Pagination";
 
 class ApplicantList extends Component {
   constructor() {

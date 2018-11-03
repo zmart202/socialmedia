@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import TextAreaFieldGroup from "../../../components/UI/Form/TextAreaFieldGroup";
+import TextAreaFieldGroup from "../../../common/Form/TextAreaFieldGroup";
 import PostFeed from "./PostFeed";
 
 class Messaging extends Component {

@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 
-import Spinner from "../../components/UI/Spinner/Spinner";
-import TextAreaFieldGroup from "../../components/UI/Form/TextAreaFieldGroup";
-import TextFieldGroup from "../../components/UI/Form/TextFieldGroup";
+import Spinner from "../../common/Spinner/Spinner";
+import TextAreaFieldGroup from "../../common/Form/TextAreaFieldGroup";
+import TextFieldGroup from "../../common/Form/TextFieldGroup";
 
 class EditJob extends Component {
   constructor(props) {

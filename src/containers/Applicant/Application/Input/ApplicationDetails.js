@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 
-import Spinner from "../../../../components/UI/Spinner/Spinner";
-import TextAreaFieldGroup from "../../../../components/UI/Form/TextAreaFieldGroup";
+import Spinner from "../../../../common/Spinner/Spinner";
+import TextAreaFieldGroup from "../../../../common/Form/TextAreaFieldGroup";
 import "./Profile/Profile.css";
 
 class ApplicationDetails extends Component {
@@ -22,45 +22,42 @@ class ApplicationDetails extends Component {
       });
     }
 
-    this.setState({
-      isLoading: true
-    }, () => {
-      const options = {
-        headers: {
-          "Content-Type": "application/pdf"
-        },
-        method: "POST",
-        body: this.state.resume
-      };
+    this.setState(
+      {
+        isLoading: true
+      },
+      () => {
+        const options = {
+          headers: {
+            "Content-Type": "application/pdf"
+          },
+          method: "POST",
+          body: this.state.resume
+        };
 
-      const {
-        companyId,
-        applicantId,
-        jobId
-      } = this.props;
+        const { companyId, applicantId, jobId } = this.props;
 
-      fetch(
-        `/api/resume/${companyId}/${applicantId}/${jobId}`
-      , options)
-      .then(res => res.json())
-      .then(data => {
-        console.log(data);
-        if (!data.success) {
-          return this.setState({
-            isLoading: false,
-            errorMsg: "Could not upload resume"
+        fetch(`/api/resume/${companyId}/${applicantId}/${jobId}`, options)
+          .then(res => res.json())
+          .then(data => {
+            console.log(data);
+            if (!data.success) {
+              return this.setState({
+                isLoading: false,
+                errorMsg: "Could not upload resume"
+              });
+            }
+            this.setState({
+              isLoading: false,
+              success: true,
+              successMsg: "Uploaded resume!"
+            });
+          })
+          .catch(err => {
+            console.error(err);
           });
-        }
-        this.setState({
-          isLoading: false,
-          success: true,
-          successMsg: "Uploaded resume!"
-        })
-      })
-      .catch(err => {
-        console.error(err);
-      })
-    });
+      }
+    );
   };
 
   selectFile = e =>
@@ -77,18 +74,25 @@ class ApplicationDetails extends Component {
           <label>Application Details</label>
         </div>
         <div className="profileinput">
-          {
-            isLoading ?
-              <Spinner /> :
-              success ?
-                <p style={{ color: 'green' }}>Uploaded resume!</p> :
-                <div>
-                  <label htmlFor="resume">Resume:</label>
-                  <input type="file" accept=".pdf" name="resume" onChange={this.selectFile} />
-                  <button type="button" onClick={this.uploadResume}>Upload</button>
-                  <p style={{ color: 'red' }}>{errorMsg}</p>
-                </div>
-          }
+          {isLoading ? (
+            <Spinner />
+          ) : success ? (
+            <p style={{ color: "green" }}>Uploaded resume!</p>
+          ) : (
+            <div>
+              <label htmlFor="resume">Resume:</label>
+              <input
+                type="file"
+                accept=".pdf"
+                name="resume"
+                onChange={this.selectFile}
+              />
+              <button type="button" onClick={this.uploadResume}>
+                Upload
+              </button>
+              <p style={{ color: "red" }}>{errorMsg}</p>
+            </div>
+          )}
           <TextAreaFieldGroup
             name="coverLetter"
             placeholder="Cover Letter"

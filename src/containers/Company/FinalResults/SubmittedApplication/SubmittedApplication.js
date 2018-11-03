@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import ResultsHeader from "../ResultsHeader";
-import Spinner from "../../../../components/UI/Spinner/Spinner";
+import Spinner from "../../../../common/Spinner/Spinner";
 import CompanyNav from "../../CompanyNav/CompanyNav";
 import "./SubmittedApplication.css";
 

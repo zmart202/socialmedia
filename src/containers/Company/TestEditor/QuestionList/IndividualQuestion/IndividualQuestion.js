@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 
 import EditQuestion from "../../EditQuestion";
-import ActionButtons from "../../../../../components/UI/Buttons/ActionButtons";
-import Spinner from "../../../../../components/UI/Spinner/Spinner";
+import ActionButtons from "../../../../../common/Buttons/ActionButtons";
+import Spinner from "../../../../../common/Spinner/Spinner";
 import "./IndividualQuestion.css";
 
 class IndividualQuestion extends Component {

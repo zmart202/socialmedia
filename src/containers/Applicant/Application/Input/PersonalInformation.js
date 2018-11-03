@@ -1,5 +1,5 @@
 import React from "react";
-import TextFieldGroup from "../../../../components/UI/Form/TextFieldGroup";
+import TextFieldGroup from "../../../../common/Form/TextFieldGroup";
 import "./PersonalInformation.css";
 
 const personalInformation = props => {
@@ -13,8 +13,7 @@ const personalInformation = props => {
         <TextFieldGroup
           name="firstName"
           invalidField={
-            props.invalidFields.find(x => x === "firstName") ?
-              true : false
+            props.invalidFields.find(x => x === "firstName") ? true : false
           }
           placeholder="First Name"
           type="text"
@@ -27,8 +26,7 @@ const personalInformation = props => {
           name="lastName"
           placeholder="Last Name"
           invalidField={
-            props.invalidFields.find(x => x === "lastName") ?
-              true : false
+            props.invalidFields.find(x => x === "lastName") ? true : false
           }
           type="text"
           onChange={props.handleChange}
@@ -40,8 +38,7 @@ const personalInformation = props => {
           name="address"
           placeholder="Address"
           invalidField={
-            props.invalidFields.find(x => x === "address") ?
-              true : false
+            props.invalidFields.find(x => x === "address") ? true : false
           }
           type="text"
           onChange={props.handleChange}
@@ -52,8 +49,7 @@ const personalInformation = props => {
         <TextFieldGroup
           name="city"
           invalidField={
-            props.invalidFields.find(x => x === "city") ?
-              true : false
+            props.invalidFields.find(x => x === "city") ? true : false
           }
           placeholder="City"
           type="text"
@@ -66,8 +62,7 @@ const personalInformation = props => {
           name="state"
           placeholder="State"
           invalidField={
-            props.invalidFields.find(x => x === "state") ?
-              true : false
+            props.invalidFields.find(x => x === "state") ? true : false
           }
           type="text"
           onChange={props.handleChange}
@@ -79,8 +74,7 @@ const personalInformation = props => {
           name="zipCode"
           placeholder="ZIP Code"
           invalidField={
-            props.invalidFields.find(x => x === "zipCode") ?
-              true : false
+            props.invalidFields.find(x => x === "zipCode") ? true : false
           }
           type="text"
           onChange={props.handleChange}
@@ -92,8 +86,7 @@ const personalInformation = props => {
           name="phone"
           placeholder="Phone"
           invalidField={
-            props.invalidFields.find(x => x === "phone") ?
-              true : false
+            props.invalidFields.find(x => x === "phone") ? true : false
           }
           type="text"
           onChange={props.handleChange}
@@ -105,8 +98,7 @@ const personalInformation = props => {
           name="email"
           placeholder="Email"
           invalidField={
-            props.invalidFields.find(x => x === "email") ?
-              true : false
+            props.invalidFields.find(x => x === "email") ? true : false
           }
           type="text"
           onChange={props.handleChange}
